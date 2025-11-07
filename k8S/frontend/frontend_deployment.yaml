@@ -10,6 +10,25 @@ spec:
       app: frontend-webapp
   # deployment order replicaset controller to keep 3 instances of these pods always running
   replicas: 3
+   # Add the rolling update strategy here
+   # It is very imporant to add a rollout strategy, specially when add required anti affinity rules
+   # required anti affinity rules will block creation of new pods on new nodes
+   # in my case, I had three nodes each running one pod for high avaibaility
+   # I then changed the image and performed a rolling update
+   # the rolling update litterally blocked the new pods from beeing created because kubernetes cannot create pods on the same node as an existing one with the same name (please check the podAntyAffinity section)
+   # We can customize the rolling update to be more or less strict with configuring the surge (number of extra pods that are created before they become the new truth about the deployment) and the maxUnavailable (which is the number of the concurrent unavailable pods)
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      # The surge is the number of extra pods that the rolling update creates
+      # in order to apply a rollout.
+      # Kubernetes blocks requests to the old pods and redirects them to new pods 
+      # that are based on the new deployment (traffic redirection during rolling update)
+      # If set to zero, there will be brief downtime since no new pods run in parallel
+      maxSurge: 0
+      # The number of unavailable pods at one time. This means that requests 
+      # will be temporarily reduced during the update
+      maxUnavailable: 1
   # pod definition section
   template:
     # metadata around the pod
@@ -43,7 +62,7 @@ spec:
       # can be multiple containers since one pod scan contain multiple containers
       - name: frontend-webapp
         # test image from docker registry, provided by nginx project
-        image: acrdev9atwih.azurecr.io/weatherforecast-frontend:latest
+        image: acrdev9atwih.azurecr.io/weatherforecast-frontend:v2.0.0
         ports:
         - containerPort: 80
         imagePullPolicy: Always # Always pull latest version

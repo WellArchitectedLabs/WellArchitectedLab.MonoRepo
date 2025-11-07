@@ -36,11 +36,13 @@ spec:
         kubernetes.azure.com/mode: user
       affinity:
         podAntiAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-          - labelSelector:
-              matchLabels:
-                app: backend-webapp
-            topologyKey: kubernetes.io/hostname
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchLabels:
+                  app: backend-webapp
+              topologyKey: kubernetes.io/hostname
       containers:
       # can be multiple containers since one pod scan contain multiple containers
       - name: backend-webapp

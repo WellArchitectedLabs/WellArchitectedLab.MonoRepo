@@ -8,5 +8,6 @@ RUN dotnet publish -c Release -o /release/publish
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
 WORKDIR /app
 COPY --from=build /release/publish .
-EXPOSE 8080
+EXPOSE 80
+ENV ASPNETCORE_URLS=http://+:80
 ENTRYPOINT [ "dotnet", "WeatherForecast.Api.dll" ]

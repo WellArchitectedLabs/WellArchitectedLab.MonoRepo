@@ -3,7 +3,7 @@ kind: PodDisruptionBudget
 metadata:
   name: pdb-backend-app
 spec:
-  minAvailable: 3
+  minAvailable: 1
   selector:
     matchLabels:
       app: backend-webapp

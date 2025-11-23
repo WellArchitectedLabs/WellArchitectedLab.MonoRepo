@@ -1,3 +1,6 @@
+# Ingress is obsolete starting march 2026
+# It is replaced by a combination of gateway classes, gateway apis and http routes 
+# Please check teh gateway api folder for better understanding of the replaced definitions
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:

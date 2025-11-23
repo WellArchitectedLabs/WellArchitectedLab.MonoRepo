@@ -7,4 +7,4 @@ metadata:
 data:
   appSettings.yaml: |
     # yaml file
-    backend_url: http://api.weatherly
+    backend_url: http://api.weatherly.local:8080

@@ -23,7 +23,7 @@ spec:
     spec:
       # give pod 30 seconds to shit down after kube sends SIGTERM signal
       terminationGracePeriodSeconds: 30
-      # Where will I tolerate my pods to run 
+      # Where will I tolerate my pods to run
       # These do not restrict the pod from running on nodes that do not have the provided taint
       tolerations:
       - key: workload
@@ -47,7 +47,7 @@ spec:
       # can be multiple containers since one pod scan contain multiple containers
       - name: backend-webapp
         # test image from docker registry, provided by nginx project
-        image: aacrdevzlj7yj.azurecr.io/weatherforecast-backend:latest
+        image: acrdevzlj7yj.azurecr.io/weatherforecast-backend:latest
         ports: 
         - containerPort: 80
         imagePullPolicy: Always  # Always pull latest

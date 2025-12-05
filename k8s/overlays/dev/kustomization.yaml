@@ -5,6 +5,7 @@ resources:
   - ../../manifests/backend
   - ../../manifests/frontend
   - ../../manifests/shared
+  - ../../manifests/database
 
 namePrefix: dev-
 nameSuffix: ""

@@ -14,8 +14,8 @@ services:
     depends_on:
       - redis
     environment:
-      WEATHERFORECAST__REDIS__READDBCONNECTION: "redis:6379,abortConnect=false"
-      WEATHERFORECAST__REDIS__WRITEDBCONNECTION: "redis:6379,abortConnect=false"
+      WEATHERFORECAST__REDIS__READDBCONNECTION: "redis:6379,abortConnect=false,connectRetry=10"
+      WEATHERFORECAST__REDIS__WRITEDBCONNECTION: "redis:6379,abortConnect=false,connectRetry=10"
       ASPNETCORE_ENVIRONMENT: "Development"
     ports:
       - "5000:80"
@@ -28,8 +28,8 @@ services:
       - backend
     environment:
       # Point frontend to backend container
-      BACKEND_URL: "http://backend:80"
+      BACKEND_URL: "http://backend:5000"
     container_name: frontend
     ports:
-      - "8080:8080"
+      - "8080:80"
     restart: always

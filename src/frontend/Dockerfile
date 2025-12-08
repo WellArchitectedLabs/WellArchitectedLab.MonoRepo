@@ -10,7 +10,6 @@ COPY package*.json ./
 # Copy template config and entrypoint script
 COPY config/appSettings.template.yaml /src/config/appSettings.template.yaml
 COPY docker-entrypoint.sh /src/docker-entrypoint.sh
-RUN chmod +x /src/docker-entrypoint.sh
 
 # Install dependencies
 RUN npm install

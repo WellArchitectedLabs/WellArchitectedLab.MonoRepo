@@ -20,7 +20,7 @@ jobs:
             
             - name: Build weather forecast API image
               run: |
-                docker build -t  ${{ secrets.ACR_LOGIN_SERVER }}/weather-forecast-api:latest .src/weather-forecast-api
+                docker build -t  ${{ secrets.ACR_LOGIN_SERVER }}/weather-forecast-api:latest ./src/weather-forecast-api
             
             - name: Push docker image
               run: |
@@ -41,7 +41,7 @@ jobs:
             
             - name: Build weather foreacst frontend image
               run: |
-                docker build -t ${{ secrets.ACR_LOGIN_SERVER }}/weather-forecast-frontend .src/weather-forecast-frontend
+                docker build -t ${{ secrets.ACR_LOGIN_SERVER }}/weather-forecast-frontend ./src/weather-forecast-frontend
 
             - name: Push docker image
               run: |

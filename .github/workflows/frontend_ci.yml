@@ -1,0 +1,17 @@
+name: Build & Push Frontend Image to ACR
+
+on:
+    push:
+        paths:
+          - "src/weather-forecast-frontend/**"
+    pull_request:
+        paths:
+          - "src/weather-forecast-frontend/**"
+
+jobs:
+    call-template:
+        uses: ./.github/workflows/docker.ci.template.yml
+        with:
+            service_name: weather-forecast-frontend
+            service_path: src/weather-forecast-frontend
+            gitversion_config_path: src/weather-forecast-frontend/GitVersion.yml

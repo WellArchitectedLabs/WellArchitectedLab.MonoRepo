@@ -1,0 +1,60 @@
+name: Docker buld and push template
+on:
+    workflow_call:
+        inputs:
+            service_name:
+                required: true
+                type: string
+            service_path:
+                required: true
+                type: string
+            gitversion_config_path:
+                required: true
+                type: string
+
+jobs:
+    versionning:
+        runs-on: ubuntu-latest
+        outputs:
+            version:  ${{ steps.gitversion.outputs.semVer }}
+            sha: ${{ steps.sha.outputs.short }}
+        
+        steps:
+           - name: Install GitVersion
+             uses: gittools/actions/gitversion/setup@v0.10.2
+             with:
+                versionSpec: "5.x"
+            
+           - name: Run GitVersion
+             id: gitversion
+             uses: gittools/actions/gitversion/execute@v0.10.2
+
+           - name: Get short SHA
+             id: sha
+             run: echo "short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+
+
+    weather-forecast-api:
+        needs: versionning
+        name: Build & Push service
+        runs-on: ubuntu-latest
+        
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+              with:
+                fetch-depth: 0   # REQUIRED for GitVersion
+            
+            - name: Login to ACR
+              uses: docker/login-action@v3
+              with:
+                registry: ${{ secrets.ACR_LOGIN_SERVER }}
+                username: ${{ secrets.ACR_USERNAME }}
+                password: ${{ secrets.ACR_PASSWORD }}
+            
+            - name: Build & Push image
+              run: |
+                VERSION_TAG="${{ needs.versionning.outputs.version }}-${{ needs.versionning.outputs.sha }}"
+                IMAGE="${{ secrets.ACR_LOGIN_SERVER}}/${{ inputs.service_name }}:$VERSION_TAG}"
+                docker build -t $IMAGE ${{ inputs.service_path }}
+                docker push $IMAGE

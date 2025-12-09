@@ -41,7 +41,7 @@ jobs:
               console.log("No Weather Forecast changes detected — skipping assignment.");
             }
             else {
-                teams.push("@WellArchitectedLabs/wf-dev-team");
+                teams.push("wf-dev-team");
             }
 
             // --------------------------------------
@@ -58,7 +58,7 @@ jobs:
               console.log("No Weather Forecast changes detected — skipping assignment.");
             }
             else {
-                teams.push("@WellArchitectedLabs/devops-team");
+                teams.push("devops-team");
             }
 
             // ---------------------------

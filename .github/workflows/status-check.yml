@@ -1,12 +1,12 @@
 name: Pull Request status check
 
 on:
-    workflow_dispatch:   # allows manual for testing
     pull_request:
         branches:
           - main
           - develop
           - 'release/**'
+    workflow_dispatch:   # allows manual for testing
 
 jobs:
     check-build:

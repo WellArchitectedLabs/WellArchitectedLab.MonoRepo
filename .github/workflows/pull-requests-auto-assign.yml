@@ -25,23 +25,21 @@ jobs:
               }
             );
 
-            const teams = []
+            const teams = [];
 
             // ------------------------------
             // ✅ I - Wf-team auto-assignment
             // ------------------------------
-
 
             const wfTouched = files.some(file =>
               file.filename.startsWith("src/weather-forecast-api/") ||
               file.filename.startsWith("src/weather-forecast-frontend/")
             );
 
-            if (!wfTouched) {
-              console.log("No Weather Forecast changes detected — skipping assignment.");
-            }
-            else {
-                teams.push("wf-dev-team");
+            if (wfTouched) {
+              teams.push("wf-dev-team");
+            } else {
+              console.log("No Weather Forecast changes detected — skipping wf-dev-team assignment.");
             }
 
             // --------------------------------------
@@ -54,22 +52,52 @@ jobs:
               file.filename.startsWith(".github")
             );
 
-            if (!devOpsTouched) {
-              console.log("No Weather Forecast changes detected — skipping assignment.");
-            }
-            else {
-                teams.push("devops-team");
+            if (devOpsTouched) {
+              teams.push("devops-team");
+            } else {
+              console.log("No DevOps changes detected — skipping devops-team assignment.");
             }
 
             // ---------------------------
             // Committing all reviewers
             // ---------------------------
 
-            await github.rest.pulls.requestReviewers({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              pull_number: context.payload.pull_request.number,
-              team_reviewers: ["devops-team"]
-            });
-            
-            console.log("✅ Team assignment completed successfully.");
+            // Deduplicate team slugs
+            const uniqueTeams = [...new Set(teams)];
+            const org = context.repo.owner;
+            const validTeams = [];
+
+            for (const slug of uniqueTeams) {
+              try {
+                // Validate team exists in the org
+                await github.request('GET /orgs/{org}/teams/{team_slug}', {
+                  org,
+                  team_slug: slug
+                });
+                validTeams.push(slug);
+              } catch (err) {
+                if (err.status === 404) {
+                  console.log(`Team not found: ${slug} — skipping.`);
+                } else {
+                  console.log(`Error checking team ${slug}: ${err.message}`);
+                }
+              }
+            }
+
+            if (validTeams.length === 0) {
+              console.log("No valid team reviewers found — skipping team request.");
+            } else {
+              try {
+                await github.rest.pulls.requestReviewers({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  pull_number: context.payload.pull_request.number,
+                  team_reviewers: validTeams
+                });
+                console.log("✅ Team assignment completed successfully:", validTeams);
+              } catch (err) {
+                console.log("Failed to request team reviewers:", err.message);
+                console.log(JSON.stringify(err, Object.getOwnPropertyNames(err)));
+                throw err;
+              }
+            }

@@ -73,4 +73,3 @@ jobs:
             });
             
             console.log("✅ Team assignment completed successfully.");
-

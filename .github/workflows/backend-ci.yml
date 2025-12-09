@@ -1,4 +1,4 @@
-name: Build & Push Weather Forecast API to Docker Registry
+name: Build & Push Weather Forecast Backend
 
 on:
     push:
@@ -10,7 +10,7 @@ on:
           - "src/weather-forecast-api/**"
 
 jobs:
-    backend-dockerBuildAndPush:
+    Backend-buildAndPush:
         uses: ./.github/workflows/ci-template.yml
         with:
             service_name: weather-forecast-api

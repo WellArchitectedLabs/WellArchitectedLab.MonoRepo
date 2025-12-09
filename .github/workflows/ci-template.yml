@@ -1,4 +1,4 @@
-name: Docker buld and push template
+name: (Template) Docker buld and push
 on:
     workflow_call:
         inputs:
@@ -21,7 +21,7 @@ on:
 
 
 jobs:
-    versionning:
+    Versionning:
         runs-on: ubuntu-latest
         outputs:
             version:  ${{ steps.gitversion.outputs.semVer }}
@@ -50,8 +50,8 @@ jobs:
              run: echo "short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
 
 
-    weather-forecast-api:
-        needs: versionning
+    BuildAndPushImage:
+        needs: Versionning
         name: Build & Push service
         runs-on: ubuntu-latest
         

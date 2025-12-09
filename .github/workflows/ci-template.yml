@@ -65,7 +65,7 @@ jobs:
               run: |
                 VERSION_TAG="${{ needs.versionning.outputs.version }}-${{ needs.versionning.outputs.sha }}"
                 IMAGE="${{ secrets.ACR_LOGIN_SERVER }}/${{ inputs.service_name }}:$VERSION_TAG"
-                echo "IMAGE=$IMAGE" >> $GITHUB_OUTPUT
+                echo "IMAGE=$IMAGE" >> $GITHUB_ENV
             
             # Only push to registry when flag is true
             - name: Login to ACR

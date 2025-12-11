@@ -1,0 +1,27 @@
+name: Status Check - Backend Pull Request Build
+
+on:
+    pull_request:
+        branches:
+          - develop
+          - main
+          - 'release/**'
+        paths:
+          - src/weather-forecast-frontend/**
+    workflow_dispatch:  # allows manual testing
+
+jobs:
+  backend-buildCheck:
+    uses: ./.github/workflows/ci-template.yml
+    with:
+        service_name: weather-forecast-api
+        gitversion_config_path: src/weather-forecast-api/GitVersion.yml
+        #status check doesn't push into ACR
+        push_to_registry: false
+        service_path: src/weather-forecast-api
+    secrets:
+        ACR_LOGIN_SERVER: ${{ secrets.ACR_LOGIN_SERVER }}
+        ACR_PASSWORD : ${{ secrets.ACR_PASSWORD }}
+        ACR_USERNAME: ${{ secrets.ACR_USERNAME }}
+
+    

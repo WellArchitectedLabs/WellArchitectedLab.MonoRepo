@@ -17,6 +17,12 @@ coverage:
         if_ci_failed: error
         informational: false
         only_pulls: false
+        ignore:
+          # We don't cover startup files and related startup extensions to prevent overkill coverage
+          - "**/Program.cs"
+          - "**/ServiceCollectionExtensions.cs"
+          - "**/WebApplicationBuilderExtensions.cs"
+          - "**/WebApplicationExtensions.cs"
       weather-forecast-frontend:
         paths:
           - src/weather-forecast-frontend/**

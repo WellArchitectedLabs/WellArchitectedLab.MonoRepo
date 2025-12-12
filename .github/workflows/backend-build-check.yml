@@ -7,12 +7,13 @@ on:
           - main
           - 'release/**'
         paths:
-          - src/weather-forecast-backend/**
+          - src/weather-forecast-api/**
     workflow_dispatch:  # allows manual testing
 
 jobs:
   backend-buildCheck:
     uses: ./.github/workflows/ci-template.yml
+    name: Backend Status Check - Try package docker image
     with:
         service_name: weather-forecast-api
         gitversion_config_path: src/weather-forecast-api/GitVersion.yml

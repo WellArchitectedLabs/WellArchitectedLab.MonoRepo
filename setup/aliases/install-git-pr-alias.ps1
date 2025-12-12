@@ -15,7 +15,7 @@ if (-not $RepoRoot) {
 # -----------------------------
 # Define path to create-pr.ps1 (relative to repo root)
 # -----------------------------
-$ScriptRelativePath = "setup/git/scripts/create-pr.ps1"
+$ScriptRelativePath = "setup/aliases/scripts/create-pr.ps1"
 $ScriptFullPath = Join-Path $RepoRoot $ScriptRelativePath
 
 if (-not (Test-Path $ScriptFullPath)) {

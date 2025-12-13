@@ -149,8 +149,18 @@ All GitHub Actions workflows live here. They automate builds, tests, releases an
 
 ### `.github/PULL_REQUEST_TEMPLATE/`
 
-Contains PR templates used to standardize contribution details, checklist and required information for reviewers. This helps maintain quality and ensures important information (testing, migration steps, security considerations) is included in each PR.
-The Pull Request Templates are used by git pr alias that you can install via installation script placed under `scripts/git` folder — **see**: https://github.com/WellArchitectedLabs/WellArchitectedLab.MonoRepo/tree/develop/scripts/git/aliases. 
+Contains PR templates used to standardize contribution details, checklist and required information for reviewers. This helps maintain quality and ensures important information (testing, migration steps, security considerations) is included in each PR. The Pull Request Templates are used by git pr alias that you can install via installation script placed under scripts/git folder — see: https://github.com/WellArchitectedLabs/WellArchitectedLab.MonoRepo/tree/develop/scripts/git/aliases.
+
+### Pull Request workflows:
+As for an enterprise scale platform, the pull request validation validation is gated by status checks.
+
+Status check workflow files are prefixed by pull-request:
+- `pull-requests_checklist-enforcer.yml`: Enforces pull creator clicked on all PR template checkboxes.
+- `pull-requests-wf-auto-assign.yml`: Auto assigns responsable teams to PRs based on the modified code. Very useful for mono repo setups. Teams are added on github organization level. In our case a parent team named wf-team was added with two child teams: wf-backend-- team and wf-frontend-team. A deveops-team is also created in the same hierarchy as wf-team.
+- `pull-requests_wf-codeql-analysis.yml`: Runs CodeQL, github's security check tool.
+- `pull-requests_wf-auto-label.yml`: Add label to pull requests based on the changed file. Typically the weather forecast api pull requests will be labeled as backend and weather-forecast. Labels are very useful for PR grouping and filtering.
+- `pull-request_weather-forecast-api-status-check.yml`: Runs a dry-run for weather forecast backend API CI workflow are is later launched on develop / main pushes.
+- `pull-request_weather-forecast-frontend-status-check.yml`: Runs a dry-run for weather forecast frontend CI workflow are is later launched on develop / main pushes.
 
 ---
 

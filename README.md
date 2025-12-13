@@ -9,12 +9,12 @@
 ## Table of contents
 
 - Introduction
-- Repository layout (one major section per root folder)
-  - `.github/` (workflows & PR templates)
-  - `iac/` (Infrastructure as Code)
-  - `k8s/` (Kubernetes manifests & AKS setup)
+- Repository layout
+  - `.github/` (github actions workflows & PR templates)
+  - `iac/` (Infrastructure as Code with Terraform)
+  - `k8s/` (Kubernetes manifests, overlays & AKS setup)
   - `src/` (application source, tests, docker-compose)
-  - `setup/` (aliases & helper scripts)
+  - `setup/` (repository setup for contributors and generalistic dev experience scripts)
 - Running the solution locally
 - Developer & DevOps notes
 - Contributing

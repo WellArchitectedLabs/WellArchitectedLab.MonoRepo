@@ -207,8 +207,9 @@ The implemented platform integrates with CodeCov: https://about.codecov.io/. Cod
 2. Change directory into `iac/` and follow any environment-specific variables or `README` inside `iac/` (if present).
 3. Run the standard Terraform flow (`terraform init`, `terraform plan`, `terraform apply`) or the equivalent ARM/az CLI flows described in the folder.
 
-**Notes about ACR & AKS attachment:**
-The repository uses (for demo) a permissive ACR access approach: the README documents that ACR was left public to avoid needing premium private endpoints. The recommended production approach is to use private endpoints or managed identity + role assignments. A sample `az aks --attach-acr` command is documented in the repo to attach ACR to the AKS cluster.
+**Notes about ACR & AKS attachment:** 
+
+ACR was left public to avoid needing premium private endpoints. The recommended production approach is to use private endpoints or managed identity + role assignments. A sample `az aks --attach-acr` command is documented in the repo to attach ACR to the AKS cluster.
 
 ---
 

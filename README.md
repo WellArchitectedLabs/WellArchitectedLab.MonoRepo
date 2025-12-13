@@ -24,15 +24,108 @@
 
 # Introduction
 
-This mono-repo demonstrates a production-minded, full-stack microservices reference platform. It was assembled to teach and prove the complete delivery lifecycle: local development, automated testing, containerization, infrastructure provisioning (IaC), Kubernetes cluster management (AKS), CI using GitHub Actions, and continuous delivery using GitOps (Argo CD). The repo is intentionally opinionated: it shows how the pieces connect so you can reuse patterns directly in real projects or list it as a demonstrated project on your CV.
+This mono-repo demonstrates a production-minded, full-stack microservices reference platform. It was assembled to teach and prove the complete delivery lifecycle: local development, automated testing, containerization, infrastructure provisioning (IaC), Kubernetes cluster management (AKS), CI using GitHub Actions, and continuous delivery using GitOps (Argo CD). The repo is intentionally opinionated.
 
 Key intentions:
-- Keep a single repository containing all artifacts needed to build, test, package and deploy the example microservices.
+- Keep a single repository containing all artifacts needed to build, test, package and deploy a sample weather forecast app.
 - Provide IaC templates so the platform can be provisioned in Azure (AKS, ACR, networking, RGs, etc.).
 - Illustrate GitHub Actions-based CI and GitOps with Argo CD for delivery.
-- Make it easy for a developer to run everything locally using the provided `docker-compose` (under `src/`).
+- Implement an enterprise grade shitft-left workflows for securely packaging, testing and deploying docker images into AKS clusters.
 
 ---
+# Technical Architecture
+
+The following diagram models the intended technical architecture.
+
+- All workloads are hosted in Azure Kubernetes Services.
+- Manifests are added in k8s folder in this same repo and are watched by ArgoCd for instant sync.
+- AKS exposes the workloads using a frontend and a backend Gateway API + Http Routes.
+- Images are built by specific CI tools that integrate with github actions, under .github/workflows folder.
+
+```mermaid
+%% AKS / k8s resource relationship diagram
+flowchart TB
+
+    %% =========================
+    %% Style Definitions
+    %% =========================
+    classDef infra fill:#2a4b8d,stroke:#1e325c,color:#ffffff;
+    classDef acr fill:#1b5e20,stroke:#0d3b12,color:#ffffff;
+    classDef ci fill:#4e342e,stroke:#3e2723,color:#ffffff;
+    classDef gitops fill:#004d40,stroke:#00332b,color:#ffffff;
+    classDef app fill:#6a1b9a,stroke:#4a136c,color:#ffffff;
+    classDef net fill:#b71c1c,stroke:#7f1313,color:#ffffff;
+    classDef policy fill:#37474f,stroke:#000000,color:#ffffff;
+    classDef external fill:#263238,stroke:#000000,color:#ffffff;
+
+    %% =========================
+    %% External Access
+    %% =========================
+    Internet(("Internet")):::external
+
+    %% =========================
+    %% CI Pipeline
+    %% =========================
+    CI["CI Pipeline\nBuild Test Version"]:::ci
+    Image["Versioned Container Image"]:::acr
+    CI -->|Build and Push| Image
+
+    %% =========================
+    %% Container Registry
+    %% =========================
+    ACR["Azure Container Registry"]:::acr
+    Image --> ACR
+
+    %% =========================
+    %% GitOps
+    %% =========================
+    GitRepo["Git Repo\nk8s Manifests"]:::gitops
+    Argo["ArgoCD"]:::gitops
+    GitRepo -->|Detect Changes| Argo
+
+    %% =========================
+    %% AKS Cluster
+    %% =========================
+    AKS["AKS Cluster"]:::infra
+    Argo -->|Sync Desired State| AKS
+
+    subgraph Workloads["Workloads in AKS"]
+        direction TB
+
+        %% Traffic entry
+        Gateway["Gateway API"]:::net
+        HTTPRoute["HTTPRoute"]:::net
+        SVC["Service"]:::app
+
+        %% Compute
+        Deploy1["Deployment"]:::app
+        Pods["Pods"]:::app
+
+        %% Policies
+        HPA["HPA"]:::policy
+        PDB["PDB"]:::policy
+
+        %% Traffic flow
+        Gateway --> HTTPRoute
+        HTTPRoute --> SVC
+        SVC --> Pods
+
+        %% Pod lifecycle
+        Deploy1 -->|Create| Pods
+
+        %% Control plane
+        HPA -->|Scale Replicas| Deploy1
+        PDB -->|Guarantee Availability| Pods
+    end
+
+    %% =========================
+    %% Cross-boundary relations
+    %% =========================
+    Internet -->|HTTP HTTPS| Gateway
+    ACR -->|Pull Image| Deploy1
+    Argo -->|Apply Manifests| Workloads
+```
+
 
 # Repository layout
 

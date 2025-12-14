@@ -82,7 +82,7 @@ spec:
             port: 80
           initialDelaySeconds: 30
           timeoutSeconds: 10
-        volumes:
-        - name: config
-          configMap:
-            name: backend-configmap
+      volumes:
+      - name: config
+        configMap:
+          name: backend-configmap

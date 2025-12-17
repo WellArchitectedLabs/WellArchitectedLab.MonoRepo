@@ -8,5 +8,5 @@ spec:
   - port: 6379
   selector:
     # writes are directed to redis-0 pod
-    statefulset.kubernetes.io/pod-name: redis-0
+    statefulset.kubernetes.io/pod-name: dev-redis-0
   type: ClusterIP

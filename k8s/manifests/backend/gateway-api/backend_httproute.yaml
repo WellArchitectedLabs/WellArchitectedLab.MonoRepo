@@ -17,6 +17,6 @@ spec:
             type: PathPrefix
             value: /
       backendRefs:
-        - name: backend-service
+        - name: dev-backend-service
           port: 8080
           namespace: default

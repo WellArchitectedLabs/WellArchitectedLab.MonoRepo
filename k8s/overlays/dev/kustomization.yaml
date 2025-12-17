@@ -11,5 +11,5 @@ resources:
 namePrefix: dev-
 nameSuffix: ""
 
-patches: 
+patchesStrategicMerge: 
   - patch-frontend-httproute.yaml

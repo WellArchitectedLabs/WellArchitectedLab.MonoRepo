@@ -31,9 +31,13 @@ spec:
           - /bin/sh
           - -c
           - |
-            if [ "$POD_NAME" = "dev-redis-0" ]; then
-              exec redis-server --appendonly no --replicaof no one
+           if [ "$POD_NAME" = "dev-redis-0" ]; then
+              exec redis-server --appendonly no
             else
+              echo "Waiting for master DNS..."
+              until redis-cli -h dev-redis-0.dev-redis -p 6379 PING; do
+                sleep 2
+              done
               exec redis-server --appendonly yes --replicaof dev-redis-0.dev-redis 6379
             fi
   volumeClaimTemplates:

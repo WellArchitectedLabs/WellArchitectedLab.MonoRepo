@@ -7,3 +7,10 @@ nameReference:
         version: v1
         group: gateway.networking.k8s.io
         path: spec/parentRefs/name
+  - kind: HTTPRoute
+    version: v1
+    group: gateway.networking.k8s.io/v1
+    fieldSpecs:
+      - kind: Service
+        version: v1
+        path: spec/rules/backendRefs/name

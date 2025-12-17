@@ -12,3 +12,6 @@ resources:
   - gateway-api/frontend_httproute.yaml
   - gateway-api/frontend_service.yaml
   - config/frontend_config-map.yaml
+
+configurations:
+  - kustomizeconfig.yaml

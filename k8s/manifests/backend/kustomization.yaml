@@ -12,3 +12,6 @@ resources:
   - gateway-api/backend_httproute.yaml
   - gateway-api/backend_reference-grant.yaml
   - gateway-api/backend_service.yaml
+
+configurations:
+  - kustomizeconfig.yaml

@@ -18,4 +18,11 @@ patches:
       kind: HTTPRoute
       name: frontend-httproute
       namespace: nginx-gateway          # ✅ specify actual namespace
-    path: patch-frontend-httproute.yaml
+    path: patches/patch-frontend-httproute.yaml
+  - target:
+      group: gateway.networking.k8s.io
+      version: v1
+      kind: HTTPRoute
+      name: frontend-httproute
+      namespace: nginx-gateway          # ✅ specify actual namespace
+    path: patches/patch-backend-httproute.yaml

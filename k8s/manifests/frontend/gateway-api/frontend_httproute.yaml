@@ -5,7 +5,7 @@ metadata:
   namespace: nginx-gateway
 spec:
   parentRefs:
-    - name: frontend-gateway
+    - name: dev-frontend-gateway
       # maps to listener named http in backend-gateway (useful for gateways with multiple listeners)
       sectionName: http
   hostnames:

@@ -18,7 +18,7 @@ COPY . .
 # Grant access to vite modules
 RUN chmod +x ./node_modules/.bin/vite
 
-# Build (optional if your image serves static files)
+# Build
 RUN npm run build
 
 # packaging stage

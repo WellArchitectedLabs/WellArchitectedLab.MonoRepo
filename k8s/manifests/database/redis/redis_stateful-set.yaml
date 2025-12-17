@@ -31,15 +31,10 @@ spec:
           - /bin/sh
           - -c
           - |
-            # If this is redis-0 → start as primary
-            if [[ "$POD_NAME" == "redis-0" ]]; then
+            if [ "$POD_NAME" = "redis-0" ]; then
               exec redis-server --appendonly no
-            
-            # For all other pods → start as replicas
             else
-              exec redis-server \
-                --appendonly yes \
-                --replicaof redis-0.redis 6379
+              exec redis-server --appendonly yes --replicaof redis-0.redis 6379
             fi
   volumeClaimTemplates:
   - metadata:

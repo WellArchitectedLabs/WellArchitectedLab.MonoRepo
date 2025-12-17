@@ -17,4 +17,4 @@ nameReference:
       - kind: HTTPRoute
         group: gateway.networking.k8s.io
         version: v1
-        path: spec/rules/backendRefs/name
+        path: spec/rules[]/backendRefs[]/name

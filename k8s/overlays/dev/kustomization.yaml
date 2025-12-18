@@ -22,7 +22,7 @@ configMapGenerator:
   - name: redisconfigenvs
     literals:
       # used by redis in order to configure the replication mecanism
-      - REDIS_HEADLESS_SERVICE=redis
+      - REDIS_HEADLESS_SERVICE=dev-redis
       - ENV_NAME=dev
     options:
       disableNameSuffixHash: true

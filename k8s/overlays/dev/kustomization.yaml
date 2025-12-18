@@ -19,11 +19,10 @@ commonLabels:
 # config map generators are used here in order to update the pods as the config changes
 # this will created a config which is suffixed by the hash of the config content. Something like 
 configMapGenerator:
-  - name: redisconfigenvs
+  - name: redisconfigenvvars
     literals:
       # used by redis in order to configure the replication mecanism
       - REDIS_HEADLESS_SERVICE=dev-redis
-      - ENV_NAME=dev
     options:
       disableNameSuffixHash: true
 

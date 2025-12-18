@@ -11,18 +11,31 @@ resources:
 namePrefix: dev-
 nameSuffix: ""
 
+# adds a metadata.label for every resource created by this kustomize hop
+commonLabels:
+  environment: dev
+
+# we need to track the environment in order to use it on pod level
+# config map generators are used here in order to update the pods as the config changes
+# this will created a config which is suffixed by the hash of the config content. Something like 
+configMapGenerator:
+  - name: redisConfigEnvs
+    literals:
+      # used by redis in order to configure the replication mecanism
+      - REDIS_HEADLESS_SERVICE=dev-redis
+
 patches:
   - target:
       group: gateway.networking.k8s.io
       version: v1
       kind: HTTPRoute
       name: frontend-httproute
-      namespace: nginx-gateway          # ✅ specify actual namespace
+      namespace: nginx-gateway
     path: patches/patch-frontend-httproute.yaml
   - target:
       group: gateway.networking.k8s.io
       version: v1
       kind: HTTPRoute
       name: backend-httproute
-      namespace: nginx-gateway          # ✅ specify actual namespace
+      namespace: nginx-gateway
     path: patches/patch-backend-httproute.yaml

@@ -97,6 +97,14 @@ resource "azurerm_kubernetes_cluster_node_pool" "npuser002" {
   vm_size               = "Standard_D4ds_v5"
 }
 
+resource "azurerm_kubernetes_cluster_node_pool" "npoperations001" {
+  kubernetes_cluster_id = azurerm_kubernetes_cluster.aks-kubernetes-001.id
+  name = "npoperations001"
+  node_taints = ["worload=operations:NoSchedule"]
+  node_count = 1
+  depends_on = [ azurerm_kubernetes_cluster.aks-kubernetes-001, azurerm_kubernetes_cluster_node_pool.npuser002  ]
+}
+
 resource "azurerm_role_assignment" "cluster-registry-access" {
   principal_id                     = azurerm_kubernetes_cluster.aks-kubernetes-001.kubelet_identity[0].object_id
   scope                            = azurerm_container_registry.acr-kubernetes-001.id

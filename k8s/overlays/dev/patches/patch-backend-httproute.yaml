@@ -9,4 +9,4 @@ spec:
         # Both Vars (which are standard kubernetes primitives) and kustomizeconfig file based replacement
         - name: dev-backend-service   # prefixed Service name for dev overlay
           port: 8080
-          namespace: default
+          namespace: backend

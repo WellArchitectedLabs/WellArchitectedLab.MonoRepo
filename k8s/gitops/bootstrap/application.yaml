@@ -8,7 +8,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/medbalighhamdi/Trainings.Kubernetes.git
+    repoURL: https://github.com/WellArchitectedLabs/WellArchitectedLab.MonoRepo.git
     targetRevision: main
     path: k8s/gitops
   destination:

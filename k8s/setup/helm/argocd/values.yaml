@@ -1,0 +1,56 @@
+global:
+  image:
+    tag: ""   # let the chart decide
+
+configs:
+  params:
+    server.insecure: true
+
+server:
+  replicas: 1
+  service:
+    type: ClusterIP
+
+  nodeSelector:
+    workload: operations
+  tolerations:
+    - key: "workload"
+      operator: "Equal"
+      value: "operations"
+      effect: "NoSchedule"
+
+controller:
+  nodeSelector:
+    workload: operations
+  tolerations:
+    - key: "workload"
+      operator: "Equal"
+      value: "operations"
+      effect: "NoSchedule"
+
+repoServer:
+  nodeSelector:
+    workload: operations
+  tolerations:
+    - key: "workload"
+      operator: "Equal"
+      value: "operations"
+      effect: "NoSchedule"
+
+applicationSet:
+  nodeSelector:
+    workload: operations
+  tolerations:
+    - key: "workload"
+      operator: "Equal"
+      value: "operations"
+      effect: "NoSchedule"
+
+redis:
+  nodeSelector:
+    workload: operations
+  tolerations:
+    - key: "workload"
+      operator: "Equal"
+      value: "operations"
+      effect: "NoSchedule"

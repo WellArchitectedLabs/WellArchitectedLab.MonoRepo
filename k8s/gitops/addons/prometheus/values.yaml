@@ -1,0 +1,28 @@
+prometheus:
+  prometheusSpec:
+    nodeSelector:
+      workload: operations
+    tolerations:
+      - key: workload
+        operator: Equal
+        value: operations
+        effect: NoSchedule
+
+alertmanager:
+  enabled: true
+  nodeSelector:
+    workload: operations
+  tolerations:
+    - key: workload
+      operator: Equal
+      value: operations
+      effect: NoSchedule
+
+grafana:
+  enabled: false
+
+nodeExporter:
+  enabled: false
+
+kubeStateMetrics:
+  enabled: false

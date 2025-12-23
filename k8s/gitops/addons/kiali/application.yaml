@@ -12,17 +12,8 @@ spec:
     chart: kiali-server
     targetRevision: 1.78.0
     helm:
-      values: |
-        deployment:
-          nodeSelector:
-            workload: operations
-          tolerations:
-            - key: "workload"
-              operator: "Equal"
-              value: "operations"
-              effect: "NoSchedule"
-        auth:
-          strategy: anonymous
+      valueFiles: 
+        - values.yaml
   destination:
     server: https://kubernetes.default.svc
     namespace: kiali

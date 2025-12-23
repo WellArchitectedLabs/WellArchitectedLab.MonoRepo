@@ -16,7 +16,7 @@ spec:
         - values.yaml
   destination:
     server: https://kubernetes.default.svc
-    namespace: kiali
+    namespace: monitoring
   syncPolicy:
     automated:
       prune: true

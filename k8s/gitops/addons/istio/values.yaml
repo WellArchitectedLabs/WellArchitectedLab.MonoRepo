@@ -1,15 +1,12 @@
-global:
-  proxy:
-    resources:
-      requests:
-        cpu: 10m
-        memory: 64Mi
-      limits:
-        cpu: 100m
-        memory: 128Mi
-
 pilot:
   replicaCount: 1
+  resources:
+    requests:
+      cpu: 50m
+      memory: 256Mi
+    limits:
+      cpu: 200m
+      memory: 512Mi
   nodeSelector:
     workload: operations
   tolerations:
@@ -17,15 +14,7 @@ pilot:
       operator: "Equal"
       value: "operations"
       effect: "NoSchedule"
-  affinity:
-    nodeAffinity:
-      requiredDuringSchedulingIgnoredDuringExecution:
-        nodeSelectorTerms:
-          - matchExpressions:
-              - key: workload
-                operator: In
-                values:
-                  - operations
+
 sidecarInjectorWebhook:
   nodeSelector:
     workload: operations
@@ -34,15 +23,7 @@ sidecarInjectorWebhook:
       operator: "Equal"
       value: "operations"
       effect: "NoSchedule"
-  affinity:
-    nodeAffinity:
-      requiredDuringSchedulingIgnoredDuringExecution:
-        nodeSelectorTerms:
-          - matchExpressions:
-              - key: workload
-                operator: In
-                values:
-                  - operations
+
 validationWebhook:
   nodeSelector:
     workload: operations
@@ -51,15 +32,7 @@ validationWebhook:
       operator: "Equal"
       value: "operations"
       effect: "NoSchedule"
-  affinity:
-    nodeAffinity:
-      requiredDuringSchedulingIgnoredDuringExecution:
-        nodeSelectorTerms:
-          - matchExpressions:
-              - key: workload
-                operator: In
-                values:
-                  - operations
+
 ingressGateway:
   enabled: true
   nodeSelector:
@@ -69,15 +42,7 @@ ingressGateway:
       operator: "Equal"
       value: "operations"
       effect: "NoSchedule"
-  affinity:
-    nodeAffinity:
-      requiredDuringSchedulingIgnoredDuringExecution:
-        nodeSelectorTerms:
-          - matchExpressions:
-              - key: workload
-                operator: In
-                values:
-                  - operations
+
 egressGateway:
   enabled: true
   nodeSelector:
@@ -87,47 +52,3 @@ egressGateway:
       operator: "Equal"
       value: "operations"
       effect: "NoSchedule"
-  affinity:
-    nodeAffinity:
-      requiredDuringSchedulingIgnoredDuringExecution:
-        nodeSelectorTerms:
-          - matchExpressions:
-              - key: workload
-                operator: In
-                values:
-                  - operations
-controller:
-  resources:
-    requests:
-      cpu: 100m
-      memory: 128Mi
-    limits:
-      cpu: 300m
-      memory: 256Mi
-
-repoServer:
-  resources:
-    requests:
-      cpu: 50m
-      memory: 64Mi
-    limits:
-      cpu: 200m
-      memory: 128Mi
-
-server:
-  resources:
-    requests:
-      cpu: 50m
-      memory: 64Mi
-    limits:
-      cpu: 200m
-      memory: 128Mi
-
-applicationSet:
-  resources:
-    requests:
-      cpu: 50m
-      memory: 64Mi
-    limits:
-      cpu: 200m
-      memory: 128Mi

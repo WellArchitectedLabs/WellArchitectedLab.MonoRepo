@@ -9,14 +9,7 @@ prometheus:
         effect: NoSchedule
 
 alertmanager:
-  enabled: true
-  nodeSelector:
-    workload: operations
-  tolerations:
-    - key: workload
-      operator: Equal
-      value: operations
-      effect: NoSchedule
+  enabled: false
 
 grafana:
   enabled: false

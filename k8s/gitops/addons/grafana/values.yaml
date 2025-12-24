@@ -1,7 +1,0 @@
-nodeSelector:
-  workload: operations
-tolerations:
-  - key: "workload"
-    operator: "Equal"
-    value: "operations"
-    effect: "NoSchedule"

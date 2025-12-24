@@ -1,17 +1,40 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: istio
+  name: istiod
   namespace: argocd
 spec:
   project: default
   source:
     chart: istiod
     repoURL: https://istio-release.storage.googleapis.com/charts
-    targetRevision: latest
+    targetRevision: "*"
     helm:
-      valueFiles:
-        - values.yaml
+      values: |
+        # Pilot (istiod) configuration
+        pilot:
+          # Node tolerations for operations nodepool
+          tolerations:
+            - key: workload
+              operator: Equal
+              value: operations
+              effect: NoSchedule
+          
+          # Sidecar injector webhook configuration
+          sidecarInjectorWebhook:
+            # Enable sidecar injection
+            enableNamespacesByDefault: false
+            # Rewrite app HTTP probes to work with sidecar
+            rewriteAppHTTPProbe: true
+
+        # Global configuration
+        global:
+          # Istio namespace
+          istioNamespace: istio-system
+          
+          # Configure validation webhook
+          configValidation: true
+          
   destination:
     server: https://kubernetes.default.svc
     namespace: istio-system

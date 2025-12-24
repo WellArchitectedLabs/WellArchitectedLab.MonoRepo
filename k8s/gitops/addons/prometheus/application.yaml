@@ -13,8 +13,27 @@ spec:
     targetRevision: 58.5.0
     helm:
       skipCrds: true
-      valueFiles: 
-        - values.yaml
+      values: |
+        prometheus:
+          prometheusSpec:
+            tolerations:
+              - key: workload
+                operator: Equal
+                value: operations
+                effect: NoSchedule
+        
+        alertmanager:
+          enabled: false
+
+        grafana:
+          enabled: false
+
+        nodeExporter:
+          enabled: false
+
+        kubeStateMetrics:
+          enabled: false
+
   destination:
     server: https://kubernetes.default.svc
     namespace: monitoring

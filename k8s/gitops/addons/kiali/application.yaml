@@ -12,8 +12,33 @@ spec:
     chart: kiali-server
     targetRevision: 1.78.0
     helm:
-      valueFiles: 
-        - values.yaml
+      values: |
+        deployment:
+          accessible_namespaces:
+            - "**"
+          tolerations:
+            - key: "workload"
+              operator: "Equal"
+              value: "operations"
+              effect: "NoSchedule"
+        
+        auth:
+          strategy: anonymous
+
+        external_services:
+          prometheus:
+            enabled: true
+            url: http://prometheus-server-kube-pro-prometheus.monitoring.svc.cluster.local:9090
+          istio:
+            enabled: true
+            root_namespace: istio-system
+            component_status:
+              enabled: true
+
+        kiali_feature-flags:
+          istio_injection_action: true
+          istio_validation_action: true
+
   destination:
     server: https://kubernetes.default.svc
     namespace: monitoring

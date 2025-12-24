@@ -3,3 +3,4 @@ kind: Kustomization
 
 resources:
   - shared_gateway-class.yaml
+  - shared_namespace-istio.yaml

@@ -3,6 +3,9 @@ kind: HTTPRoute
 metadata:
   name: backend-httproute
   namespace: istio-gateway
+  labels:
+    app: frontend
+    version: v1
 spec:
   parentRefs:
     - name: backend-gateway

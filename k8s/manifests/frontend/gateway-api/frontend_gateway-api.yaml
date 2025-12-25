@@ -3,8 +3,11 @@ kind: Gateway
 metadata:
   name: frontend-gateway
   namespace: istio-gateway
+  labels:
+    app: frontend
+    version: v1
 spec:
-  gatewayClassName: istio           # changed from nginx to istio
+  gatewayClassName: istio
   listeners:
     - name: http
       protocol: HTTP

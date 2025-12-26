@@ -7,8 +7,8 @@ metadata:
     app: frontend
     version: v1
   annotations:
-    # This annotation tells Istio Gateway controller to set externalTrafficPolicy: Local
-    networking.istio.io/service-type: LoadBalancer
+    # Istio-specific annotation to control the service spec
+    service.istio.io/externalTrafficPolicy: Local
 spec:
   gatewayClassName: istio
   listeners:

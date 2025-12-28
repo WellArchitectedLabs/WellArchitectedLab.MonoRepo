@@ -8,15 +8,15 @@ metadata:
     version: v1
 spec:
   hosts:
-    - api.weatherly.local
+    - istio-gateway/dev-weatherly-gateway
   gateways:
-    - weatherly-gateway
+    - dev-weatherly-gateway
   http:
     - match:
         - uri:
             prefix: /
       route:
         - destination:
-            host: backend-service.backend.svc.cluster.local
+            host: dev-backend-service.backend.svc.cluster.local
             port:
               number: 8080

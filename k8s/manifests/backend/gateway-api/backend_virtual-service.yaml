@@ -2,7 +2,6 @@ apiVersion: networking.istio.io/v1beta1
 kind: VirtualService
 metadata:
   name: backend-virtualservice
-  namespace: istio-gateway
   labels:
     app: backend
     version: v1

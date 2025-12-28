@@ -8,9 +8,9 @@ metadata:
     version: v1
 spec:
   hosts:
-    - istio-gateway/dev-weatherly-gateway
+    - api.weatherly.local
   gateways:
-    - dev-weatherly-gateway
+    - istio-gateway/dev-weatherly-gateway
   http:
     - match:
         - uri:

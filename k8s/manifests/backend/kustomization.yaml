@@ -13,5 +13,5 @@ resources:
   - gateway-api/backend_service.yaml
   - gateway-api/backend_virtual-service.yaml
 
-configurations:
-  - kustomizeconfig.yaml
+# configurations:
+#   - kustomizeconfig.yaml

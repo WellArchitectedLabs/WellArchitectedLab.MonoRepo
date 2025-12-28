@@ -1,0 +1,57 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: istio-ingressgateway
+  namespace: argocd
+  labels:
+    isIstio: "true"
+  annotations:
+    argocd.argoproj.io/sync-wave: "2" # Install istio gateway after istio deamon (ranked 0) and istio crds (ranked 1) in order
+spec:
+  project: default
+  source:
+    chart: gateway
+    repoURL: https://istio-release.storage.googleapis.com/charts
+    targetRevision: "*"
+    helm:
+      values: |
+        name: istio-ingressgateway
+
+        labels:
+          istio: ingressgateway
+        
+        tolerations:
+          - key: workload
+            operator: Equal
+            value: operations
+            effect: NoSchedule
+        
+        autoscaling:
+          enabled: true
+          minReplicas: 2
+          maxReplicas: 5
+
+        service:
+          type: LoadBalancer
+          # tell azure LB to load balance only on operations node (for performance and to do not have health probe issues)
+          externalTrafficPolicy: Local
+          ports:
+            - name: status-port
+              port: 15021
+              targetPort: 15021
+            - name: http2
+              port: 80
+              targetPort: 8080
+            - name: https
+              port: 443
+              targetPort: 8443
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: istio-system
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+

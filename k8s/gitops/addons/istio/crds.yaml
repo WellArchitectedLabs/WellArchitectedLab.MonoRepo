@@ -6,6 +6,8 @@ kind: Application
 metadata:
   name: istio-base
   namespace: argocd
+  labels:
+    isIstio: "true"
   annotations:
     argocd.argoproj.io/sync-wave: "0"   # I need crds to exist before deamon
 spec:

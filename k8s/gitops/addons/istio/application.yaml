@@ -3,6 +3,8 @@ kind: Application
 metadata:
   name: istiod
   namespace: argocd
+  labels:
+    isIstio: "true"
   annotations:
     argocd.argoproj.io/sync-wave: "1"   # I need deamon to be installed after crds
 spec:

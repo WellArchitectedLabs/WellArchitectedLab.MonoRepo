@@ -12,11 +12,11 @@ spec:
   gateways:
     - weatherly-gateway
   http:
-  - match:
-  - uri:
-      prefix: /
-  route:
-    - destination:
-        host: backend-service.backend.svc.cluster.local
-        port:
-          number: 8080
+    - match:
+        - uri:
+            prefix: /
+      route:
+        - destination:
+            host: backend-service.backend.svc.cluster.local
+            port:
+              number: 8080

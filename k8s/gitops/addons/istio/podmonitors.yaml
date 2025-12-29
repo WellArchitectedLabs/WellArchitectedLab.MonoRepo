@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: istio-prometheus-servicemonitors
+  name: istio-prometheus-podmonitors
   namespace: argocd
   labels:
     isIstio: "true"

@@ -11,6 +11,14 @@ prometheus:
         value: "operations"
         effect: "NoSchedule"
 
+    # VERY IMPORTANT
+    serviceMonitorSelectorNilUsesHelmValues: false
+    podMonitorSelectorNilUsesHelmValues: false
+
+    # Allow Istio ServiceMonitors
+    serviceMonitorSelector: {}
+    podMonitorSelector: {}
+
 # ------------------------
 # Alertmanager configuration
 # ------------------------

@@ -31,6 +31,8 @@ spec:
           prometheus:
             enabled: true
             url: http://prometheus-server-kube-pro-prometheus.monitoring.svc.cluster.local:9090
+            query_scope:
+              cluster: true
           istio:
             enabled: true
             root_namespace: istio-system

@@ -21,6 +21,16 @@ spec:
                 operator: Equal
                 value: operations
                 effect: NoSchedule
+            
+            # Very important for istio integration
+            # These configs allow prometheus to read istio specific metrics
+            # Which are pushed by istio service monitors
+            # F.e: one of the main metrics that are istio specific and that prometheus must read is istio_requests_total
+
+            serviceMonitorSelectorNilUsesHelmValues: false
+            podMonitorSelectorNilUsesHelmValues: false
+            serviceMonitorSelector: {}
+            podMonitorSelector: {}
         
         alertmanager:
           enabled: false

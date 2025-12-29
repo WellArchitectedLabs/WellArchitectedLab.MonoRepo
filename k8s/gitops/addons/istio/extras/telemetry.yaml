@@ -1,0 +1,12 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: istio-proxy
+  namespace: istio-system
+spec:
+  selector:
+    matchLabels:
+      istio: proxy
+  endpoints:
+    - port: http-envoy-prom
+      interval: 15s

@@ -19,6 +19,7 @@ spec:
 
         labels:
           istio: ingressgateway
+          version: v1
         
         tolerations:
           - key: workload

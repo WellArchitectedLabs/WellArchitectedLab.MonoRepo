@@ -6,6 +6,7 @@ metadata:
 spec:
   selector:
     app: frontend-webapp
+    version: v1
   ports:
   - port: 80
     targetPort: 80

@@ -12,6 +12,7 @@ spec:
   source:
     repoURL: https://github.com/WellArchitectedLabs/WellArchitectedLab.MonoRepo.git
     path: k8s/gitops/addons/istio/extras
+    targetRevision: main
   destination:
     server: https://kubernetes.default.svc
     namespace: istio-system

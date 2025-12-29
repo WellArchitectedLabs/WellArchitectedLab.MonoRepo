@@ -4,9 +4,6 @@ kind: Deployment
 metadata:
   name: frontend-webapp
   namespace: frontend
-  labels:
-    app: frontend-webapp
-    version: v1
 spec:
   selector:
     matchLabels:
@@ -41,6 +38,8 @@ spec:
         app: frontend-webapp
         # optional (nice to have)
         editor: vscode
+        # necessary for kiali integration
+        version: v1
     spec:
       # give pod 30 seconds to shut down after kube sends SIGTERM signal
       terminationGracePeriodSeconds: 30

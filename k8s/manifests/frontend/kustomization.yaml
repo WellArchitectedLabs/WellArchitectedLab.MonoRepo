@@ -9,9 +9,8 @@ resources:
   - frontend_deployment.yaml
   - high-availability/frontend_hpa.yaml
   - high-availability/frontend_pod-disruption-budget.yaml
-  - gateway-api/frontend_service.yaml
-  - gateway-api/frontend_reference-grant.yaml
-  - gateway-api/frontend_virtual-service.yaml
+  - services/frontend_service.yaml
+  - services/frontend_virtual-service.yaml
   - config/frontend_config-map.yaml
 
 configurations:

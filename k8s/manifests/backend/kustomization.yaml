@@ -9,9 +9,5 @@ resources:
   - backend_deployment.yaml
   - high-availability/backend_hpa.yaml
   - high-availability/backend_pod-disruption-budget.yaml
-  - gateway-api/backend_reference-grant.yaml
-  - gateway-api/backend_service.yaml
-  - gateway-api/backend_virtual-service.yaml
-
-# configurations:
-#   - kustomizeconfig.yaml
+  - services/backend_service.yaml
+  - services/backend_virtual-service.yaml

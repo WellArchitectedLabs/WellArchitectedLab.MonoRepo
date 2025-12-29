@@ -3,6 +3,9 @@ kind: Deployment
 metadata:
   name:  backend-webapp
   namespace: backend
+  labels:
+    app: backend-webapp
+    version: v1
 spec:
   selector:
     matchLabels:

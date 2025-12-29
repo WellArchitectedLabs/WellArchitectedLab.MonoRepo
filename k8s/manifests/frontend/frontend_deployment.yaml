@@ -4,6 +4,9 @@ kind: Deployment
 metadata:
   name: frontend-webapp
   namespace: frontend
+  labels:
+    app: frontend-webapp
+    version: v1
 spec:
   selector:
     matchLabels:

@@ -4,6 +4,8 @@ kind: Deployment
 metadata:
   name: frontend-webapp
   namespace: frontend
+  annotations:
+    sidecar.istio.io/inject: "true"
 spec:
   selector:
     matchLabels:

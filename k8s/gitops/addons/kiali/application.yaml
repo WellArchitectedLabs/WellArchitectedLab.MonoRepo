@@ -21,6 +21,10 @@ spec:
               operator: "Equal"
               value: "operations"
               effect: "NoSchedule"
+          view_only_mode: false
+
+          logger:
+            log_level: debug
 
         auth:
           strategy: anonymous
@@ -31,15 +35,32 @@ spec:
           prometheus:
             enabled: true
             url: http://prometheus-server-kube-pro-prometheus.monitoring.svc.cluster.local:9090
+            custom_metrics_url: http://prometheus-server-kube-pro-prometheus.monitoring.svc.cluster.local:9090
             query_scope:
-              cluster: true
+              cluster: tru
+            rate:
+              interval: 5m
           istio:
             enabled: true
             root_namespace: istio-system
             component_status:
               enabled: true
-            # Tell kiali tgat istio is installed as a gateway api (new way) and not as an ingress controller (traditional way)
-            gateway_api_enabled: true
+              
+          tracing:
+            enabled: false
+        
+        #show rate for all namespaces, all kind of workloads and all workload names
+        rate:
+          - namespace: ".*"
+            kind: ".*"
+            name: ".*"
+        
+        # shpw graph even for low level rate edges
+        graph:
+          # Show edges with very low request rates (default filters out edges < 0.1 rps)
+          hide:
+            edges:
+              - idle: false  # Don't hide idle edges
 
         health_config:
           # Disable side car check for these namespaces (optional for clean kiali interface)
@@ -58,6 +79,12 @@ spec:
         kiali_feature_flags:
           istio_injection_action: true
           istio_validation_action: true
+          ui_defaults:
+            namespaces:
+            - istio-system
+            - istio-gateway
+            - backend
+            - frontend
 
   destination:
     server: https://kubernetes.default.svc

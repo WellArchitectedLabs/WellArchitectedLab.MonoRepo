@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: heavy-traffic-generator
+  namespace: frontend
+  labels:
+    app: heavy-traffic-generator
+    version: v1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: heavy-traffic-generator
+  template:
+    metadata:
+      labels:
+        app: heavy-traffic-generator
+        version: v1
+      annotations:
+        sidecar.istio.io/inject: "true"
+    spec:
+      containers:
+      - name: traffic
+        image: curlimages/curl:8.6.0
+        command: ["/bin/sh"]
+        args:
+        - -c
+        - |
+          echo "🚦 Starting HEAVY Istio mesh traffic generator"
+          TARGET="http://dev-frontend-service.frontend.svc.cluster.local"
+          while true; do
+            for i in $(seq 1 10); do
+              curl -s --max-time 1 "$TARGET" > /dev/null &
+            done
+            wait
+            sleep 1
+          done
+        resources:
+          requests:
+            cpu: "50m"
+            memory: "64Mi"
+          limits:
+            cpu: "200m"
+            memory: "128Mi"

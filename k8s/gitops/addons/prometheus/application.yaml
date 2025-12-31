@@ -16,6 +16,7 @@ spec:
       values: |
         prometheus:
           prometheusSpec:
+            enableAdminAPI: true
             tolerations:
               - key: workload
                 operator: Equal

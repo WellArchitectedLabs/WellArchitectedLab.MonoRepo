@@ -17,6 +17,9 @@ spec:
         prometheus:
           prometheusSpec:
             enableAdminAPI: true
+            logLevel: debug
+            additionalAgs:
+              - --log.level=debug
             tolerations:
               - key: workload
                 operator: Equal

@@ -6,7 +6,8 @@ metadata:
   namespace: backend
 spec:
   ports:
-  - port: 6379
+  - name: resp
+    port: 6379
   selector:
     # writes are directed to redis-0 pod
     statefulset.kubernetes.io/pod-name: dev-redis-0

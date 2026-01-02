@@ -9,5 +9,5 @@ spec:
   selector:
     app: redis
   ports:
-  - port: 6379
-    name: redis
+  - name: resp
+    port: 6379

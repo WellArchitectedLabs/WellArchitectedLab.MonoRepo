@@ -6,7 +6,7 @@ metadata:
   namespace: backend
 spec:
   ports:
-  - name: resp
+  - name: redis
     port: 6379
   selector:
     # writes are directed to redis-0 pod

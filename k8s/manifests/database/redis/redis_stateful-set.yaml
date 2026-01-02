@@ -13,6 +13,8 @@ spec:
     metadata:
       labels:
         app: redis
+        # necessary for kiali integration
+        version: v1
     spec:
       containers:
       - name: redis

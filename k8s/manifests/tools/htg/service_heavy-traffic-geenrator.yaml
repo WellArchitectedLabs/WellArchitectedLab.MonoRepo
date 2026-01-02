@@ -3,12 +3,10 @@ kind: Service
 metadata:
   name: heavy-traffic-generator
   namespace: frontend
-  labels:
-    app: heavy-traffic-generator
 spec:
   selector:
     app: heavy-traffic-generator
   ports:
   - name: http
-    port: 80
-    targetPort: 80
+    port: 8080
+    targetPort: http

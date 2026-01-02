@@ -40,6 +40,9 @@ spec:
         - name: UPSTREAM_URIS
           value: "http://dev-backend-service.backend.svc.cluster.local/WeatherForecast"
 
+        - name: UPSTREAM_REQUESTS_PER_SECOND
+          value: "5"
+
         # Generate steady load
         - name: UPSTREAM_WORKERS
           value: "10"

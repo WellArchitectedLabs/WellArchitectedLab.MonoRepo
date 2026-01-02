@@ -9,6 +9,7 @@ resources:
   - ../../manifests/database
   - backend_config-map.yaml
   - ../../manifests/ingress
+  - ../../manifests/tools/htg
 
 
 # define a dev prefix for all created environment in relation to this overlay

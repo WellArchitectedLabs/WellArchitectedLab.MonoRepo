@@ -22,21 +22,28 @@ spec:
         sidecar.istio.io/inject: "true"
     spec:
       containers:
-      - name: traffic
-        image: curlimages/curl:8.6.0
-        command: ["/bin/sh"]
-        args:
-        - -c
-        - |
-          echo "🚦 Starting HEAVY Istio mesh traffic generator"
-          TARGET="http://dev-frontend-service.frontend.svc.cluster.local"
-          while true; do
-            for i in $(seq 1 10); do
-              curl -s --max-time 1 "$TARGET" > /dev/null &
-            done
-            wait
-            sleep 1
-          done
+      - name: generator
+        image: ghcr.io/nicholasjackson/fake-service:v0.26.0
+        env:
+        # Expose an HTTP server (makes it a real app)
+        - name: LISTEN_ADDR
+          value: "0.0.0.0:8080"
+
+        # Generate outbound traffic (THIS is what creates the edge)
+        - name: UPSTREAM_URIS
+          value: "http://dev-frontend-service.frontend.svc.cluster.local"
+
+        # Control traffic rate (10 req/sec)
+        - name: UPSTREAM_WORKERS
+          value: "10"
+
+        # Optional: make logs quieter
+        - name: LOG_LEVEL
+          value: "info"
+
+        ports:
+        - containerPort: 8080
+
         resources:
           requests:
             cpu: "50m"

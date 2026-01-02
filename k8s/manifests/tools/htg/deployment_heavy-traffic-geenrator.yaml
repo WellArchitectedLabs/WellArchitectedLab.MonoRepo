@@ -38,7 +38,7 @@ spec:
 
         # ✅ DIRECT IN-MESH call to backend
         - name: UPSTREAM_URIS
-          value: "http://dev-backend-service.backend.svc.cluster.local:8080"
+          value: "http://dev-backend-service.backend.svc.cluster.local:8080/WeatherForecast"
 
         # Generate steady load
         - name: UPSTREAM_WORKERS

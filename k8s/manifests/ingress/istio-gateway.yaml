@@ -4,7 +4,8 @@ metadata:
   name: weatherly-gateway
   namespace: istio-gateway
   labels:
-    app: gateway
+    app: istioingress
+    version: v1
 spec:
   selector:
     istio: ingressgateway

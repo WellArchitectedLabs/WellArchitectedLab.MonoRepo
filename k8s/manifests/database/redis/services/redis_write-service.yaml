@@ -4,6 +4,9 @@ kind: Service
 metadata:
   name: redis-primary
   namespace: backend
+  labels:
+    app: redis
+    version: v1
 spec:
   ports:
   - name: redis

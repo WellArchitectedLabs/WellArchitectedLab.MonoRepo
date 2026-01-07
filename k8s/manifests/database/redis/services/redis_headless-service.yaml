@@ -13,9 +13,13 @@ kind: Service
 metadata:
   name: redis
   namespace: backend
+  labels:
+    app: redis
+    version: v1
 spec:
   selector:
     app: redis
+    version: v1
   ports:
   - port: 6379
     name: redis

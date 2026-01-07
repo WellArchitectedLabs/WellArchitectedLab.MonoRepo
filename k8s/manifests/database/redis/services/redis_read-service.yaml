@@ -4,6 +4,9 @@ kind: Service
 metadata:
   name: redis-secondary
   namespace: backend
+  labels:
+    app: redis
+    version: v1
 spec:
   type: ClusterIP
   selector:

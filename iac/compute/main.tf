@@ -11,8 +11,8 @@ terraform {
   }
   backend "azurerm" {
     key                  = "kubernetes.terraform.tfstate"
-    storage_account_name = "sttbasics001"
-    resource_group_name  = "rg-global"
+    storage_account_name = "devwaltstate"
+    resource_group_name  = "dev-rg-terraforminit"
     container_name       = "tfstate"
   }
 }

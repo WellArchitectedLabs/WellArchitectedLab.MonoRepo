@@ -79,10 +79,10 @@ spec:
             # metrics are constantly sent from kubelet into metrics api (api server)
             # which updates etcd, 
             # kubernetes scheduler would then read the metrics and decide in which node the pod will be ran
-            memory: "64Mi"
+            memory: "2Mi"
             # quarter of a CPU core is supposed to be allocated to this pod
             # this is used by kubernetes's scheduler for determining wether the pod can run into the node
-            cpu: "250m"
+            cpu: "20m"
           limits:
             memory: "1Gi"
             #1 core maimum allocated to each pod

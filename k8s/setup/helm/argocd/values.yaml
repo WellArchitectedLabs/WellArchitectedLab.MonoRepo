@@ -12,45 +12,45 @@ server:
     type: ClusterIP
 
   nodeSelector:
-    workload: operations
+    workload: weather-forecast
   tolerations:
     - key: "workload"
       operator: "Equal"
-      value: "operations"
+      value: "weather-forecast"
       effect: "NoSchedule"
 
 controller:
   nodeSelector:
-    workload: operations
+    workload: weather-forecast
   tolerations:
     - key: "workload"
       operator: "Equal"
-      value: "operations"
+      value: "weather-forecast"
       effect: "NoSchedule"
 
 repoServer:
   nodeSelector:
-    workload: operations
+    workload: weather-forecast
   tolerations:
     - key: "workload"
       operator: "Equal"
-      value: "operations"
+      value: "weather-forecast"
       effect: "NoSchedule"
 
 applicationSet:
   nodeSelector:
-    workload: operations
+    workload: weather-forecast
   tolerations:
     - key: "workload"
       operator: "Equal"
-      value: "operations"
+      value: "weather-forecast"
       effect: "NoSchedule"
 
 redis:
   nodeSelector:
-    workload: operations
+    workload: weather-forecast
   tolerations:
     - key: "workload"
       operator: "Equal"
-      value: "operations"
+      value: "weather-forecast"
       effect: "NoSchedule"

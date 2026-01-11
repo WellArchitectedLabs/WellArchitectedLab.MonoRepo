@@ -4,11 +4,11 @@
 prometheus:
   prometheusSpec:
     nodeSelector:
-      workload: operations
+      workload: weather-forecast
     tolerations:
       - key: "workload"
         operator: "Equal"
-        value: "operations"
+        value: "weather-forecast"
         effect: "NoSchedule"
 
     # VERY IMPORTANT
@@ -24,15 +24,12 @@ prometheus:
 # ------------------------
 alertmanager:
   nodeSelector:
-    workload: operations
+    workload: weather-forecast
   tolerations:
     - key: "workload"
       operator: "Equal"
-      value: "operations"
+      value: "weather-forecast"
       effect: "NoSchedule"
-
-# ------------------------
-# Grafana disabled (as in your ArgoCD app)
-# ------------------------
+      
 grafana:
   enabled: true

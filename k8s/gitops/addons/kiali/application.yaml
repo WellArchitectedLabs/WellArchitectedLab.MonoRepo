@@ -4,7 +4,7 @@ metadata:
   name: kiali
   namespace: argocd
   labels:
-    workload: operations
+    workload: weather-forecast
 spec:
   project: default
   source:
@@ -19,7 +19,7 @@ spec:
           tolerations:
             - key: "workload"
               operator: "Equal"
-              value: "operations"
+              value: "weather-forecast"
               effect: "NoSchedule"
           view_only_mode: false
 

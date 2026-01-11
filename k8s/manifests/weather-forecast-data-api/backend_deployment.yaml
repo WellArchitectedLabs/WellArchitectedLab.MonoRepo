@@ -31,7 +31,7 @@ spec:
       tolerations:
       - key: workload
         operator: 'Equal'
-        value: 'backend'
+        value: 'weather-forecast'
         effect: 'NoSchedule'
       # Where will my pods will run, and in what node label
       # We should add a toleration because the user nodes are tainted and will be not schedule the pods if the taint is not provided

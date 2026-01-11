@@ -9,7 +9,7 @@ spec:
   project: default
   source:
     repoURL: https://github.com/WellArchitectedLabs/WellArchitectedLab.MonoRepo.git
-    targetRevision: main
+    targetRevision: feature/singleNodePool
     path: k8s/overlays/dev
   destination:
     server: https://kubernetes.default.svc

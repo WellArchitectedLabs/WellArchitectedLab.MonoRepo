@@ -4,7 +4,7 @@ metadata:
   name: prometheus-server
   namespace: argocd
   labels:
-    workload: operations
+    workload: weather-forecast
 spec:
   project: default
   source:
@@ -23,7 +23,7 @@ spec:
             tolerations:
               - key: workload
                 operator: Equal
-                value: operations
+                value: weather-forecast
                 effect: NoSchedule
             
             # Very important for istio integration

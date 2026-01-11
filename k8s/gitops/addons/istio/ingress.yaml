@@ -24,7 +24,7 @@ spec:
         tolerations:
           - key: workload
             operator: Equal
-            value: operations
+            value: weather-forecast
             effect: NoSchedule
         
         autoscaling:
@@ -34,7 +34,7 @@ spec:
 
         service:
           type: LoadBalancer
-          # tell azure LB to load balance only on operations node (for performance and to do not have health probe issues)
+          # tell azure LB to load balance only on weather-forecast node (for performance and to do not have health probe issues)
           externalTrafficPolicy: Local
           ports:
             - name: status-port

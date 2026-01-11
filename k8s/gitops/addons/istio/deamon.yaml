@@ -17,11 +17,11 @@ spec:
       values: |
         # Pilot (istiod) configuration
         pilot:
-          # Node tolerations for operations nodepool
+          # Node tolerations for weather-forecast nodepool
           tolerations:
             - key: workload
               operator: Equal
-              value: operations
+              value: weather-forecast
               effect: NoSchedule
           
           # Sidecar injector webhook configuration

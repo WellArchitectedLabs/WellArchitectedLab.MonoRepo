@@ -50,7 +50,7 @@ spec:
       # can be multiple containers since one pod scan contain multiple containers
       - name: backend-webapp
         # test image from docker registry, provided by nginx project
-        image: acrdevzlj7yj.azurecr.io/weather-forecast-api:0.1.0-7b109e4
+        image: acrdevtshpwn.azurecr.io/weather-forecast-api:0.1.0-singleNodePool.1-55a41ad
         # mounting config file
         volumeMounts:
           - name: config

@@ -67,7 +67,7 @@ resource "azurerm_kubernetes_cluster" "aks-kubernetes-001" {
   resource_group_name = var.resource_group_name
   default_node_pool {
     name       = "npkube001"
-    vm_size    = "standard_a2_v2"
+    vm_size    = "Standard_B2s_v2"
     node_count = 1
     # link aks cluster to the subnet in question
     # temporary_name_for_rotation = "npkubtemp"
@@ -83,32 +83,41 @@ resource "azurerm_kubernetes_cluster" "aks-kubernetes-001" {
 resource "azurerm_kubernetes_cluster_node_pool" "npuser001" {
   kubernetes_cluster_id = azurerm_kubernetes_cluster.aks-kubernetes-001.id
   name                  = "npuser001"
-  node_taints           = ["workload=backend:NoSchedule"]
-  node_count            = 2
+  node_taints           = ["workload=weather-forecast:NoSchedule"]
+  node_count            = 1
   depends_on            = [azurerm_kubernetes_cluster.aks-kubernetes-001]
-  vm_size               = "Standard_B2s"
-}
-resource "azurerm_kubernetes_cluster_node_pool" "npuser002" {
-  kubernetes_cluster_id = azurerm_kubernetes_cluster.aks-kubernetes-001.id
-  name                  = "npuser002"
-  node_taints           = ["workload=frontend:NoSchedule"]
-  node_count            = 2
-  depends_on            = [azurerm_kubernetes_cluster.aks-kubernetes-001, azurerm_kubernetes_cluster_node_pool.npuser001]
-  vm_size               = "Standard_B2s"
-}
-
-resource "azurerm_kubernetes_cluster_node_pool" "npoperations001" {
-  kubernetes_cluster_id = azurerm_kubernetes_cluster.aks-kubernetes-001.id
-  name = "npops001"
-  node_taints = ["workload=operations:NoSchedule"]
-  node_count = 1
-  depends_on = [ azurerm_kubernetes_cluster.aks-kubernetes-001, azurerm_kubernetes_cluster_node_pool.npuser002 ]
-  vm_size = "Standard_D4ds_v5"
+  vm_size               = "Standard_B2s_v2"
   node_labels = {
-    workload = "operations"
     istio    = "pilot"
   }
 }
+
+# It was decided, for workloads optimizations in regards to subscription quotas to use a single node pool for all user workloads
+# Weither it is operations (istio, grafana, argocd ect..) or user applications (weather forecast bff or frontend ect..)
+# They are live in the same node pool, in the same cluster
+# So the frontend and operations nodepools were merged into a single node pool
+
+# resource "azurerm_kubernetes_cluster_node_pool" "npuser002" {
+#   kubernetes_cluster_id = azurerm_kubernetes_cluster.aks-kubernetes-001.id
+#   name                  = "npuser002"
+#   node_taints           = ["workload=frontend:NoSchedule"]
+#   node_count            = 1
+#   depends_on            = [azurerm_kubernetes_cluster.aks-kubernetes-001, azurerm_kubernetes_cluster_node_pool.npuser001]
+#   vm_size               = "Standard_B2s_v2"
+# }
+
+# resource "azurerm_kubernetes_cluster_node_pool" "npoperations001" {
+#   kubernetes_cluster_id = azurerm_kubernetes_cluster.aks-kubernetes-001.id
+#   name = "npops001"
+#   node_taints = ["workload=operations:NoSchedule"]
+#   node_count = 1
+#   depends_on = [ azurerm_kubernetes_cluster.aks-kubernetes-001, azurerm_kubernetes_cluster_node_pool.npuser002 ]
+#   vm_size = "Standard_B2s_v2"
+#   node_labels = {
+#     workload = "operations"
+#     istio    = "pilot"
+#   }
+# }
 
 resource "azurerm_role_assignment" "cluster-registry-access" {
   principal_id                     = azurerm_kubernetes_cluster.aks-kubernetes-001.kubelet_identity[0].object_id

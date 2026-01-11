@@ -7,7 +7,7 @@ spec:
   selector:
     matchLabels:
       app: backend-webapp
-  replicas: 3
+  replicas: 2
   strategy:
     type: RollingUpdate
     rollingUpdate:
@@ -78,7 +78,7 @@ spec:
             cpu: "250m"
           limits:
             memory: "1Gi"
-            #1 core maimum allocated to each pod
+            #1 core maximum allocated to each pod
             cpu: "1"
         # defning liveness and readiness probes
         livenessProbe:

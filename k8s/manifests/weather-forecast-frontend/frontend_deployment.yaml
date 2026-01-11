@@ -12,7 +12,7 @@ spec:
       #should be used to identify the pod the deployment manages
       app: frontend-webapp
   # deployment order replicaset controller to keep 3 instances of these pods always running
-  replicas: 3
+  replicas: 2
    # Add the rolling update strategy here
    # It is very imporant to add a rollout strategy, specially when add required anti affinity rules
    # required anti affinity rules will block creation of new pods on new nodes

@@ -21,11 +21,6 @@ spec:
           istio: ingressgateway
           version: v1
 
-        image:
-          repository: docker.io/istio/proxyv2
-          tag: 1.18.0  # choose the version that matches the chart
-          pullPolicy: IfNotPresent
-
         tolerations:
           - key: workload
             operator: Equal

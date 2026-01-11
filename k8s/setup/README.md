@@ -11,4 +11,3 @@ The init shell script will install all necessary prerequisites for the AKS clust
 
 - Argocd for GitOps
 - Prometheus CRDs which are necessary for startup
-- 

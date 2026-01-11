@@ -3,8 +3,8 @@ kind: Kustomization
 
 # reference all manifests from base folder
 resources:
-  - ../../manifests/backend
-  - ../../manifests/frontend
+  - ../../manifests/weather-forecast-api
+  - ../../manifests/weather-forecast-frontend
   - ../../manifests/shared
   - ../../manifests/database
   - backend_config-map.yaml

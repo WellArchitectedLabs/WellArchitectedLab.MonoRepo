@@ -20,13 +20,18 @@ spec:
         labels:
           istio: ingressgateway
           version: v1
-        
+
+        image:
+          repository: docker.io/istio/proxyv2
+          tag: 1.18.0  # choose the version that matches the chart
+          pullPolicy: IfNotPresent
+
         tolerations:
           - key: workload
             operator: Equal
             value: weather-forecast
             effect: NoSchedule
-        
+
         autoscaling:
           enabled: true
           minReplicas: 2
@@ -46,6 +51,7 @@ spec:
             - name: https
               port: 443
               targetPort: 8443
+
   destination:
     server: https://kubernetes.default.svc
     namespace: istio-system

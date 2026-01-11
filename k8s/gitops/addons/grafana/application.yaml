@@ -42,12 +42,12 @@ spec:
                   authType: serviceAccount
                   tlsSkipVerify: true
                 editable: false
-        # It is important that grafana database is persisted
-        # Otherwise, dashboards and data will be reset on cluster restart or any event happening in the nodes
+        # # It is important that grafana database is persisted
+        # # Otherwise, dashboards and data will be reset on cluster restart or any event happening in the nodes
         persistence:
           type: pvc
           enabled: true
-          storageClassName: default
+          storageClassName: managed-csi
 
         adminUser: admin
   destination:

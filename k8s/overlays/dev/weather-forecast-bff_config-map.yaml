@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: wf-backend_config-map
+  name: weather-forecast-backend-config-map
   namespace: backend
 data:
   appsettings.json: |

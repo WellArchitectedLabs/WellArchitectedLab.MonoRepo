@@ -1,10 +1,10 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: frontend-configmap
+  name: weather-forecast-frontend_config-map
   namespace: frontend
   labels:
-    app: frontend-configmap
+    app: weather-forecast-frontend_config-map
 data:
   appSettings.yaml: |
     # yaml file

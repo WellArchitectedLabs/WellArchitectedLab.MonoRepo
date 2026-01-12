@@ -1,14 +1,14 @@
 apiVersion: networking.istio.io/v1beta1
 kind: VirtualService
 metadata:
-  name: backend-virtualservice
+  name: weather-forecast-frontend-virtualservice
   namespace: istio-gateway
   labels:
-    app: backend
+    app: frontend
     version: v1
 spec:
   hosts:
-    - api.weatherly.local
+    - front.weatherly.local
   gateways:
     - istio-gateway/dev-weatherly-gateway
   http:
@@ -17,6 +17,6 @@ spec:
             prefix: /
       route:
         - destination:
-            host: dev-backend-service.backend.svc.cluster.local
+            host: dev-weather-forecast-frontend-service.frontend.svc.cluster.local
             port:
-              number: 8080
+              number: 80

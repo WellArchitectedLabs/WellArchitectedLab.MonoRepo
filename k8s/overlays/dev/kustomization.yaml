@@ -3,12 +3,11 @@ kind: Kustomization
 
 # reference all manifests from base folder
 resources:
-  - ../../manifests/weather-forecast-bff
-  - ../../manifests/weather-forecast-frontend
+  - ../../manifests/weather-forecast/bff
+  - ../../manifests/weather-forecast/frontend
   - ../../manifests/shared
-  - ../../manifests/database
-  - backend_config-map.yaml
-  - ../../manifests/ingress
+  - ../../manifests/weather-forecast/database
+  - weather-forecast-bff_config-map.yaml
 
 
 # define a dev prefix for all created environment in relation to this overlay

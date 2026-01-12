@@ -1,7 +1,7 @@
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
-  name: frontend-hpa
+  name: weather-forecast-frontend-hpa
   namespace: frontend
 spec:
   scaleTargetRef:

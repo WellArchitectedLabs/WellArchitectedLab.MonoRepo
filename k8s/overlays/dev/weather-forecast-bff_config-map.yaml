@@ -15,8 +15,8 @@ data:
     "AllowedHosts": "*",
     "WeatherForecast": {
         "Redis": {
-          "WriteDbConnection": "dev-redis-primary.backend.svc.cluster.local:6379",
-          "ReadDbConnection": "dev-redis-secondary.backend.svc.cluster.local:6379"
+          "WriteDbConnection": "dev-weather-forecast-bff-redis-primary.backend.svc.cluster.local:6379",
+          "ReadDbConnection": "dev-weather-forecast-bff-redis-secondary.backend.svc.cluster.local:6379"
         }
       }
     }

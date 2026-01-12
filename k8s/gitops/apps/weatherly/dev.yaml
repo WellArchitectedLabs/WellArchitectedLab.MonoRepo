@@ -14,13 +14,17 @@ spec:
   destination:
     server: https://kubernetes.default.svc
     namespace: default
+  ignoreDifferences:
+  - group: bitnami.com
+    kind: SealedSecret
+    jsonPointers:
+    - /status
   syncPolicy:
     automated:
       prune: true
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
-      - ServerSideApply=true
     retry:
       limit: 2
       backoff:

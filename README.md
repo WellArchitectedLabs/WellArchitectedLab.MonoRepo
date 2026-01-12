@@ -288,9 +288,8 @@ This repo intention is solely for demo purposes.
 If you would like to add a new stack that you judge as relevent for modern microservices, please go ahead and send your collaborations !
 Yet there are some rules to follow:
 1. Use feature branches (`feature/<short-desc>`).
-2. Run unit tests locally and ensure they pass.
-3. Update documentation and READMEs for changes that affect usage or setup.
-4. Create high-quality PRs just by using the developed `git pr` alias, which ensures the usage of templates under `.github/PULL_REQUEST_TEMPLATE/` folder.
+2. Update documentation and READMEs for changes that affect usage or setup.
+3. Install git pr alias using the setup powershell script and create high-quality PRs just by using the developed `git pr` alias.
 
 ---
 

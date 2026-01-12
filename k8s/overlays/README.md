@@ -1,0 +1,1 @@
+Overlays are environment specific folders that orchestrate manifests as per environment basis.

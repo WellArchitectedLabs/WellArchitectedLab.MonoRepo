@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 #descriptions arounf the deployment
 metadata:
-  name: frontend-webapp
+  name: weather-forecast-frontend
   namespace: frontend
   annotations:
     sidecar.istio.io/inject: "true"
@@ -10,7 +10,7 @@ spec:
   selector:
     matchLabels:
       #should be used to identify the pod the deployment manages
-      app: frontend-webapp
+      app: weather-forecast-frontend
   # deployment order replicaset controller to keep 3 instances of these pods always running
   replicas: 2
    # Add the rolling update strategy here
@@ -37,7 +37,7 @@ spec:
     # metadata around the pod
     metadata:
       labels:
-        app: frontend-webapp
+        app: weather-forecast-frontend
         # optional (nice to have)
         editor: vscode
         # necessary for kiali integration
@@ -63,11 +63,11 @@ spec:
             podAffinityTerm:
               labelSelector:
                 matchLabels:
-                  app: frontend-webapp
+                  app: weather-forecast-frontend
               topologyKey: kubernetes.io/hostname
       containers:
       # can be multiple containers since one pod scan contain multiple containers
-      - name: frontend-webapp
+      - name: weather-forecast-frontend
         # test image from docker registry, provided by nginx project
         image: acrdevtshpwn.azurecr.io/weather-forecast-frontend:0.1.0-singleNodePool.1-55a41ad
         ports:

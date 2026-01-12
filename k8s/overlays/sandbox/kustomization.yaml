@@ -9,17 +9,18 @@ resources:
   - ../../manifests/database
   - backend_config-map.yaml
   - ../../manifests/ingress
+  - ../../manifests/tools/htg
 
 
-# define a dev prefix for all created environment in relation to this overlay
-namePrefix: dev-
+# define a sandbox prefix for all created environment in relation to this overlay
+namePrefix: sandbox-
 # no suffix is defined
 nameSuffix: ""
 
 # adds a metadata.label for every resource created by this kustomize hop
 # this allows easy resource managemnt using -l filters
 commonLabels:
-  environment: dev
+  environment: sandbox
 
 # we need to track the environment in order to use it on pod level
 # config map generators are used here in order to update the pods as the config changes

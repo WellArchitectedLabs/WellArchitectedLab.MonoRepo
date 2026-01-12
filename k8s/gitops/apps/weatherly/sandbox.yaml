@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: dev-weatherly-app
+  name: sandbox-weatherly-app
   namespace: argocd
   labels:
     workload: applications
@@ -9,8 +9,8 @@ spec:
   project: default
   source:
     repoURL: https://github.com/WellArchitectedLabs/WellArchitectedLab.MonoRepo.git
-    targetRevision: feature/singleNodePool
-    path: k8s/overlays/dev
+    targetRevision: disabled
+    path: empty
   destination:
     server: https://kubernetes.default.svc
     namespace: default

@@ -5,7 +5,7 @@ metadata:
   namespace: backend
 spec:
   selector:
-    app: backend-webapp
+    app: weather-forecast-bff
     version: v1
   ports:
   - name: http

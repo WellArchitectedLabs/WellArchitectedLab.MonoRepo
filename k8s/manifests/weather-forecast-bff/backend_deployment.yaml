@@ -1,12 +1,12 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name:  backend-webapp
+  name:  weather-forecast-bff
   namespace: backend
 spec:
   selector:
     matchLabels:
-      app: backend-webapp
+      app: weather-forecast-bff
   replicas: 2
   strategy:
     type: RollingUpdate
@@ -18,7 +18,7 @@ spec:
     # metadata around the pod
     metadata:
       labels:
-        app: backend-webapp
+        app: weather-forecast-bff
         # optional (nice to have)
         editor: vscode
         # necessary for kiali integration
@@ -44,11 +44,11 @@ spec:
             podAffinityTerm:
               labelSelector:
                 matchLabels:
-                  app: backend-webapp
+                  app: weather-forecast-bff
               topologyKey: kubernetes.io/hostname
       containers:
       # can be multiple containers since one pod scan contain multiple containers
-      - name: backend-webapp
+      - name: weather-forecast-bff
         # test image from docker registry, provided by nginx project
         image: acrdevtshpwn.azurecr.io/weather-forecast-api:0.1.0-singleNodePool.1-55a41ad
         # mounting config file

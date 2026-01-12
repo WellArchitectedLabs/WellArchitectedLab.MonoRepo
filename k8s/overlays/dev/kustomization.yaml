@@ -3,12 +3,11 @@ kind: Kustomization
 
 # reference all manifests from base folder
 resources:
-  - ../../manifests/weather-forecast-bff
-  - ../../manifests/weather-forecast-frontend
+  - ../../manifests/weather-forecast/bff
+  - ../../manifests/weather-forecast/frontend
   - ../../manifests/shared
-  - ../../manifests/database
-  - backend_config-map.yaml
-  - ../../manifests/ingress
+  - ../../manifests/weather-forecast/bff/database
+  - weather-forecast-bff_config-map.yaml
 
 
 # define a dev prefix for all created environment in relation to this overlay
@@ -25,11 +24,11 @@ commonLabels:
 # config map generators are used here in order to update the pods as the config changes
 # this will created a config which is suffixed by the hash of the config content. Something like 
 configMapGenerator:
-  - name: redisconfigenvvars
+  - name: rediswfconfigenvvars
     namespace: backend
     literals:
       # used by redis in order to configure the replication mecanism
-      - REDIS_HEADLESS_SERVICE=dev-redis
+      - REDIS_HEADLESS_SERVICE=dev-weather-forecast-bff-redis
     # this is necessary in order to avoid non conventional resource name with naming RFCs
     options:
       disableNameSuffixHash: true

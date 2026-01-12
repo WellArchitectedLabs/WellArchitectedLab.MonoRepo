@@ -1,0 +1,10 @@
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: weather-forecast-frontend-pdb
+  namespace: frontend
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: weather-forecast-frontend

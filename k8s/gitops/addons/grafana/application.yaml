@@ -4,7 +4,7 @@ metadata:
   name: grafana
   namespace: argocd
   labels:
-    workload: operations
+    workload: weather-forecast
 spec:
   project: default
   source:
@@ -16,7 +16,7 @@ spec:
         tolerations:
           - key: "workload"
             operator: "Equal"
-            value: "operations"
+            value: "weather-forecast"
             effect: "NoSchedule"
 
         # Below is a gitops friendly way to declare a datasource for the grafana instance
@@ -42,12 +42,12 @@ spec:
                   authType: serviceAccount
                   tlsSkipVerify: true
                 editable: false
-        # It is important that grafana database is persisted
-        # Otherwise, dashboards and data will be reset on cluster restart or any event happening in the nodes
+        # # It is important that grafana database is persisted
+        # # Otherwise, dashboards and data will be reset on cluster restart or any event happening in the nodes
         persistence:
           type: pvc
           enabled: true
-          storageClassName: default
+          storageClassName: managed-csi
 
         adminUser: admin
   destination:

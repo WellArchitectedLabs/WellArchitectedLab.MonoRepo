@@ -228,7 +228,8 @@ ACR was left public to avoid needing premium private endpoints. The recommended 
 **AKS setup notes:**
 
 - Attach ACR to AKS with az aks update --attach-acr <acr> to allow node pools to pull images. This instruction is placed in the repo README under the AKS notes and is reiterated in this k8s section because it is part of cluster setup.
-- There are also Argo CD instructions (install Argo CD via Helm, then apply the gitops application manifest). See the repo README for the referenced gitops application manifest name.
+- Please run cluster init script under k8s/setup folder
+- Get the ACR password using the following command: az acr credential show --name acrdevTShPwN (admin access is already enabled by terraform).
 
 ---
 

@@ -20,13 +20,13 @@ spec:
         labels:
           istio: ingressgateway
           version: v1
-        
+
         tolerations:
           - key: workload
             operator: Equal
-            value: operations
+            value: weather-forecast
             effect: NoSchedule
-        
+
         autoscaling:
           enabled: true
           minReplicas: 2
@@ -34,7 +34,7 @@ spec:
 
         service:
           type: LoadBalancer
-          # tell azure LB to load balance only on operations node (for performance and to do not have health probe issues)
+          # tell azure LB to load balance only on weather-forecast node (for performance and to do not have health probe issues)
           externalTrafficPolicy: Local
           ports:
             - name: status-port
@@ -46,6 +46,7 @@ spec:
             - name: https
               port: 443
               targetPort: 8443
+
   destination:
     server: https://kubernetes.default.svc
     namespace: istio-system

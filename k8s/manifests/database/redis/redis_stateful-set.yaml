@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: redis
+  namespace: backend
 spec:
   selector:
     matchLabels:
@@ -12,6 +13,8 @@ spec:
     metadata:
       labels:
         app: redis
+        # necessary for kiali integration
+        version: v1
     spec:
       containers:
       - name: redis
@@ -27,20 +30,30 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.name
+        envFrom:
+          - configMapRef:
+              name: redisconfigenvvars
         command:
           - /bin/sh
           - -c
           - |
-            # If this is redis-0 → start as primary
-            if [[ "$POD_NAME" == "redis-0" ]]; then
-              exec redis-server --appendonly yes
-            
-            # For all other pods → start as replicas
-            else
-              exec redis-server \
-                --appendonly yes \
-                --replicaof redis-0.redis 6379
-            fi
+              set -e
+              # Derive StatefulSet base name (remove -<ordinal>)
+              BASE_NAME="${POD_NAME%-*}"
+              MASTER_POD="${BASE_NAME}-0"
+              MASTER_HOST="${MASTER_POD}.${REDIS_HEADLESS_SERVICE}"
+
+              if [ "$POD_NAME" = "$MASTER_POD" ]; then
+                echo "Starting Redis master: $POD_NAME"
+                exec redis-server --appendonly no
+              else
+                echo "Waiting for Redis master at $MASTER_HOST..."
+                until redis-cli -h "$MASTER_HOST" -p 6379 PING; do
+                  sleep 2
+                done
+                echo "Starting Redis replica: $POD_NAME"
+                exec redis-server --appendonly yes --replicaof "$MASTER_HOST" 6379
+              fi
   volumeClaimTemplates:
   - metadata:
       name: redis-data

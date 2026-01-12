@@ -8,11 +8,15 @@ terraform {
       source  = "hashicorp/random"
       version = "~> 3.1"
     }
+    azuread = {
+      source  = "hashicorp/azuread"
+      version = "~> 2.50"
+    }
   }
   backend "azurerm" {
     key                  = "kubernetes.terraform.tfstate"
-    storage_account_name = "sttbasics001"
-    resource_group_name  = "rg-global"
+    storage_account_name = "devwaltstate"
+    resource_group_name  = "dev-rg-terraforminit"
     container_name       = "tfstate"
   }
 }
@@ -30,11 +34,11 @@ resource "random_string" "acr_suffix" {
 }
 
 resource "azurerm_container_registry" "acr-kubernetes-001" {
-  name                          = "acr${var.environment}${random_string.acr_suffix.result}"
-  sku                           = "Standard"
-  resource_group_name           = var.resource_group_name
-  location                      = var.region
-  admin_enabled                 = true
+  name                = "acr${var.environment}${random_string.acr_suffix.result}"
+  sku                 = "Standard"
+  resource_group_name = var.resource_group_name
+  location            = var.region
+  admin_enabled       = false
 }
 
 resource "azurerm_virtual_network" "vnet-kubernetes-dev-001" {
@@ -67,7 +71,7 @@ resource "azurerm_kubernetes_cluster" "aks-kubernetes-001" {
   resource_group_name = var.resource_group_name
   default_node_pool {
     name       = "npkube001"
-    vm_size    = "standard_a2_v2"
+    vm_size    = "Standard_B2s_v2"
     node_count = 1
     # link aks cluster to the subnet in question
     # temporary_name_for_rotation = "npkubtemp"
@@ -83,19 +87,41 @@ resource "azurerm_kubernetes_cluster" "aks-kubernetes-001" {
 resource "azurerm_kubernetes_cluster_node_pool" "npuser001" {
   kubernetes_cluster_id = azurerm_kubernetes_cluster.aks-kubernetes-001.id
   name                  = "npuser001"
-  node_taints           = ["workload=backend:NoSchedule"]
-  node_count            = 2
+  node_taints           = ["workload=weather-forecast:NoSchedule"]
+  node_count            = 1
   depends_on            = [azurerm_kubernetes_cluster.aks-kubernetes-001]
-  vm_size               = "Standard_D4ds_v5"
+  vm_size               = "Standard_B2s_v2"
+  node_labels = {
+    istio = "pilot"
+  }
 }
-resource "azurerm_kubernetes_cluster_node_pool" "npuser002" {
-  kubernetes_cluster_id = azurerm_kubernetes_cluster.aks-kubernetes-001.id
-  name                  = "npuser002"
-  node_taints           = ["workload=frontend:NoSchedule"]
-  node_count            = 2
-  depends_on            = [azurerm_kubernetes_cluster.aks-kubernetes-001, azurerm_kubernetes_cluster_node_pool.npuser001]
-  vm_size               = "Standard_D4ds_v5"
-}
+
+# It was decided, for workloads optimizations in regards to subscription quotas to use a single node pool for all user workloads
+# Weither it is operations (istio, grafana, argocd ect..) or user applications (weather forecast bff or frontend ect..)
+# They are live in the same node pool, in the same cluster
+# So the frontend and operations nodepools were merged into a single node pool
+
+# resource "azurerm_kubernetes_cluster_node_pool" "npuser002" {
+#   kubernetes_cluster_id = azurerm_kubernetes_cluster.aks-kubernetes-001.id
+#   name                  = "npuser002"
+#   node_taints           = ["workload=frontend:NoSchedule"]
+#   node_count            = 1
+#   depends_on            = [azurerm_kubernetes_cluster.aks-kubernetes-001, azurerm_kubernetes_cluster_node_pool.npuser001]
+#   vm_size               = "Standard_B2s_v2"
+# }
+
+# resource "azurerm_kubernetes_cluster_node_pool" "npoperations001" {
+#   kubernetes_cluster_id = azurerm_kubernetes_cluster.aks-kubernetes-001.id
+#   name = "npops001"
+#   node_taints = ["workload=operations:NoSchedule"]
+#   node_count = 1
+#   depends_on = [ azurerm_kubernetes_cluster.aks-kubernetes-001, azurerm_kubernetes_cluster_node_pool.npuser002 ]
+#   vm_size = "Standard_B2s_v2"
+#   node_labels = {
+#     workload = "operations"
+#     istio    = "pilot"
+#   }
+# }
 
 resource "azurerm_role_assignment" "cluster-registry-access" {
   principal_id                     = azurerm_kubernetes_cluster.aks-kubernetes-001.kubelet_identity[0].object_id
@@ -105,7 +131,42 @@ resource "azurerm_role_assignment" "cluster-registry-access" {
   skip_service_principal_aad_check = true
 }
 
-# # Private endpoints will bind an integration subnet, which is generally dedicated to the "consumer" of the private resource to the private resource itself
+####################################################################################
+# Enterprise App Creation
+# The enterprise application will be used for weather forecast acr push rights assignment
+####################################################################################
+
+resource "azuread_application" "acr_push_app" {
+  display_name = "ea-acr-push-weather-forecast-${var.environment}"
+}
+
+resource "azuread_application_password" "acr_push_app_password" {
+  # secret is consultable in secrets screen on the enterprise application level
+  application_id = azuread_application.acr_push_app.id
+}
+
+##################################################
+# Associate a service principal to the enterprise app
+##################################################
+
+resource "azuread_service_principal" "acr_push_sp" {
+  client_id = azuread_application.acr_push_app.client_id
+}
+
+##################################################
+# Assign role 
+##################################################
+
+resource "azurerm_role_assignment" "acr_push" {
+  principal_id         = azuread_service_principal.acr_push_sp.id
+  role_definition_name = "AcrPush"
+  scope                = azurerm_container_registry.acr-kubernetes-001.id
+  depends_on           = [azuread_service_principal.acr_push_sp, azurerm_container_registry.acr-kubernetes-001]
+}
+
+# Used for getting the tenant ID for outputs
+data "azurerm_client_config" "current" {}
+
 # # In our case: the consumer is the AKS cluster and the resource if the container resgitry
 # # When this private endpoint config is applied, we can say that we enabled the AKS cluster integration with other azure services using private endpoints, which a majot security enhancement since we no longer need to exposes the dependant services publically to the internet
 # # Please note the restriction on azure level that requires that the subnet running the consumer resource (the AKS cluster or App Service or any compute service) need to be 'delegated' for the given service. This means that the subnet will only support aks cluster resources and nothing else

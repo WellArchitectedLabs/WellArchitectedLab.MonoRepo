@@ -2,19 +2,21 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: backend-configmap
+  namespace: backend
 data:
-  appSettings.json: |
-    # json fieldPath:
+  appsettings.json: |
+    {
     "Logging": {
-    "LogLevel": {
-      "Default": "Information",
-      "Microsoft.AspNetCore": "Warning"
+      "LogLevel": {
+        "Default": "Information",
+        "Microsoft.AspNetCore": "Warning"
       }
     },
-    "AllowedHosts": "*"
-    "WeatherForecast":{
-      "Redis": {
-          "WriteDbConnection": "redis-primary.default.svc.cluster.local:6379"
-          "ReadDbConnection": "redis-secondary.default.svc.cluster.local:6379"
+    "AllowedHosts": "*",
+    "WeatherForecast": {
+        "Redis": {
+          "WriteDbConnection": "dev-redis-primary.backend.svc.cluster.local:6379",
+          "ReadDbConnection": "dev-redis-secondary.backend.svc.cluster.local:6379"
         }
+      }
     }

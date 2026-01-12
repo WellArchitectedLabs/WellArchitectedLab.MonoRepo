@@ -1,0 +1,32 @@
+# Ingress is obsolete starting march 2026
+# It is replaced by a combination of gateway classes, gateway apis and http routes 
+# Please check teh gateway api folder for better understanding of the replaced definitions
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: backend-ingress
+  namespace: backend
+  labels:
+    app.kubernetes.io/name: backend-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/enable-cors: "true"           # enable CORS
+    nginx.ingress.kubernetes.io/cors-allow-origin: "http://front.weatherly"
+    nginx.ingress.kubernetes.io/cors-allow-methods: "GET, POST, OPTIONS"
+    nginx.ingress.kubernetes.io/cors-allow-headers: "Content-Type,Authorization"
+    nginx.ingress.kubernetes.io/cors-expose-headers: "Content-Length,Content-Range"
+spec:
+  # Specify the app routing ingress class
+  # The ingress class is got from command kubectl get ingressclass which should return two ingress classes
+  # This references the ingress class that is created in defaults ingress class yaml file
+  ingressClassName: webapprouting.kubernetes.azure.com
+  rules:
+  - host: api.weatherly
+    http:
+      paths:
+      - pathType: Prefix
+        path: /
+        backend:
+          service:
+            name: backend-service
+            port: 
+              number: 8080

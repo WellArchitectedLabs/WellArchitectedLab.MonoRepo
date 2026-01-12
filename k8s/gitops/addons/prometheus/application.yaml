@@ -1,0 +1,65 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: prometheus-server
+  namespace: argocd
+  labels:
+    workload: weather-forecast
+spec:
+  project: default
+  source:
+    repoURL: https://prometheus-community.github.io/helm-charts
+    chart: kube-prometheus-stack
+    targetRevision: 58.5.0
+    helm:
+      skipCrds: true
+      values: |
+        prometheus:
+          prometheusSpec:
+            enableAdminAPI: true
+            logLevel: debug
+            additionalAgs:
+              - --log.level=debug
+            tolerations:
+              - key: workload
+                operator: Equal
+                value: weather-forecast
+                effect: NoSchedule
+            
+            # Very important for istio integration
+            # These configs allow prometheus to read istio specific metrics
+            # Which are pushed by istio service monitors
+            # F.e: one of the main metrics that are istio specific and that prometheus must read is istio_requests_total
+
+            serviceMonitorSelectorNilUsesHelmValues: false
+            podMonitorSelectorNilUsesHelmValues: false
+            serviceMonitorSelector: {}
+            podMonitorSelector: {}
+        
+        alertmanager:
+          enabled: false
+
+        grafana:
+          enabled: false
+
+        nodeExporter:
+          enabled: false
+
+        kubeStateMetrics:
+          enabled: false
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: monitoring
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+    retry:
+      limit: 5
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 3m

@@ -1,0 +1,104 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: kiali
+  namespace: argocd
+  labels:
+    workload: weather-forecast
+spec:
+  project: default
+  source:
+    repoURL: https://kiali.org/helm-charts
+    chart: kiali-server
+    targetRevision: 1.78.0
+    helm:
+      values: |
+        deployment:
+          accessible_namespaces:
+            - "**"
+          tolerations:
+            - key: "workload"
+              operator: "Equal"
+              value: "weather-forecast"
+              effect: "NoSchedule"
+          view_only_mode: false
+
+          logger:
+            log_level: debug
+
+        auth:
+          strategy: anonymous
+          anonymous:
+            enabled: true
+
+        external_services:
+          prometheus:
+            enabled: true
+            cache_enabled: false
+            url: http://prometheus-operated.monitoring:9090
+            custom_metrics_url: http://prometheus-operated.monitoring:9090
+            query_scope:
+              cluster: true
+            rate:
+              interval: 1m
+          istio:
+            enabled: true
+            root_namespace: istio-system
+            component_status:
+              enabled: true
+
+          tracing:
+            enabled: false
+        
+        #show rate for all namespaces, all kind of workloads and all workload names
+        rate:
+          - namespace: ".*"
+            kind: ".*"
+            name: ".*"
+        
+        # shpw graph even for low level rate edges
+        graph:
+          # Show edges with very low request rates (default filters out edges < 0.1 rps)
+          hide:
+            edges:
+              - idle: false  # Don't hide idle edges
+
+        # health_config:
+        #   # Disable side car check for these namespaces (optional for clean kiali interface)
+        #   # Kiali checks istio proxy sidecar injection for all namespaces by default
+        #   namespace:
+        #     - name: istio-system
+        #       health:
+        #         sidecar: false
+        #     - name: istio-gateway
+        #       health:
+        #         sidecar: false
+        #     - name: monitoring
+        #       health:
+        #         sidecar: false
+
+        kiali_feature_flags:
+          istio_injection_action: true
+          istio_validation_action: true
+          ui_defaults:
+            namespaces:
+            - istio-system
+            - istio-gateway
+            - backend
+            - frontend
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: istio-system
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+    retry:
+      limit: 5
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 3m

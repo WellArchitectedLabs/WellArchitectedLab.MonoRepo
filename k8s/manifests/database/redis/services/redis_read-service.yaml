@@ -1,0 +1,16 @@
+# This is a cluster IP service that load balances between the three redis pods
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-secondary
+  namespace: backend
+  labels:
+    app: redis
+    version: v1
+spec:
+  type: ClusterIP
+  selector:
+    app: redis
+  ports:
+  - name: redis
+    port: 6379

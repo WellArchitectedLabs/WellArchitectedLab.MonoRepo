@@ -1,0 +1,24 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: cluster-bootstrap
+  namespace: argocd
+  labels:
+    workload: applications
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/WellArchitectedLabs/WellArchitectedLab.MonoRepo.git
+    targetRevision: main
+    path: k8s/gitops
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: argocd
+  syncPolicy:
+    retry:
+      limit: 2
+      backoff:
+        duration: 5s
+    automated:
+      prune: true
+      selfHeal: true

@@ -1,0 +1,56 @@
+global:
+  image:
+    tag: ""   # let the chart decide
+
+configs:
+  params:
+    server.insecure: true
+
+server:
+  replicas: 1
+  service:
+    type: ClusterIP
+
+  nodeSelector:
+    workload: weather-forecast
+  tolerations:
+    - key: "workload"
+      operator: "Equal"
+      value: "weather-forecast"
+      effect: "NoSchedule"
+
+controller:
+  nodeSelector:
+    workload: weather-forecast
+  tolerations:
+    - key: "workload"
+      operator: "Equal"
+      value: "weather-forecast"
+      effect: "NoSchedule"
+
+repoServer:
+  nodeSelector:
+    workload: weather-forecast
+  tolerations:
+    - key: "workload"
+      operator: "Equal"
+      value: "weather-forecast"
+      effect: "NoSchedule"
+
+applicationSet:
+  nodeSelector:
+    workload: weather-forecast
+  tolerations:
+    - key: "workload"
+      operator: "Equal"
+      value: "weather-forecast"
+      effect: "NoSchedule"
+
+redis:
+  nodeSelector:
+    workload: weather-forecast
+  tolerations:
+    - key: "workload"
+      operator: "Equal"
+      value: "weather-forecast"
+      effect: "NoSchedule"

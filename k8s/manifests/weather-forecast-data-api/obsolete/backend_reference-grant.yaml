@@ -1,0 +1,21 @@
+# gateway and backend services exist on different namespaces
+# namespaces are really network limits
+# components from different namespaces cannot connect directly
+# this resource allow traffix flowing from a "from" namespace to a target one
+# and are introduced by the kubernetes spec in order to allow the namespace flow from an exact service type to an exact service in a declarative and secure way so the network isolation is concious and ensured
+apiVersion: gateway.networking.k8s.io/v1beta1
+# depending on the cluster version, ReferenceGrant can exist in the v1 or betav1 version of specs
+# please run kubectl api-resources in order to view all the cluster's managed resources up with their corresponding version of the api definition (which is not totally v1 for all resources)
+# typically it is v1beta for ReferenceGrants
+kind: ReferenceGrant
+metadata:
+  name: nginx-class-to-backend-grant
+  namespace: backend #needs to be the service namespace
+spec:
+  from: 
+  - group: gateway.networking.k8s.io
+    kind: HTTPRoute
+    namespace: istio-gateway
+  to:
+  - group: ""
+    kind: Service

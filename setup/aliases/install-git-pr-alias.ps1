@@ -27,7 +27,7 @@ if (-not (Test-Path $ScriptFullPath)) {
 # Set git alias 'pr'
 # -----------------------------
 # Use relative path to repo root
-$AliasCommand = "!powershell -ExecutionPolicy Bypass -File './$ScriptRelativePath'"
+$AliasCommand = "!pwsh -ExecutionPolicy Bypass -File './$ScriptRelativePath'"
 
 git config --local alias.pr $AliasCommand
 

@@ -8,6 +8,7 @@ metadata:
   namespace: argocd
   labels:
     isIstio: "true"
+    workload: operations
   annotations:
     argocd.argoproj.io/sync-wave: "0"   # I need crds to exist before deamon
 spec:

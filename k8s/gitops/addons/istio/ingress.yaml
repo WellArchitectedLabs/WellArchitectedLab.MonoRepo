@@ -5,6 +5,7 @@ metadata:
   namespace: argocd
   labels:
     isIstio: "true"
+    workload: operations
   annotations:
     argocd.argoproj.io/sync-wave: "2" # Install istio gateway after istio deamon (ranked 0) and istio crds (ranked 1) in order
 spec:

@@ -1,18 +1,18 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: redis
+  name: weather-forecast-bff-redis
   namespace: backend
 spec:
   selector:
     matchLabels:
-      app: redis
-  serviceName: redis
+      app: weather-forecast-bff-redis
+  serviceName: weather-forecast-bff-redis
   replicas: 3
   template:
     metadata:
       labels:
-        app: redis
+        app: weather-forecast-bff-redis
         # necessary for kiali integration
         version: v1
     spec:
@@ -32,7 +32,7 @@ spec:
               fieldPath: metadata.name
         envFrom:
           - configMapRef:
-              name: redisconfigenvvars
+              name: rediswfconfigenvvars
         command:
           - /bin/sh
           - -c

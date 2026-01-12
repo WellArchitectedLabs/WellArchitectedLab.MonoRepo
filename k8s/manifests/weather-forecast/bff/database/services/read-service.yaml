@@ -2,15 +2,15 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: redis-secondary
+  name: weather-forecast-bff-redis-secondary
   namespace: backend
   labels:
-    app: redis
+    app: weather-forecast-bff-redis
     version: v1
 spec:
   type: ClusterIP
   selector:
-    app: redis
+    app: weather-forecast-bff-redis
   ports:
   - name: redis
     port: 6379

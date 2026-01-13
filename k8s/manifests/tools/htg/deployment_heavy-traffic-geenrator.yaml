@@ -31,7 +31,7 @@ spec:
         - name: LISTEN_ADDR
           value: "0.0.0.0:8080"
         - name: UPSTREAM_URIS
-          value: "http://dev-backend-service.backend.svc.cluster.local:8080/WeatherForecast"
+          value: "http://dev-weather-forecast-bff-service.backend.svc.cluster.local:8080/WeatherForecast"
         - name: UPSTREAM_REQUESTS_PER_SECOND
           value: "5"
         resources:

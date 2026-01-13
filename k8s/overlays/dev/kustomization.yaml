@@ -9,6 +9,7 @@ resources:
   - ../../manifests/shared
   - ../../manifests/weather-forecast/bff/database
   - weather-forecast-bff_config-map.yaml
+  - ../../manifests/tools/htg
 
 
 # define a dev prefix for all created environment in relation to this overlay

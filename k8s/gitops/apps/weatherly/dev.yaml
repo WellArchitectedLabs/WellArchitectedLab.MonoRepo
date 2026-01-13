@@ -9,16 +9,11 @@ spec:
   project: default
   source:
     repoURL: https://github.com/WellArchitectedLabs/WellArchitectedLab.MonoRepo.git
-    targetRevision: feature/k8sWorkloadsMigration
+    targetRevision: develop
     path: k8s/overlays/dev
   destination:
     server: https://kubernetes.default.svc
     namespace: default
-  ignoreDifferences:
-  - group: bitnami.com
-    kind: SealedSecret
-    jsonPointers:
-    - /status
   syncPolicy:
     automated:
       prune: true

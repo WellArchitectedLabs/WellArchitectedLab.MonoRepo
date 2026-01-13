@@ -1,0 +1,68 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: grafana-database
+  namespace: argocd
+  labels:
+    workload: operations
+    isGrafana: "true"
+    isDatabase: "true"
+  annotations:
+    argocd.argoproj.io/sync-wave: "10"
+spec:
+  project: default
+  source:
+    repoURL: https://charts.bitnami.com/bitnami
+    chart: postgresql
+    targetRevision: "15.5.0"
+    helm:
+      values: |
+        image:
+          registry: docker.io
+          repository: bitnamilegacy/postgresql
+          tag: "15.5.0-debian-11-r0"
+          pullPolicy: IfNotPresent
+
+        metrics:
+          image:
+            repository: bitnamilegacy/postgres-exporter
+            tag: "0.11.1-debian-11-r0"
+
+        volumePermissions:
+          image:
+            repository: bitnamilegacy/os-shell
+            tag: "10.4.1-debian-11-r17"
+
+        auth:
+          username: grafana                    # Hardcode the username
+          database: grafana                    # Hardcode the database name
+          existingSecret: grafana-secrets      # Use secret ONLY for passwords
+          secretKeys:
+            adminPasswordKey: password         # postgres superuser (postgres) password from secret
+            userPasswordKey: password          # grafana user password from secret, equals to the super user password
+            replicationPasswordKey: password   # replication password from secret
+
+        primary:
+          persistence:
+            enabled: true
+            storageClass: managed-csi
+            size: 10Gi
+          tolerations:
+            - key: "workload"
+              operator: "Equal"
+              value: "weather-forecast"
+              effect: "NoSchedule"
+
+  destination:
+    namespace: monitoring
+    server: https://kubernetes.default.svc
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+    retry:
+      limit: 2
+      backoff:
+        duration: 5s

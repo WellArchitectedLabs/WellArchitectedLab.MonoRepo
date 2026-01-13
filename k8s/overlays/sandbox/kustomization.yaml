@@ -3,6 +3,7 @@ kind: Kustomization
 
 # reference all manifests from base folder
 resources:
+  - ../../manifests/operations
   - ../../manifests/weather-forecast/bff
   - ../../manifests/weather-forecast/frontend
   - ../../manifests/shared

@@ -5,6 +5,9 @@ metadata:
   namespace: argocd
   labels:
     workload: operations
+    isGrafana: "true"
+  annotations:
+    argocd.argoproj.io/sync-wave: "11" # We need the grafana server installed after database
 spec:
   project: default
   source:
@@ -13,15 +16,28 @@ spec:
     targetRevision: 7.3.9
     helm:
       values: |
+        # Only one replica is sufficient for most production ready setups
+        replicas: 1
+
+        # Secure grafana admin credentials via existing kubernetes secret
+        admin:
+          existingSecret: grafana-secrets
+          userKey: grafana-admin-user
+          passwordKey: grafana-admin-password
+
+        # Tolerate the grafana instance to run into the weather forecast node
+        # Ideally, a separate node pool for monitoring (prometheus, grafana) and operations
+        # Should be used.
+        # We are hitting a quotas limitation so we are using only one node pool
         tolerations:
           - key: "workload"
             operator: "Equal"
             value: "weather-forecast"
             effect: "NoSchedule"
 
-        # Below is a gitops friendly way to declare a datasource for the grafana instance
         # The datasource simply points to the prometheus service 
         # that is deployed via the prometheus argocd app
+        # the kubernetes datasource points to current cluster
         datasources:
           datasources.yaml:
             apiVersion: 1
@@ -42,14 +58,32 @@ spec:
                   authType: serviceAccount
                   tlsSkipVerify: true
                 editable: false
-        # # It is important that grafana database is persisted
-        # # Otherwise, dashboards and data will be reset on cluster restart or any event happening in the nodes
+        
+        # Use the deployed postgres instance to store grafana data
+
+        # Load all secret keys as environment variables
+        envFromSecret: grafana-secrets
+        
+        # Reference the environment variables for database configuration
+        env:
+          GF_DATABASE_TYPE: postgres
+          GF_DATABASE_HOST: grafana-database-postgresql.monitoring.svc.cluster.local:5432
+          GF_DATABASE_NAME: $__env{GF_POSTGRES_DB}
+          GF_DATABASE_USER: $__env{GF_POSTGRES_USER}
+          GF_DATABASE_PASSWORD: $__env{GF_POSTGRES_PASSWORD}
+          GF_DATABASE_SSL_MODE: disable
+        
+        # It is important that grafana database is persisted
+        # Otherwise, dashboards and data will be reset on cluster restart or any event happening in the nodes
         persistence:
           type: pvc
           enabled: true
           storageClassName: managed-csi
+          # Makes sure mvcs are deployed with the right access modes
+          accessModes:
+            - ReadWriteOnce
+          size: 10Gi
 
-        adminUser: admin
   destination:
     server: https://kubernetes.default.svc
     namespace: monitoring

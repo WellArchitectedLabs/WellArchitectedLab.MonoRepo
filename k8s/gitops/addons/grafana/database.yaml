@@ -38,8 +38,8 @@ spec:
           database: grafana                    # Hardcode the database name
           existingSecret: grafana-secrets      # Use secret ONLY for passwords
           secretKeys:
-            adminPasswordKey: password         # postgres superuser password from secret
-            userPasswordKey: password          # grafana user password from secret
+            adminPasswordKey: password         # postgres superuser (postgres) password from secret
+            userPasswordKey: password          # grafana user password from secret, equals to the super user password
             replicationPasswordKey: password   # replication password from secret
 
         primary:

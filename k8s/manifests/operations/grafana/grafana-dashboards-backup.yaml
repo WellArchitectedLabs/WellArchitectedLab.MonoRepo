@@ -36,7 +36,7 @@ spec:
 
             # Container 2: GitHub CLI
             - name: github-pr
-              image: ghcr.io/cli/cli:latest
+              image: ghcli/gh:2.35.0
               volumeMounts:
                 - mountPath: /backups
                   name: backup-volume

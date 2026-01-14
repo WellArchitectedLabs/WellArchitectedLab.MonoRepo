@@ -92,7 +92,8 @@ spec:
                 - |
                   set -euo pipefail
 
-                  apk add --no-cache curl
+                  # Sanity check
+                  test -f /backups/grafana-dashboards.json
 
                   # Install gh CLI
                   GH_VERSION=2.35.0

@@ -16,7 +16,7 @@ spec:
 
           initContainers:
           - name: grafana-backup
-            image: ghcr.io/jqlang/jq:1.7
+            image: alpine:3.19
             volumeMounts:
               - mountPath: /backups
                 name: backup-volume

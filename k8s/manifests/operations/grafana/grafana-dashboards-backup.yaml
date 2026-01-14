@@ -10,59 +10,67 @@ spec:
       template:
         spec:
           restartPolicy: OnFailure
+
           volumes:
             - name: backup-volume
               emptyDir: {}
 
+          # ===============================
+          # Init container: Grafana export
+          # ===============================
           initContainers:
-          - name: grafana-backup
-            image: alpine:3.19
-            volumeMounts:
-              - mountPath: /backups
-                name: backup-volume
-            env:
-              - name: GRAFANA_URL
-                value: "http://grafana.monitoring.svc.cluster.local"
-              - name: GRAFANA_TOKEN
-                valueFrom:
-                  secretKeyRef:
-                    name: dev-grafana-secrets
-                    key: GRAFANA_TOKEN
-            command:
-              - /bin/sh
-              - -c
-              - |
-                set -euo pipefail
+            - name: grafana-backup
+              image: alpine:3.19
+              volumeMounts:
+                - mountPath: /backups
+                  name: backup-volume
+              env:
+                - name: GRAFANA_URL
+                  value: "http://grafana.monitoring.svc.cluster.local"
+                - name: GRAFANA_TOKEN
+                  valueFrom:
+                    secretKeyRef:
+                      name: dev-grafana-secrets
+                      key: GRAFANA_TOKEN
+              command:
+                - /bin/sh
+                - -c
+                - |
+                  set -euo pipefail
 
-                echo "Fetching dashboards list"
-                curl -sS -H "Authorization: Bearer ${GRAFANA_TOKEN}" \
-                  ${GRAFANA_URL}/api/search?type=dash-db \
-                  > /backups/dashboards.json
+                  apk add --no-cache curl jq
 
-                echo "[" > /backups/grafana-dashboards.json
-                first=true
+                  echo "Fetching dashboard list"
+                  curl -sS -H "Authorization: Bearer ${GRAFANA_TOKEN}" \
+                    "${GRAFANA_URL}/api/search?type=dash-db" \
+                    > /backups/dashboards.json
 
-                jq -r '.[].uid' /backups/dashboards.json | while read uid; do
-                  echo "Exporting dashboard $uid"
-                  dashboard=$(curl -sS -H "Authorization: Bearer ${GRAFANA_TOKEN}" \
-                    ${GRAFANA_URL}/api/dashboards/uid/${uid})
+                  echo "[" > /backups/grafana-dashboards.json
+                  first=true
 
-                  if [ "$first" = true ]; then
-                    first=false
-                  else
-                    echo "," >> /backups/grafana-dashboards.json
-                  fi
+                  jq -r '.[].uid' /backups/dashboards.json | while read uid; do
+                    echo "Exporting dashboard $uid"
+                    dashboard=$(curl -sS -H "Authorization: Bearer ${GRAFANA_TOKEN}" \
+                      "${GRAFANA_URL}/api/dashboards/uid/${uid}")
 
-                  echo "$dashboard" >> /backups/grafana-dashboards.json
-                done
+                    if [ "$first" = true ]; then
+                      first=false
+                    else
+                      echo "," >> /backups/grafana-dashboards.json
+                    fi
 
-                echo "]" >> /backups/grafana-dashboards.json
+                    echo "$dashboard" >> /backups/grafana-dashboards.json
+                  done
 
-                echo "Backup completed"
-                ls -lh /backups
+                  echo "]" >> /backups/grafana-dashboards.json
+                  ls -lh /backups
+
+          # ===============================
+          # Main container: Git + PR
+          # ===============================
           containers:
             - name: github-pr
-              image: bitnami/git:latest
+              image: bitnami/git:2.44.0
               volumeMounts:
                 - mountPath: /backups
                   name: backup-volume
@@ -84,8 +92,7 @@ spec:
                 - |
                   set -euo pipefail
 
-                  # Sanity check
-                  test -f /backups/grafana-dashboards.json
+                  apk add --no-cache curl
 
                   # Install gh CLI
                   GH_VERSION=2.35.0
@@ -104,6 +111,7 @@ spec:
 
                   git config user.name "grafana-backup-bot"
                   git config user.email "grafana-backup@org.local"
+
                   git add grafana-dashboards.json
                   git commit -m "Automated Grafana dashboards backup" || exit 0
 
@@ -114,7 +122,7 @@ spec:
                     --head ${SOURCE_BRANCH} \
                     --base ${TARGET_BRANCH} \
                     --title "Automated Grafana dashboards backup" \
-                    --body "Backup JSON updated." \
+                    --body "Automated Grafana dashboards backup" \
                   || gh pr edit ${SOURCE_BRANCH} \
                     --title "Automated Grafana dashboards backup" \
-                    --body "Backup JSON updated."
+                    --body "Automated Grafana dashboards backup"

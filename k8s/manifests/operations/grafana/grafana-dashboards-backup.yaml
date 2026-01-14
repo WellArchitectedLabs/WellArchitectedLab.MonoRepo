@@ -45,11 +45,12 @@ spec:
 
                   mkdir -p /backups/dashboards
 
-                  jq -r '.[].uid' /backups/dashboards.json | while read uid; do
-                    echo "Exporting dashboard $uid"
+                  jq -r '.[] | "\(.uid) \(.title)"' /backups/dashboards.json | while read uid title; do
+                    safe_title=$(echo "$title" | tr -c '[:alnum:]._-' '_')
+                    echo "Exporting dashboard $title ($uid) -> $safe_title.json"
                     dashboard=$(curl -sS -H "Authorization: Bearer ${GRAFANA_TOKEN}" \
                       "${GRAFANA_URL}/api/dashboards/uid/${uid}")
-                    echo "$dashboard" | jq '.' > "/backups/dashboards/${uid}.json"
+                    echo "$dashboard" | jq '.' > "/backups/dashboards/${safe_title}.json"
                   done
 
                   rm /backups/dashboards.json

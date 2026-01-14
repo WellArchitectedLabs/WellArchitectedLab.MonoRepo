@@ -34,9 +34,9 @@ spec:
                 - |
                   grafana-cli dashboards backup --output /backups/grafana-dashboards.json
 
-            # Container 2: GitHub CLI
+            # Container 2: Git + GH CLI
             - name: github-pr
-              image: ghcli/gh:2.35.0
+              image: bitnami/git:latest
               volumeMounts:
                 - mountPath: /backups
                   name: backup-volume
@@ -57,6 +57,13 @@ spec:
                 - -c
                 - |
                   set -euo pipefail
+
+                  # Install GH CLI
+                  curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | gpg --dearmor -o /usr/share/keyrings/githubcli-archive-keyring.gpg
+                  echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | tee /etc/apt/sources.list.d/github-cli.list > /dev/null
+                  apt-get update && apt-get install -y gh
+
+                  # Clone repo and update backup
                   cd /backups
                   git clone https://github.com/${GIT_REPO}.git repo
                   cd repo
@@ -66,6 +73,9 @@ spec:
                   git config user.email "grafana-backup@org.local"
                   git add grafana-dashboards.json
                   git commit -m "Automated Grafana dashboards backup" || exit 0
-                  git push -f origin ${SOURCE_BRANCH}
+
+                  # Push branch and create/update PR
+                  git push -f https://${GITHUB_PAT}@github.com/${GIT_REPO}.git ${SOURCE_BRANCH}
+                  gh auth login --with-token <<< "${GITHUB_PAT}"
                   gh pr create --repo ${GIT_REPO} --head ${SOURCE_BRANCH} --base ${TARGET_BRANCH} --title "Automated Grafana dashboards backup" --body "Backup JSON updated." || \
                   gh pr edit ${SOURCE_BRANCH} --title "Automated Grafana dashboards backup" --body "Backup JSON updated."

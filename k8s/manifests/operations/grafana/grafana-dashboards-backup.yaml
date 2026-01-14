@@ -70,7 +70,7 @@ spec:
           # ===============================
           containers:
             - name: github-pr
-              image: bitnami/git:2.44.0
+              image: bitnami/git:latest
               volumeMounts:
                 - mountPath: /backups
                   name: backup-volume

@@ -43,25 +43,17 @@ spec:
                     "${GRAFANA_URL}/api/search?type=dash-db" \
                     > /backups/dashboards.json
 
-                  echo "[" > /backups/grafana-dashboards.json
-                  first=true
+                  mkdir -p /backups/dashboards
 
                   jq -r '.[].uid' /backups/dashboards.json | while read uid; do
                     echo "Exporting dashboard $uid"
                     dashboard=$(curl -sS -H "Authorization: Bearer ${GRAFANA_TOKEN}" \
                       "${GRAFANA_URL}/api/dashboards/uid/${uid}")
-
-                    if [ "$first" = true ]; then
-                      first=false
-                    else
-                      echo "," >> /backups/grafana-dashboards.json
-                    fi
-
-                    echo "$dashboard" >> /backups/grafana-dashboards.json
+                    echo "$dashboard" | jq '.' > "/backups/dashboards/${uid}.json"
                   done
 
-                  echo "]" >> /backups/grafana-dashboards.json
-                  ls -lh /backups
+                  rm /backups/dashboards.json
+                  ls -lh /backups/dashboards
 
           # ===============================
           # Main container: Git + PR
@@ -91,10 +83,11 @@ spec:
                   set -euo pipefail
 
                   # Sanity check
-                  test -f /backups/grafana-dashboards.json
+                  test -d /backups/dashboards
 
                   # Install GitHub CLI
                   GH_VERSION=2.35.0
+                  apk add --no-cache curl tar gzip
                   curl -sSL https://github.com/cli/cli/releases/download/v${GH_VERSION}/gh_${GH_VERSION}_linux_amd64.tar.gz \
                     | tar -xz
                   mv gh_${GH_VERSION}_linux_amd64/bin/gh /usr/local/bin/gh
@@ -102,31 +95,27 @@ spec:
                   echo "${GITHUB_PAT}" | gh auth login --with-token
 
                   cd /backups
-                  if [ -d repo/.git ]; then
-                    echo "Repo already exists, reusing it"
-                    cd repo
-                    git fetch origin
-                  else
-                    echo "Cloning repo"
-                    git clone https://github.com/${GIT_REPO}.git repo
-                    cd repo
-                  fi
+                  # Clean previous clone if exists
+                  rm -rf repo
+                  git clone https://github.com/${GIT_REPO}.git repo
+                  cd repo
 
-                  git checkout -B ${SOURCE_BRANCH} origin/${TARGET_BRANCH} || git checkout -B ${SOURCE_BRANCH}
+                  # Create/update source branch
+                  git checkout -B ${SOURCE_BRANCH}
 
-                  # 🔑 Inject PAT into git remote for push
-                  git remote set-url origin https://x-access-token:${GITHUB_PAT}@github.com/${GIT_REPO}.git
-
-                  cp /backups/grafana-dashboards.json grafana-dashboards.json
+                  # Copy dashboards folder
+                  mkdir -p grafana-dashboards
+                  cp /backups/dashboards/*.json grafana-dashboards/
 
                   git config user.name "grafana-backup-bot"
                   git config user.email "grafana-backup@org.local"
 
-                  git add grafana-dashboards.json
+                  git add grafana-dashboards/
                   git commit -m "Automated Grafana dashboards backup" || exit 0
 
-                  git push -f origin ${SOURCE_BRANCH}
+                  git push -f https://${GITHUB_PAT}@github.com/${GIT_REPO}.git ${SOURCE_BRANCH}
 
+                  # Create or update PR
                   gh pr create \
                     --repo ${GIT_REPO} \
                     --head ${SOURCE_BRANCH} \
@@ -135,4 +124,4 @@ spec:
                     --body "Automated Grafana dashboards backup" \
                   || gh pr edit ${SOURCE_BRANCH} \
                     --title "Automated Grafana dashboards backup" \
-                    --body "Automated Grafana dashboards backup."
+                    --body "Automated Grafana dashboards backup"

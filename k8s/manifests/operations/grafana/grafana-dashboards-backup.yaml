@@ -1,0 +1,70 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: grafana-dashboard-backup
+spec:
+  schedule: "0 2 * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: OnFailure
+          volumes:
+            - name: backup-volume
+              emptyDir: {}
+          containers:
+            # Container 1: Grafana CLI
+            - name: grafana-backup
+              image: grafana/grafana:latest
+              volumeMounts:
+                - mountPath: /backups
+                  name: backup-volume
+              env:
+                - name: GRAFANA_URL
+                  value: "http://grafana.monitoring.svc.cluster.local"
+                - name: GRAFANA_TOKEN
+                  valueFrom:
+                    secretKeyRef:
+                      name: grafana-secrets
+                      key: GRAFANA_TOKEN
+              args:
+                - /bin/sh
+                - -c
+                - |
+                  grafana-cli dashboards backup --output /backups/grafana-dashboards.json
+
+            # Container 2: GitHub CLI
+            - name: github-pr
+              image: ghcr.io/cli/cli:latest
+              volumeMounts:
+                - mountPath: /backups
+                  name: backup-volume
+              env:
+                - name: GITHUB_PAT
+                  valueFrom:
+                    secretKeyRef:
+                      name: grafana-secrets
+                      key: GITHUB_PAT
+                - name: GIT_REPO
+                  value: "WellArchitectedLabs/WellArchitectedLab.MonoRepo"
+                - name: TARGET_BRANCH
+                  value: "develop"
+                - name: SOURCE_BRANCH
+                  value: "grafana-dashboard-backup"
+              args:
+                - /bin/sh
+                - -c
+                - |
+                  set -euo pipefail
+                  cd /backups
+                  git clone https://github.com/${GIT_REPO}.git repo
+                  cd repo
+                  git checkout -B ${SOURCE_BRANCH}
+                  cp /backups/grafana-dashboards.json ./grafana-dashboards.json
+                  git config user.name "grafana-backup-bot"
+                  git config user.email "grafana-backup@org.local"
+                  git add grafana-dashboards.json
+                  git commit -m "Automated Grafana dashboards backup" || exit 0
+                  git push -f origin ${SOURCE_BRANCH}
+                  gh pr create --repo ${GIT_REPO} --head ${SOURCE_BRANCH} --base ${TARGET_BRANCH} --title "Automated Grafana dashboards backup" --body "Backup JSON updated." || \
+                  gh pr edit ${SOURCE_BRANCH} --title "Automated Grafana dashboards backup" --body "Backup JSON updated."

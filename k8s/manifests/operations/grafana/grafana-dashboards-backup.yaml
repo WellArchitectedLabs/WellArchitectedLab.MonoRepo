@@ -44,7 +44,7 @@ spec:
                 - name: GITHUB_PAT
                   valueFrom:
                     secretKeyRef:
-                      name: grafana-secrets
+                      name: github-secrets
                       key: GITHUB_PAT
                 - name: GIT_REPO
                   value: "WellArchitectedLabs/WellArchitectedLab.MonoRepo"

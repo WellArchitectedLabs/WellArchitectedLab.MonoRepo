@@ -92,10 +92,8 @@ spec:
                 - |
                   set -euo pipefail
 
-                  # Sanity check
                   test -f /backups/grafana-dashboards.json
 
-                  # Install gh CLI
                   GH_VERSION=2.35.0
                   curl -sSL https://github.com/cli/cli/releases/download/v${GH_VERSION}/gh_${GH_VERSION}_linux_amd64.tar.gz \
                     | tar -xz
@@ -104,9 +102,18 @@ spec:
                   echo "${GITHUB_PAT}" | gh auth login --with-token
 
                   cd /backups
-                  git clone https://github.com/${GIT_REPO}.git repo
-                  cd repo
-                  git checkout -B ${SOURCE_BRANCH}
+
+                  if [ -d repo/.git ]; then
+                    echo "Repo already exists, reusing it"
+                    cd repo
+                    git fetch origin
+                  else
+                    echo "Cloning repo"
+                    git clone https://github.com/${GIT_REPO}.git repo
+                    cd repo
+                  fi
+
+                  git checkout -B ${SOURCE_BRANCH} origin/${TARGET_BRANCH} || git checkout -B ${SOURCE_BRANCH}
 
                   cp /backups/grafana-dashboards.json grafana-dashboards.json
 

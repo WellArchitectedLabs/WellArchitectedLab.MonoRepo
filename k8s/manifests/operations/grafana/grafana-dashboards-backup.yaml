@@ -85,7 +85,6 @@ spec:
                 - |
                   set -euo pipefail
 
-                  # Sanity check
                   test -d /backups/dashboards
 
                   # Install GitHub CLI
@@ -101,7 +100,7 @@ spec:
                   git clone https://github.com/${GIT_REPO}.git repo
                   cd repo
 
-                  git checkout -B ${SOURCE_BRANCH} || git reset --hard origin/${SOURCE_BRANCH}
+                  git checkout -B ${SOURCE_BRANCH}
 
                   mkdir -p ${DASHBOARDS_REPO_LOCATION}
                   cp /backups/dashboards/*.json ${DASHBOARDS_REPO_LOCATION}/
@@ -114,10 +113,12 @@ spec:
 
                   git push -f https://${GITHUB_PAT}@github.com/${GIT_REPO}.git ${SOURCE_BRANCH}
 
-                  # Check if PR already exists
-                  if gh pr view --repo ${GIT_REPO} --head ${SOURCE_BRANCH} >/dev/null 2>&1; then
-                    echo "PR already exists, updating title/body"
-                    gh pr edit ${SOURCE_BRANCH} \
+                  # Create or update PR
+                  PR_URL=$(gh pr list --repo ${GIT_REPO} --head ${SOURCE_BRANCH} --json url -q '.[0].url' || true)
+
+                  if [ -n "$PR_URL" ]; then
+                    echo "PR already exists ($PR_URL), updating title/body"
+                    gh pr edit "$PR_URL" \
                       --title "Automated Grafana dashboards backup" \
                       --body "Automated Grafana dashboards backup"
                   else

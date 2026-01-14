@@ -13,8 +13,8 @@ spec:
           volumes:
             - name: backup-volume
               emptyDir: {}
-          containers:
-            # Container 1: Grafana CLI
+
+          initContainers:
             - name: grafana-backup
               image: grafana/grafana:latest
               volumeMounts:
@@ -28,13 +28,14 @@ spec:
                     secretKeyRef:
                       name: dev-grafana-secrets
                       key: GRAFANA_TOKEN
-              args:
+              command:
                 - /bin/sh
                 - -c
                 - |
-                  grafana-cli dashboards backup --output /backups/grafana-dashboards.json
+                  grafana-cli dashboards backup \
+                    --output /backups/grafana-dashboards.json
 
-            # Container 2: GitHub CLI
+          containers:
             - name: github-pr
               image: bitnami/git:latest
               volumeMounts:
@@ -52,19 +53,21 @@ spec:
                   value: "develop"
                 - name: SOURCE_BRANCH
                   value: "grafana-dashboard-backup"
-              args:
+              command:
                 - /bin/sh
                 - -c
                 - |
                   set -euo pipefail
 
-                  # Install gh CLI (static binary, no gpg, no apt)
+                  # Sanity check
+                  test -f /backups/grafana-dashboards.json
+
+                  # Install gh CLI
                   GH_VERSION=2.35.0
                   curl -sSL https://github.com/cli/cli/releases/download/v${GH_VERSION}/gh_${GH_VERSION}_linux_amd64.tar.gz \
                     | tar -xz
                   mv gh_${GH_VERSION}_linux_amd64/bin/gh /usr/local/bin/gh
 
-                  # Authenticate gh
                   echo "${GITHUB_PAT}" | gh auth login --with-token
 
                   cd /backups
@@ -81,7 +84,6 @@ spec:
 
                   git push -f https://${GITHUB_PAT}@github.com/${GIT_REPO}.git ${SOURCE_BRANCH}
 
-                  # Create or update PR
                   gh pr create \
                     --repo ${GIT_REPO} \
                     --head ${SOURCE_BRANCH} \

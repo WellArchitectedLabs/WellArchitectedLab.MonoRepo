@@ -15,24 +15,51 @@ spec:
               emptyDir: {}
 
           initContainers:
-            - name: grafana-backup
-              image: grafana/grafana:latest
-              volumeMounts:
-                - mountPath: /backups
-                  name: backup-volume
-              env:
-                - name: GRAFANA_URL
-                  value: "http://grafana.monitoring.svc.cluster.local"
-                - name: GRAFANA_TOKEN
-                  valueFrom:
-                    secretKeyRef:
-                      name: dev-grafana-secrets
-                      key: GRAFANA_TOKEN
-              args:
-                - /bin/sh
-                - -c
-                - |
-                  grafana-cli dashboards backup --output /backups/grafana-dashboards.json
+          - name: grafana-backup
+            image: curlimages/curl:8.5.0
+            volumeMounts:
+              - mountPath: /backups
+                name: backup-volume
+            env:
+              - name: GRAFANA_URL
+                value: "http://grafana.monitoring.svc.cluster.local"
+              - name: GRAFANA_TOKEN
+                valueFrom:
+                  secretKeyRef:
+                    name: dev-grafana-secrets
+                    key: GRAFANA_TOKEN
+            command:
+              - /bin/sh
+              - -c
+              - |
+                set -euo pipefail
+
+                echo "Fetching dashboards list"
+                curl -sS -H "Authorization: Bearer ${GRAFANA_TOKEN}" \
+                  ${GRAFANA_URL}/api/search?type=dash-db \
+                  > /backups/dashboards.json
+
+                echo "[" > /backups/grafana-dashboards.json
+                first=true
+
+                jq -r '.[].uid' /backups/dashboards.json | while read uid; do
+                  echo "Exporting dashboard $uid"
+                  dashboard=$(curl -sS -H "Authorization: Bearer ${GRAFANA_TOKEN}" \
+                    ${GRAFANA_URL}/api/dashboards/uid/${uid})
+
+                  if [ "$first" = true ]; then
+                    first=false
+                  else
+                    echo "," >> /backups/grafana-dashboards.json
+                  fi
+
+                  echo "$dashboard" >> /backups/grafana-dashboards.json
+                done
+
+                echo "]" >> /backups/grafana-dashboards.json
+
+                echo "Backup completed"
+                ls -lh /backups
           containers:
             - name: github-pr
               image: bitnami/git:latest

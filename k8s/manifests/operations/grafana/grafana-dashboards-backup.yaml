@@ -120,7 +120,7 @@ spec:
                     echo "PR already exists ($PR_URL), updating title/body"
                     gh pr edit "$PR_URL" \
                       --title "Automated Grafana dashboards backup" \
-                      --body "Automated Grafana dashboards backup"
+                      --body "Automated Grafana dashboards backup" || true
                   else
                     echo "Creating new PR"
                     gh pr create \

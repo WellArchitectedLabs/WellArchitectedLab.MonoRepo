@@ -5,4 +5,5 @@ metadata:
   name: operations-kustomization
 
 resources:
-  - sealed-secrets.yaml
+  - grafana/secrets.yaml
+  - grafana/grafana-dashboards-backup.yaml

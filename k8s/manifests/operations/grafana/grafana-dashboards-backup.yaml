@@ -36,7 +36,7 @@ spec:
 
             # Container 2: GitHub CLI
             - name: github-pr
-              image: ghcli/gh:2.35.0
+              image: bitnami/git:latest
               volumeMounts:
                 - mountPath: /backups
                   name: backup-volume
@@ -57,15 +57,37 @@ spec:
                 - -c
                 - |
                   set -euo pipefail
+
+                  # Install gh CLI (static binary, no gpg, no apt)
+                  GH_VERSION=2.35.0
+                  curl -sSL https://github.com/cli/cli/releases/download/v${GH_VERSION}/gh_${GH_VERSION}_linux_amd64.tar.gz \
+                    | tar -xz
+                  mv gh_${GH_VERSION}_linux_amd64/bin/gh /usr/local/bin/gh
+
+                  # Authenticate gh
+                  echo "${GITHUB_PAT}" | gh auth login --with-token
+
                   cd /backups
                   git clone https://github.com/${GIT_REPO}.git repo
                   cd repo
                   git checkout -B ${SOURCE_BRANCH}
-                  cp /backups/grafana-dashboards.json ./grafana-dashboards.json
+
+                  cp /backups/grafana-dashboards.json grafana-dashboards.json
+
                   git config user.name "grafana-backup-bot"
                   git config user.email "grafana-backup@org.local"
                   git add grafana-dashboards.json
                   git commit -m "Automated Grafana dashboards backup" || exit 0
-                  git push -f origin ${SOURCE_BRANCH}
-                  gh pr create --repo ${GIT_REPO} --head ${SOURCE_BRANCH} --base ${TARGET_BRANCH} --title "Automated Grafana dashboards backup" --body "Backup JSON updated." || \
-                  gh pr edit ${SOURCE_BRANCH} --title "Automated Grafana dashboards backup" --body "Backup JSON updated."
+
+                  git push -f https://${GITHUB_PAT}@github.com/${GIT_REPO}.git ${SOURCE_BRANCH}
+
+                  # Create or update PR
+                  gh pr create \
+                    --repo ${GIT_REPO} \
+                    --head ${SOURCE_BRANCH} \
+                    --base ${TARGET_BRANCH} \
+                    --title "Automated Grafana dashboards backup" \
+                    --body "Backup JSON updated." \
+                  || gh pr edit ${SOURCE_BRANCH} \
+                    --title "Automated Grafana dashboards backup" \
+                    --body "Backup JSON updated."

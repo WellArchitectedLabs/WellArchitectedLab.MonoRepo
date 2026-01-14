@@ -26,7 +26,7 @@ spec:
                 - name: GRAFANA_TOKEN
                   valueFrom:
                     secretKeyRef:
-                      name: grafana-secrets
+                      name: dev-grafana-secrets
                       key: GRAFANA_TOKEN
               args:
                 - /bin/sh
@@ -44,7 +44,7 @@ spec:
                 - name: GITHUB_PAT
                   valueFrom:
                     secretKeyRef:
-                      name: github-secrets
+                      name: dev-github-secrets
                       key: GITHUB_PAT
                 - name: GIT_REPO
                   value: "WellArchitectedLabs/WellArchitectedLab.MonoRepo"

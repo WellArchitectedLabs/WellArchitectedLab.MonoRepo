@@ -16,7 +16,7 @@ spec:
 
           initContainers:
           - name: grafana-backup
-            image: curlimages/curl:8.5.0
+            image: ghcr.io/jqlang/jq:1.7
             volumeMounts:
               - mountPath: /backups
                 name: backup-volume

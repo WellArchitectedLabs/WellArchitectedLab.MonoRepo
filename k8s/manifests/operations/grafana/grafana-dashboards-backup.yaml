@@ -77,6 +77,8 @@ spec:
                   value: "develop"
                 - name: SOURCE_BRANCH
                   value: "grafana-dashboard-backup"
+                - name: DASHBOARDS_REPO_LOCATION
+                  value: "k8s/gitops/addons/grafana/dashboard-backups"
               command:
                 - /bin/sh
                 - -c
@@ -95,33 +97,35 @@ spec:
                   echo "${GITHUB_PAT}" | gh auth login --with-token
 
                   cd /backups
-                  # Clean previous clone if exists
                   rm -rf repo
                   git clone https://github.com/${GIT_REPO}.git repo
                   cd repo
 
-                  # Create/update source branch
-                  git checkout -B ${SOURCE_BRANCH}
+                  git checkout -B ${SOURCE_BRANCH} || git reset --hard origin/${SOURCE_BRANCH}
 
-                  # Copy dashboards folder
-                  mkdir -p grafana-dashboards
-                  cp /backups/dashboards/*.json grafana-dashboards/
+                  mkdir -p ${DASHBOARDS_REPO_LOCATION}
+                  cp /backups/dashboards/*.json ${DASHBOARDS_REPO_LOCATION}/
 
                   git config user.name "grafana-backup-bot"
                   git config user.email "grafana-backup@org.local"
 
-                  git add grafana-dashboards/
-                  git commit -m "Automated Grafana dashboards backup" || exit 0
+                  git add ${DASHBOARDS_REPO_LOCATION}/
+                  git commit -m "Automated Grafana dashboards backup" || echo "No changes to commit"
 
                   git push -f https://${GITHUB_PAT}@github.com/${GIT_REPO}.git ${SOURCE_BRANCH}
 
-                  # Create or update PR
-                  gh pr create \
-                    --repo ${GIT_REPO} \
-                    --head ${SOURCE_BRANCH} \
-                    --base ${TARGET_BRANCH} \
-                    --title "Automated Grafana dashboards backup" \
-                    --body "Automated Grafana dashboards backup" \
-                  || gh pr edit ${SOURCE_BRANCH} \
-                    --title "Automated Grafana dashboards backup" \
-                    --body "Automated Grafana dashboards backup"
+                  # Check if PR already exists
+                  if gh pr view --repo ${GIT_REPO} --head ${SOURCE_BRANCH} >/dev/null 2>&1; then
+                    echo "PR already exists, updating title/body"
+                    gh pr edit ${SOURCE_BRANCH} \
+                      --title "Automated Grafana dashboards backup" \
+                      --body "Automated Grafana dashboards backup"
+                  else
+                    echo "Creating new PR"
+                    gh pr create \
+                      --repo ${GIT_REPO} \
+                      --head ${SOURCE_BRANCH} \
+                      --base ${TARGET_BRANCH} \
+                      --title "Automated Grafana dashboards backup" \
+                      --body "Automated Grafana dashboards backup"
+                  fi

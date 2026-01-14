@@ -28,13 +28,11 @@ spec:
                     secretKeyRef:
                       name: dev-grafana-secrets
                       key: GRAFANA_TOKEN
-              command:
+              args:
                 - /bin/sh
                 - -c
                 - |
-                  grafana-cli dashboards backup \
-                    --output /backups/grafana-dashboards.json
-
+                  grafana-cli dashboards backup --output /backups/grafana-dashboards.json
           containers:
             - name: github-pr
               image: bitnami/git:latest

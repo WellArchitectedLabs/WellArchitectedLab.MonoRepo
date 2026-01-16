@@ -31,6 +31,11 @@ spec:
         # Please do not confuse this with sending Tempo metrics to prometheus
         serviceMonitors:
           enabled: true
+          namespace: monitoring
+          labels:
+            release: prometheus-server   # must match Prometheus serviceMonitorSelector
+          interval: 30s                  # optional scrape interval
+          scrapeTimeout: 10s             # optional
         
         resources:
           requests:

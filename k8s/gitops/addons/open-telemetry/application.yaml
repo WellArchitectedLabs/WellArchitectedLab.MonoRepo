@@ -1,0 +1,66 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: otlp-collector
+  namespace: argocd
+  labels:
+    workload: operations
+  annotations:
+    argocd.argoproj.io/sync-wave: "12" # We need open telemetry to deploy after Tempo and before grafana is started
+spec:
+  project: default
+  source:
+    repoURL: https://open-telemetry.github.io/opentelemetry-helm-charts
+    chart: opentelemetry-collector
+    targetRevision: 0.87.0
+    helm:
+      values: |
+        mode: deployment
+
+        config:
+          receivers:
+            otlp:
+              protocols:
+                grpc:
+                http:
+
+          processors:
+            # needed as processor and referenced later in yaml
+            # to configure the trace export pipeline
+            batch:
+            # prevents out of memories when the otlp receiver is overwhelmed
+            memory_limiter:
+              limit_mib: 512
+
+          exporters:
+            otlp:
+              # point to the Tempo OTLP receiver
+              endpoint: tempo.monitoring.svc.cluster.local:4317
+              tls:
+                # Tempo is accessed from into the cluster
+                # So for simplicity, we skip TLS verification
+                insecure: true
+
+          service:
+            pipelines:
+              traces:
+                # traces pipeline definition
+                # The reception phase is done by otlp
+                # Two processors are called sequentially
+                # The otlp receiver also exports the traces
+                receivers: [otlp]
+                processors: [memory_limiter, batch]
+                exporters: [otlp]
+
+        resources:
+          requests:
+            cpu: 200m
+            memory: 512Mi
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: monitoring
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true

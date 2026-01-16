@@ -1,0 +1,66 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: tempo
+  namespace: argocd
+  labels:
+    workload: operations
+    isGrafana: "true"
+  annotations:
+    argocd.argoproj.io/sync-wave: "11" # We need tempo to run before grafana is started
+spec:
+  project: default
+  source:
+    repoURL: https://grafana.github.io/helm-charts
+    chart: tempo
+    targetRevision: 1.8.2
+    helm:
+      values: |
+        tempo:
+          # retention is the period of time
+          # for traces persistence
+          retention: 24h
+
+        persistence:
+          enabled: true
+          size: 5Gi
+        
+        # Enable prometheus to scrape metrics from tempo
+        # This is important for monitoring Tempo itself via metrics
+        # Like CPU Usage, Memory ect...
+        # Please do not confuse this with sending Tempo metrics to prometheus
+        serviceMonitors:
+          enabled: true
+        
+        resources:
+          requests:
+            memory: "100Mi"
+            cpu: "50m"
+
+        # Define an OTLP receiver
+        # For receiving open telemetry from otlp collector
+        receivers:
+          otlp:
+            protocols:
+              http:
+                enable: true
+              # necessary because the oltp listeners
+              # on the tempo level uses grpc for streaming telemtry data
+              grpc:
+                enabled: true
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: monitoring
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+    retry:
+      limit: 5
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 3m

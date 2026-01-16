@@ -36,9 +36,20 @@ spec:
         global:
           # Istio namespace
           istioNamespace: istio-system
-          
           # Configure validation webhook
           configValidation: true
+        
+        meshConfig:
+          # necessary for emitting tracing metrics for otlp collector
+          enableTracing: true
+          defaultConfig:
+            tracing:
+              # all requests are sent
+              # use a lower percentage for production (10 per cent f.e)
+              sampling: 100.0
+              otlp:
+                address: otlp-collector.monitoring.svc.cluster.local:4317
+
           
   destination:
     server: https://kubernetes.default.svc

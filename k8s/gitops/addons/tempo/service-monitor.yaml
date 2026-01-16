@@ -6,11 +6,6 @@ metadata:
   labels:
     release: prometheus-server
 spec:
-  tolerations:
-    - key: workload
-      operator: Equal
-      value: weather-forecast
-      effect: NoSchedule
   selector:
     matchLabels:
       app: tempo

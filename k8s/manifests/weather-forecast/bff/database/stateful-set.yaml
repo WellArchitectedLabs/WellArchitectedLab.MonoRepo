@@ -16,6 +16,11 @@ spec:
         # necessary for kiali integration
         version: v1
     spec:
+      tolerations:
+      - key: workload
+        operator: 'Equal'
+        value: 'weather-forecast'
+        effect: 'NoSchedule'
       containers:
       - name: redis
         image: redis:7.2

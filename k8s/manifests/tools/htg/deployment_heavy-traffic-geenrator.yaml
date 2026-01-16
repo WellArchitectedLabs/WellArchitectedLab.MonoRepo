@@ -21,6 +21,11 @@ spec:
       annotations:
         sidecar.istio.io/inject: "true"
     spec:
+      tolerations:
+      - key: workload
+        operator: 'Equal'
+        value: 'weather-forecast'
+        effect: 'NoSchedule'
       containers:
       - name: generator
         image: ghcr.io/nicholasjackson/fake-service:v0.26.0

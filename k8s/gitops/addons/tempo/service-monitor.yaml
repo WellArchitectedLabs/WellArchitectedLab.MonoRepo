@@ -1,0 +1,18 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: tempo
+  namespace: monitoring
+  labels:
+    release: prometheus-server
+spec:
+  selector:
+    matchLabels:
+      app: tempo
+  namespaceSelector:
+    matchNames:
+      - monitoring
+  endpoints:
+    - port: prom-metrics  # Tempo exposes metrics on this port
+      interval: 30s
+      scrapeTimeout: 10s

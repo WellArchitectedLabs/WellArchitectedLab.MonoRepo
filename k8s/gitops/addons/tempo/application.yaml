@@ -25,18 +25,6 @@ spec:
           enabled: true
           size: 5Gi
         
-        # Enable prometheus to scrape metrics from tempo
-        # This is important for monitoring Tempo itself via metrics
-        # Like CPU Usage, Memory ect...
-        # Please do not confuse this with sending Tempo metrics to prometheus
-        serviceMonitors:
-          enabled: true
-          namespace: monitoring
-          labels:
-            release: prometheus-server   # must match Prometheus serviceMonitorSelector
-          interval: 30s                  # optional scrape interval
-          scrapeTimeout: 10s             # optional
-        
         resources:
           requests:
             memory: "100Mi"

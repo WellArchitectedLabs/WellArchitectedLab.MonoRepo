@@ -21,16 +21,17 @@ spec:
           receivers:
             otlp:
               protocols:
-                grpc:
-                http:
+                grpc: {}
+                http: {}
 
           processors:
             # needed as processor and referenced later in yaml
             # to configure the trace export pipeline
-            batch:
+            batch: {}
             # prevents out of memories when the otlp receiver is overwhelmed
             memory_limiter:
               limit_mib: 512
+              check_interval: 30s
 
           exporters:
             otlp:

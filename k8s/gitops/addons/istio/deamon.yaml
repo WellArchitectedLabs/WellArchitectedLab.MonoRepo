@@ -48,7 +48,7 @@ spec:
               # use a lower percentage for production (10 per cent f.e)
               sampling: 100.0
               otlp:
-                address: otlp-collector.monitoring.svc.cluster.local:4317
+                address: otlp-collector-opentelemetry-collector.monitoring.svc.cluster.local:4317
 
           
   destination:

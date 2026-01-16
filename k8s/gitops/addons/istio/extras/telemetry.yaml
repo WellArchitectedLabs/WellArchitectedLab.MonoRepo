@@ -3,6 +3,8 @@ kind: PodMonitor
 metadata:
   name: istio-proxy
   namespace: istio-system
+  labels:
+    release: prometheus-server
 spec:
   selector:
     matchExpressions:

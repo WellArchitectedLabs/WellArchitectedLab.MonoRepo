@@ -6,11 +6,12 @@ metadata:
 spec:
   selector:
     matchLabels:
-      app: tempo
+      app.kubernetes.io/instance: tempo
+      app.kubernetes.io/name: tempo
   namespaceSelector:
     matchNames:
       - monitoring
   endpoints:
-    - port: prom-metrics  # Tempo exposes metrics on this port
+    - port: tempo-prom-metrics  # Tempo exposes metrics on this port name, please check service spec for port name validation
       interval: 30s
       scrapeTimeout: 10s

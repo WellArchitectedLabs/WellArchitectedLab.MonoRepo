@@ -30,12 +30,23 @@ spec:
             # These configs allow prometheus to read istio specific metrics
             # Which are pushed by istio service monitors
             # F.e: one of the main metrics that are istio specific and that prometheus must read is istio_requests_total
-
             serviceMonitorSelectorNilUsesHelmValues: false
             podMonitorSelectorNilUsesHelmValues: false
-            serviceMonitorSelector: {}
-            podMonitorSelector: {}
-        
+
+            # If this config does not exist, any team could create a ServiceMonitor
+            # Prometheus would scrape it automatically
+            # Metrics pollution, duplication, and security issues appear
+            # Multiple Prometheus instances would scrape the same targets
+            # In the above config, we are only settings service and pod monitors to be scraped by a specific helm release label
+
+            serviceMonitorSelector:
+              matchLabels:
+                release: prometheus-server
+
+            podMonitorSelector:
+              matchLabels:
+                release: prometheus-server
+
         alertmanager:
           enabled: false
 
@@ -43,10 +54,24 @@ spec:
           enabled: false
 
         nodeExporter:
-          enabled: false
+          enabled: true
+          serviceMonitors:
+            namespace: monitoring
+            selector:
+              matchLabels:
+                release: prometheus-server
 
         kubeStateMetrics:
-          enabled: false
+          enabled: true
+          serviceMonitors:
+            namespace: monitoring
+            additionalNamespaces:
+              - backend
+              - frontend
+              - operations
+            selector:
+              matchLabels:
+                release: prometheus-server
 
   destination:
     server: https://kubernetes.default.svc

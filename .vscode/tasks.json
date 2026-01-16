@@ -141,6 +141,18 @@
       }
     },
     {
+      "label": "cluster management",
+      "type": "shell",
+      "command": "exec $SHELL",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "presentation": {
+        "panel": "dedicated",
+        "group": "cluster management"
+      }
+    },
+    {
       "label": "Open all terminals",
       "type": "shell",
       "dependsOn": [
@@ -150,7 +162,8 @@
         "WF API Source Code",
         "WF Frontend Source Code",
         "kubectl manifests",
-        "kubectl addons"
+        "kubectl addons",
+        "cluster management"
       ],
       "dependsOrder": "parallel"
     },

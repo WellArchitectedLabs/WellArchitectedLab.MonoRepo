@@ -39,13 +39,8 @@ spec:
             # Multiple Prometheus instances would scrape the same targets
             # In the above config, we are only settings service and pod monitors to be scraped by a specific helm release label
 
-            serviceMonitorSelector:
-              matchLabels:
-                release: prometheus-server
-
-            podMonitorSelector:
-              matchLabels:
-                release: prometheus-server
+            serviceMonitorSelector: {}
+            podMonitorSelector: {}
 
         alertmanager:
           enabled: false

@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: istio-prometheus-podmonitors
+  name: tempo-prometheus-servicemonitors
   namespace: argocd
   labels:
     isIstio: "true"
@@ -12,11 +12,11 @@ spec:
   project: default
   source:
     repoURL: https://github.com/WellArchitectedLabs/WellArchitectedLab.MonoRepo.git
-    path: k8s/gitops/addons/istio/prometheus-monitors
+    path: k8s/gitops/addons/tempo/prometheus-monitors
     targetRevision: feature/grafanaBackups
   destination:
     server: https://kubernetes.default.svc
-    namespace: istio-system
+    namespace: monitoring
   syncPolicy:
     automated:
       prune: true

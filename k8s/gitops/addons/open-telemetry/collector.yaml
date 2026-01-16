@@ -17,6 +17,12 @@ spec:
       values: |
         mode: deployment
 
+        tolerations:
+          - key: "workload"
+            operator: "Equal"
+            value: "weather-forecast"
+            effect: "NoSchedule"
+
         config:
           receivers:
             otlp:

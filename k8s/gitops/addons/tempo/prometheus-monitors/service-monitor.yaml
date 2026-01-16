@@ -3,8 +3,6 @@ kind: ServiceMonitor
 metadata:
   name: tempo
   namespace: monitoring
-  labels:
-    release: prometheus-server
 spec:
   selector:
     matchLabels:

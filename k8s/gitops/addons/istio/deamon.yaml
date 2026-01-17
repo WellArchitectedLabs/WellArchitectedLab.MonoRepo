@@ -28,6 +28,14 @@ spec:
           # Select user nodes
           nodeSelector:
             kubernetes.azure.com/mode: user
+
+          resources:
+            requests:
+              cpu: 50m
+              memory: 100Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
           
           # Sidecar injector webhook configuration
           sidecarInjectorWebhook:
@@ -59,8 +67,6 @@ spec:
               # all requests are sent
               # use a lower percentage for production (10 per cent f.e)
               sampling: 100.0
-
-
           
   destination:
     server: https://kubernetes.default.svc

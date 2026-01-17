@@ -4,10 +4,10 @@ metadata:
   name: tempo-prometheus-servicemonitors
   namespace: argocd
   labels:
-    isIstio: "true"
+    isGrafana: "true"
     workload: operations
   annotations:
-    argocd.argoproj.io/sync-wave: "3"   # Install monitors after istio deamon, crds and ingress
+    argocd.argoproj.io/sync-wave: "12" # We need tempo to run before grafana is started
 spec:
   project: default
   source:

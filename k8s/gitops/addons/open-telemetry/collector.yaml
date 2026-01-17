@@ -6,7 +6,7 @@ metadata:
   labels:
     workload: operations
   annotations:
-    argocd.argoproj.io/sync-wave: "12" # We need open telemetry to deploy after Tempo and before grafana is started
+    argocd.argoproj.io/sync-wave: "13" # We need open telemetry to deploy after Tempo and before grafana is started
 spec:
   project: default
   source:

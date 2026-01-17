@@ -21,46 +21,45 @@ spec:
           # for traces persistence
           retention: 24h
 
-        persistence:
-          enabled: true
-          size: 5Gi
+          persistence:
+            enabled: true
+            size: 5Gi
 
-        resources:
-          requests:
-            memory: "100Mi"
-            cpu: "50m"
+          resources:
+            requests:
+              memory: "100Mi"
+              cpu: "50m"
 
-        # Define an OTLP receiver
-        # For receiving open telemetry from otlp collector
-        receivers:
-          otlp:
-            protocols:
-              http:
-                enabled: true
-              grpc:
-                enabled: true
+          # Define an OTLP receiver
+          # For receiving open telemetry from otlp collector
+          receivers:
+            otlp:
+              protocols:
+                http:
+                  enabled: true
+                grpc:
+                  enabled: true
 
-        # Activate metrics generator
-        # Necessary for prometheus integration and for Tempo database monitoring via dedicated spans
-        # The most common metric is: tempo_spanmetrics_latency_bucket
-        # We also include the service_graph processor which correlates grafana metrics with their related traces
-        # That is necessary for grafana drill down functionality to traces from prometheus metrics
-        metricsGenerator:
-          enabled: true
+          # Activate metrics generator
+          # Necessary for prometheus integration and for Tempo database monitoring via dedicated spans
+          # The most common metric is: tempo_spanmetrics_latency_bucket
+          # We also include the service_graph processor which correlates grafana metrics with their related traces
+          # That is necessary for grafana drill down functionality to traces from prometheus metrics
+          metricsGenerator:
+            enabled: true
 
-          processors:
-            - service-graphs
-            - span-metrics
+            processors:
+              - service-graphs
+              - span-metrics
 
-          config:
             registry:
               collection_interval: 15s
 
-          storage:
-            path: /var/tempo/metrics
+            storage:
+              path: /var/tempo/metrics
 
-          serviceMonitor:
-            enabled: true
+        serviceMonitor:
+          enabled: true
 
   destination:
     server: https://kubernetes.default.svc

@@ -12,7 +12,7 @@ server:
     type: ClusterIP
 
   nodeSelector:
-    workload: weather-forecast
+    kubernetes.azure.com/mode: user
   tolerations:
     - key: "workload"
       operator: "Equal"
@@ -21,7 +21,7 @@ server:
 
 controller:
   nodeSelector:
-    workload: weather-forecast
+    kubernetes.azure.com/mode: user
   tolerations:
     - key: "workload"
       operator: "Equal"
@@ -30,7 +30,7 @@ controller:
 
 repoServer:
   nodeSelector:
-    workload: weather-forecast
+    kubernetes.azure.com/mode: user
   tolerations:
     - key: "workload"
       operator: "Equal"
@@ -39,7 +39,7 @@ repoServer:
 
 applicationSet:
   nodeSelector:
-    workload: weather-forecast
+    kubernetes.azure.com/mode: user
   tolerations:
     - key: "workload"
       operator: "Equal"
@@ -48,7 +48,7 @@ applicationSet:
 
 redis:
   nodeSelector:
-    workload: weather-forecast
+    kubernetes.azure.com/mode: user
   tolerations:
     - key: "workload"
       operator: "Equal"

@@ -25,6 +25,8 @@ spec:
                 operator: Equal
                 value: weather-forecast
                 effect: NoSchedule
+            nodeSelector:
+              kubernetes.azure.com/mode: user
             
             # Very important for istio integration
             # These configs allow prometheus to read istio specific metrics

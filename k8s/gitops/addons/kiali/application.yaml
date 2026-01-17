@@ -21,6 +21,9 @@ spec:
               operator: "Equal"
               value: "weather-forecast"
               effect: "NoSchedule"
+          nodeSelector:
+            kubernetes.azure.com/mode: user
+            
           view_only_mode: false
 
           logger:

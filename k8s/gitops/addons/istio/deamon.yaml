@@ -24,6 +24,10 @@ spec:
               operator: Equal
               value: weather-forecast
               effect: NoSchedule
+              
+          # Select user nodes
+          nodeSelector:
+            kubernetes.azure.com/mode: user
           
           # Sidecar injector webhook configuration
           sidecarInjectorWebhook:

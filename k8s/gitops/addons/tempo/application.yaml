@@ -41,15 +41,21 @@ spec:
                 enabled: true
 
         # Activate metrics generator
-        # Necessary for prometheus integration and for Tempo database monitoring via dedicated spans
-        # The most common metric is: tempo_spanmetrics_latency_bucket
-        # We also include the service_graph processor which correlates grafana metrics with their related traces
-        # That is necessary for grafana drill down functionality to traces from prometheus metrics
+        # Metrics generator is necessary for plugging Tempo to prometheus's metrics
+        # This will allow us to monitor Tempo (which is basically a traces system) via dedicated metrics that are pushed into prometheus db
         metricsGenerator:
           enabled: true
 
+          remoteWrite:
+            - url: http://prometheus-server-kube-pro-prometheus.monitoring.svc.cluster.local:9090/api/v1/write
+
           processors:
+
+            # We also include the service_graph processor which correlates grafana metrics with their related traces
+            # That is necessary for grafana drill down functionality to traces from prometheus metrics
             - service-graphs
+            # Processor that will push metrics that are related to Tempo traces (or what we call spans in Tempo terminology) 
+            # The most common metric is: tempo_spanmetrics_latency_bucket
             - span-metrics
 
           config:

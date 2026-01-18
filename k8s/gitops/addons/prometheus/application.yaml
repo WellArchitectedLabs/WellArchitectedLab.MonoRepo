@@ -44,12 +44,24 @@ spec:
             serviceMonitorSelector: {}
             podMonitorSelector: {}
 
+            # The default mode for intergrating metrics into prometheus is via operator
+            # The operator mode is a pull mode where prometheus scrapes metrics from the target via configurations that are called pod / service monitors
+            # pod monitors are plugged to pod level and service monitors are plugged to service level. It all depend on at what the level the monitored workload exposes its metrics
+            # The metrics are generally expose by pod or service via a /metrics endpoint
+            # Some metrics are not scraped by prometheus in the traditional way
+            # They are pushed to prometheus via the remote write receiver
+            # In the following two lines, we are enabling prometheus write receiver for these specific metrics to be pushed
+            # This is necessary for Tempo span metrics that integrated only push mode (example traces_spanmetrics_calls_total or traces_service_graph_request_total)
+            enableFeatures:
+              - remote-write-receiver
+
         alertmanager:
           enabled: false
 
         grafana:
           enabled: false
 
+        # Node exporter enables pushing metrics related node pools status
         nodeExporter:
           enabled: true
           serviceMonitors:
@@ -58,6 +70,7 @@ spec:
               matchLabels:
                 release: prometheus-server
 
+        # Kub state metrics compare kubernetes objects status to their desired status like stored in etcd
         kubeStateMetrics:
           enabled: true
           serviceMonitors:

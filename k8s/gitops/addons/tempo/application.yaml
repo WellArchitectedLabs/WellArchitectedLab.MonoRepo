@@ -27,46 +27,35 @@ spec:
 
         resources:
           requests:
-            memory: "100Mi"
-            cpu: "50m"
-
-        # Define an OTLP receiver
-        # For receiving open telemetry from otlp collector
-        receivers:
-          otlp:
-            protocols:
-              http:
-                enabled: true
-              grpc:
-                enabled: true
+            cpu: 100m
+            memory: 50Mi
 
         # Activate metrics generator
         # Metrics generator is necessary for plugging Tempo to prometheus's metrics
         # This will allow us to monitor Tempo (which is basically a traces system) via dedicated metrics that are pushed into prometheus db
-        metricsGenerator:
-          enabled: true
-
-          remoteWrite:
-            - url: http://prometheus-server-kube-pro-prometheus.monitoring.svc.cluster.local:9090/api/v1/write
-
-          processors:
-
-            # We also include the service_graph processor which correlates grafana metrics with their related traces
-            # That is necessary for grafana drill down functionality to traces from prometheus metrics
-            - service-graphs
-            # Processor that will push metrics that are related to Tempo traces (or what we call spans in Tempo terminology) 
-            # The most common metric is: tempo_spanmetrics_latency_bucket
-            - span-metrics
-
-          config:
-            registry:
-              collection_interval: 15s
-
-          storage:
-            path: /var/tempo/metrics
-
-          serviceMonitor:
+          metricsGenerator:
             enabled: true
+
+            processors:
+              # We also include the service_graph processor which correlates grafana metrics with their related traces
+              # That is necessary for grafana drill down functionality to traces from prometheus metrics
+              - service-graphs
+              # Processor that will push metrics that are related to Tempo traces (or what we call spans in Tempo terminology) 
+              # The most common metric is: tempo_spanmetrics_latency_bucket
+              - span-metrics
+
+            remote_write:
+              - url: http://prometheus-server-kube-pro-prometheus.monitoring.svc.cluster.local:9090/api/v1/write
+        
+          # Define an OTLP receiver
+          # For receiving open telemetry from otlp collector
+          receivers:
+            otlp:
+              protocols:
+                grpc:
+                  enabled: true
+                http:
+                  enabled: true
 
   destination:
     server: https://kubernetes.default.svc

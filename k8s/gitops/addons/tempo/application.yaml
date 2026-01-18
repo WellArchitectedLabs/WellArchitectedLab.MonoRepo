@@ -39,19 +39,27 @@ spec:
             remoteWriteUrl: "http://prometheus-server-kube-pro-prometheus.monitoring.svc.cluster.local:9090/api/v1/write"
             
             processor:
-              # We also include the service_graph processor which correlates grafana metrics with their related traces
-              # That is necessary for grafana drill down functionality to traces from prometheus metrics
+              # we also include the service_graph processor which correlates grafana metrics with their related traces
+              # that is necessary for grafana drill down functionality to traces from prometheus metrics
+              # traces pushed by this processor have name: traces_service_graph_*
               service_graphs:
                 dimensions:
+                  # seperate trace_service_graph metrics are created by service.name and service.namespace
+                  # service.name and service.namespace are span attributes that are automatically created by the service graph processor
+                  # this will permit us to say "show me all calls from this service or to this service"
                   - "service.name"
                   - "service.namespace"
                 wait: 10s
                 max_items: 10000
-              
-              # Processor that will push metrics that are related to Tempo traces (or what we call spans in Tempo terminology) 
-              # The most common metric is: tempo_spanmetrics_latency_bucket
+
+              # processor that will push metrics that are related to Tempo traces themselves (or what we call spans in Tempo terminology)
+              # these metrics are pushed under traces_spanmetrics_*
+              # these metrics will expose RED (Rate, Error and Duration) metrics related to tempo spans
+              # these metrics will permit to answer questions like "how many requests failed?" or "what is the average latency?"
               span_metrics:
                 dimensions:
+                  # drilling the RED metric for every service, every namespace, method and status code
+                  # for example http.method will permit to answer questions like "what is the average latency for POST http method for this service?"
                   - "service.name"
                   - "service.namespace"
                   - "http.method"

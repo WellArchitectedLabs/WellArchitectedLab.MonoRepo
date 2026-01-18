@@ -20,33 +20,7 @@ spec:
           # retention is the period of time
           # for traces persistence
           retention: 24h
-
-        persistence:
-          enabled: true
-          size: 5Gi
-
-        resources:
-          requests:
-            cpu: 100m
-            memory: 50Mi
-
-        # Activate metrics generator
-        # Metrics generator is necessary for plugging Tempo to prometheus's metrics
-        # This will allow us to monitor Tempo (which is basically a traces system) via dedicated metrics that are pushed into prometheus db
-          metricsGenerator:
-            enabled: true
-
-            processors:
-              # We also include the service_graph processor which correlates grafana metrics with their related traces
-              # That is necessary for grafana drill down functionality to traces from prometheus metrics
-              - service-graphs
-              # Processor that will push metrics that are related to Tempo traces (or what we call spans in Tempo terminology) 
-              # The most common metric is: tempo_spanmetrics_latency_bucket
-              - span-metrics
-
-            remote_write:
-              - url: http://prometheus-server-kube-pro-prometheus.monitoring.svc.cluster.local:9090/api/v1/write
-        
+          
           # Define an OTLP receiver
           # For receiving open telemetry from otlp collector
           receivers:
@@ -56,6 +30,41 @@ spec:
                   enabled: true
                 http:
                   enabled: true
+          
+          # Activate metrics generator
+          # Metrics generator is necessary for plugging Tempo to prometheus's metrics
+          # This will allow us to monitor Tempo (which is basically a traces system) via dedicated metrics that are pushed into prometheus db
+          metricsGenerator:
+            enabled: true
+            remoteWriteUrl: "http://prometheus-server-kube-pro-prometheus.monitoring.svc.cluster.local:9090/api/v1/write"
+            
+            processor:
+              # We also include the service_graph processor which correlates grafana metrics with their related traces
+              # That is necessary for grafana drill down functionality to traces from prometheus metrics
+              service_graphs:
+                dimensions:
+                  - "service.name"
+                  - "service.namespace"
+                wait: 10s
+                max_items: 10000
+              
+              # Processor that will push metrics that are related to Tempo traces (or what we call spans in Tempo terminology) 
+              # The most common metric is: tempo_spanmetrics_latency_bucket
+              span_metrics:
+                dimensions:
+                  - "service.name"
+                  - "service.namespace"
+                  - "http.method"
+                  - "http.status_code"
+
+        persistence:
+          enabled: true
+          size: 5Gi
+
+        resources:
+          requests:
+            cpu: 100m
+            memory: 50Mi
 
   destination:
     server: https://kubernetes.default.svc

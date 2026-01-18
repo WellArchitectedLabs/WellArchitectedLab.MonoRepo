@@ -51,6 +51,7 @@ spec:
                 url: http://prometheus-server-kube-pro-prometheus.monitoring.svc.cluster.local:9090
                 isDefault: true
                 editable: false
+                uid: prometheus-uid
               # current kubernetes cluster
               - name: Kubernetes
                 type: kubernetes
@@ -61,16 +62,37 @@ spec:
                   tlsSkipVerify: true
                 editable: false
               - name: Tempo
-                type: tempo
-                access: proxy
-                url: http://tempo.monitoring.svc.cluster.local:3100
-                jsonData:
-                  tracesToMetrics:
-                    datasourceUid: Prometheus
-                    spanStartTimeShift: "-1h"
-                    spanEndTimeShift: "1h"
-                    tags: ["service.name", "http.method"]
-                editable: false
+                  type: tempo
+                  access: proxy
+                  url: http://tempo.monitoring.svc.cluster.local:3100
+                  uid: tempo-uid
+                  jsonData:
+                    tracesToMetrics:
+                      datasourceUid: prometheus-uid
+                      spanStartTimeShift: "-1h"
+                      spanEndTimeShift: "1h"
+                      tags: 
+                        - key: "service.name"
+                          value: "service"
+                        - key: "http.method"
+                    # Service graph configuration
+                    serviceMap:
+                      datasourceUid: prometheus-service-graph
+                    nodeGraph:
+                      enabled: true
+                    search:
+                      hide: false
+                    lokiSearch:
+                      datasourceUid: ""
+                  editable: false
+                
+                # Dedicated Prometheus datasource for service graphs
+                - name: Prometheus-ServiceGraph
+                  type: prometheus
+                  access: proxy
+                  url: http://prometheus-server-kube-pro-prometheus.monitoring.svc.cluster.local:9090
+                  uid: prometheus-service-graph
+                  editable: false
         
         # Use the deployed postgres instance to store grafana data
 

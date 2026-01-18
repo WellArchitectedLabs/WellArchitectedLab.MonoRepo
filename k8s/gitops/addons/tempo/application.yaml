@@ -20,16 +20,16 @@ spec:
           # retention is the period of time
           # for traces persistence
           retention: 24h
-          
+
           # Define an OTLP receiver
           # For receiving open telemetry from otlp collector
           receivers:
             otlp:
               protocols:
                 grpc:
-                  enabled: true
+                  endpoint: 0.0.0.0:4317
                 http:
-                  enabled: true
+                  endpoint: 0.0.0.0:4318
           
           # Activate metrics generator
           # Metrics generator is necessary for plugging Tempo to prometheus's metrics

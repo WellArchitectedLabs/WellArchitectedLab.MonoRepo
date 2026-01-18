@@ -62,37 +62,38 @@ spec:
                   tlsSkipVerify: true
                 editable: false
               - name: Tempo
-                  type: tempo
-                  access: proxy
-                  url: http://tempo.monitoring.svc.cluster.local:3100
-                  uid: tempo-uid
-                  jsonData:
-                    tracesToMetrics:
-                      datasourceUid: prometheus-uid
-                      spanStartTimeShift: "-1h"
-                      spanEndTimeShift: "1h"
-                      tags: 
-                        - key: "service.name"
-                          value: "service"
-                        - key: "http.method"
-                    # Service graph configuration
-                    serviceMap:
-                      datasourceUid: prometheus-service-graph
-                    nodeGraph:
-                      enabled: true
-                    search:
-                      hide: false
-                    lokiSearch:
-                      datasourceUid: ""
-                  editable: false
-                
-                # Dedicated Prometheus datasource for service graphs
-                - name: Prometheus-ServiceGraph
-                  type: prometheus
-                  access: proxy
-                  url: http://prometheus-server-kube-pro-prometheus.monitoring.svc.cluster.local:9090
-                  uid: prometheus-service-graph
-                  editable: false
+                type: tempo
+                access: proxy
+                url: http://tempo.monitoring.svc.cluster.local:3100
+                uid: tempo-uid
+                jsonData:
+                  # necessary section for mapping tempo traces to metrics
+                  # this will allow advanced grafana features like graph drilling and dependency graph generation
+                  tracesToMetrics:
+                    datasourceUid: prometheus-uid
+                    spanStartTimeShift: -1h
+                    spanEndTimeShift: 1h
+                    tags:
+                    - key: service.name
+                    - key: http.method
+                  serviceMap:
+                    # map the tempo data source to the graph data source using the datasource uid
+                    # below is the graph data source configuration
+                    datasourceUid: prometheus-service-graph
+                  nodeGraph:
+                    enabled: true
+                  search:
+                    hide: false
+                editable: false
+              # dedicated datasource for service graph
+              # uses the prometheus server url as a backend
+              # please note that it is intended to completely separate this data source from the "normal" prometheus datasource above.
+              - name: Prometheus-ServiceGraph
+                type: prometheus
+                access: proxy
+                url: http://prometheus-server-kube-pro-prometheus.monitoring.svc.cluster.local:9090
+                uid: prometheus-service-graph
+                editable: false
         
         # Use the deployed postgres instance to store grafana data
 

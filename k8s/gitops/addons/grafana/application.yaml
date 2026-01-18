@@ -34,10 +34,8 @@ spec:
             operator: "Equal"
             value: "weather-forecast"
             effect: "NoSchedule"
-
-        # Select user nodes
         nodeSelector:
-          kubernetes.azure.com/mode: user
+            kubernetes.azure.com/mode: system
 
         # The datasource simply points to the prometheus service 
         # that is deployed via the prometheus argocd app

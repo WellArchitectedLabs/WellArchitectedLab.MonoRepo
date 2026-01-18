@@ -52,6 +52,8 @@ spec:
               operator: "Equal"
               value: "weather-forecast"
               effect: "NoSchedule"
+          nodeSelector:
+            kubernetes.azure.com/mode: system
 
           resources:
             requests:

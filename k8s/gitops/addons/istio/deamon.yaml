@@ -24,10 +24,8 @@ spec:
               operator: Equal
               value: weather-forecast
               effect: NoSchedule
-
-          # Select user nodes
           nodeSelector:
-            kubernetes.azure.com/mode: user
+            kubernetes.azure.com/mode: system
 
           resources:
             requests:

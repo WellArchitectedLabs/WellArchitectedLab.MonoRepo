@@ -57,6 +57,7 @@ spec:
       # We should add a toleration because the user nodes are tainted and will be not schedule the pods if the taint is not provided
       nodeSelector:
         kubernetes.azure.com/mode: user
+        
       affinity:
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:

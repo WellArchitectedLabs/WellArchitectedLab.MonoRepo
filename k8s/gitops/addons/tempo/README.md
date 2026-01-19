@@ -75,3 +75,48 @@ Provide a nice and clear sepratation between:
 - graph servie metrics (traces_service_graph_*)
 
 Please access the compraison table here: https://claude.ai/share/d690d781-211e-43e1-878d-5c2f5345fa96
+
+─────────────────────────────────────────────────────────┐
+│ Original Trace (in Tempo)                               │
+│ {                                                        │
+│   "attributes": {                                        │
+│     "service.name": "weather-forecast-bff",             │
+│     "http.method": "POST",                              │
+│     "http.status_code": 500                             │
+│   }                                                      │
+│ }                                                        │
+└────────────┬───────────────────────┬────────────────────┘
+             │                       │
+    ┌────────▼────────┐    ┌────────▼─────────┐
+    │ span_metrics    │    │ service_graphs   │
+    │ processor       │    │ processor        │
+    └────────┬────────┘    └────────┬─────────┘
+             │                      │
+    ┌────────▼────────────────────────────────────┐
+    │ Prometheus                                  │
+    │ - traces_spanmetrics_calls_total{...}      │
+    │ - traces_service_graph_request_total{...}  │
+    └────────┬───────────────────────────────────┘
+             │
+    ┌────────▼────────┐
+    │ Grafana         │
+    │ Uses "tags" to  │
+    │ query Tempo     │
+    │ for traces      │
+    └─────────────────┘
+
+
+Tags can be found is spans:
+
+Trace ID: abc123
+├─ Span: POST /weather
+   ├─ Attributes:
+   │  ├─ service.name: weather-forecast-bff
+   │  ├─ service.namespace: backend
+   │  ├─ http.method: POST
+   │  ├─ http.status_code: 500
+   │  └─ http.route: /weather
+
+Tags are used by Grafana UI in order to map a prometheus span metric to its corresponding trace span, using its corresponding span attributes
+In tempo, traces are stored with attributes. One of the attributes is service.name (like tag is named)
+In prometheus metrics spans, the service.name attribute is called service_name for json compatibility (. to _ transformation happening)

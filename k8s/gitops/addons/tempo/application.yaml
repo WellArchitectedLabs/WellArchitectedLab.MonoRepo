@@ -36,6 +36,7 @@ spec:
           # This will allow us to monitor Tempo (which is basically a traces system) via dedicated metrics that are pushed into prometheus db
           metricsGenerator:
             enabled: true
+            # metrics generator needs to circle back to prometheus in order to store span metrics or graph metrics or any other metric that it calculates
             remoteWriteUrl: "http://prometheus-server-kube-pro-prometheus.monitoring.svc.cluster.local:9090/api/v1/write"
             
             processor:

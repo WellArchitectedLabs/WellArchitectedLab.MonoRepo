@@ -61,7 +61,9 @@ spec:
         grafana:
           enabled: false
 
-        # Node exporter enables pushing metrics related node pools status
+        # node exporter enables pushing metrics related node pools status
+        # can be installed independtly, but in this instance, we are including it via the prometheus stack
+        # project url: https://github.com/prometheus/node_exporter
         nodeExporter:
           enabled: true
           serviceMonitors:
@@ -71,6 +73,8 @@ spec:
                 release: prometheus-server
 
         # Kub state metrics compare kubernetes objects status to their desired status like stored in etcd
+        # can be installed independtly, but in this instance, we are including it via the prometheus stack
+        # project url: https://github.com/kubernetes/kube-state-metrics
         kubeStateMetrics:
           enabled: true
           serviceMonitors:

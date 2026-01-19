@@ -52,30 +52,20 @@ spec:
                 isDefault: true
                 editable: false
                 uid: prometheus-uid
-              # current kubernetes cluster
-              - name: Kubernetes
-                type: kubernetes
-                access: proxy
-                url: https://kubernetes.default.svc
-                jsonData:
-                  authType: serviceAccount
-                  tlsSkipVerify: true
-                editable: false
               - name: Tempo
                 type: tempo
                 access: proxy
                 url: http://tempo.monitoring.svc.cluster.local:3100
                 uid: tempo-uid
                 jsonData:
-                  # necessary section for mapping tempo traces to metrics
-                  # this will allow advanced grafana features like graph drilling and dependency graph generation
-                  tracesToMetrics:
-                    datasourceUid: prometheus-uid
-                    spanStartTimeShift: -1h
-                    spanEndTimeShift: 1h
-                    tags:
-                    - key: service.name
-                    - key: http.method
+                  # # necessary section for mapping tempo traces to metrics
+                  # # this will allow advanced grafana features like metrics jump to metrics from a trace for more context on the service health when trace appeared
+                  # tracesToMetrics:
+                  #   datasourceUid: prometheus-uid
+                  #   spanStartTimeShift: -1h
+                  #   spanEndTimeShift: 1h
+                  #   tags:
+                  #   - key: service.name
                   serviceMap:
                     # map the tempo data source to the graph data source using the datasource uid
                     # below is the graph data source configuration
@@ -84,6 +74,10 @@ spec:
                     enabled: true
                   search:
                     hide: false
+                  # metricsQueries:
+                  #   # just a test query for debugging 
+                  #   - name: "Sanity"
+                  #     query: up
                 editable: false
               # dedicated datasource for service graph
               # uses the prometheus server url as a backend
@@ -108,7 +102,7 @@ spec:
           GF_DATABASE_USER: $__env{GF_POSTGRES_USER}
           GF_DATABASE_PASSWORD: $__env{GF_POSTGRES_PASSWORD}
           GF_DATABASE_SSL_MODE: disable
-        
+
         # It is important that grafana database is persisted
         # Otherwise, dashboards and data will be reset on cluster restart or any event happening in the nodes
         persistence:

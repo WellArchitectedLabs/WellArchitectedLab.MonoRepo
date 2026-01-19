@@ -120,3 +120,14 @@ Trace ID: abc123
 Tags are used by Grafana UI in order to map a prometheus span metric to its corresponding trace span, using its corresponding span attributes
 In tempo, traces are stored with attributes. One of the attributes is service.name (like tag is named)
 In prometheus metrics spans, the service.name attribute is called service_name for json compatibility (. to _ transformation happening)
+
+Mental model (keep this)
+
+- Istio emits attributes 
+- Tempo blindly converts attributes → labels
+- Prometheus stores labels
+- Grafana matches strings only
+
+What we see in the traces, span screen are span attributes emitted by istio that are blindly converted to attributes by Tempo.
+Tempo does not invent attributes. It stores span and interprets the TraceQl queries.
+Grafana maps the istio attribute (which is written as is by Tempo).

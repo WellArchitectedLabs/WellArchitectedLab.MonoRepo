@@ -1,22 +1,22 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: istio-prometheus-podmonitors
+  name: tempo-prometheus-servicemonitors
   namespace: argocd
   labels:
-    isIstio: "true"
+    isGrafana: "true"
     workload: operations
   annotations:
-    argocd.argoproj.io/sync-wave: "3"   # Install monitors after istio deamon, crds and ingress
+    argocd.argoproj.io/sync-wave: "13" # We need service monitor to deploy just after tempo app
 spec:
   project: default
   source:
     repoURL: https://github.com/WellArchitectedLabs/WellArchitectedLab.MonoRepo.git
-    path: k8s/gitops/addons/istio/prometheus-monitors
+    path: k8s/gitops/addons/tempo/prometheus-monitors
     targetRevision: develop
   destination:
     server: https://kubernetes.default.svc
-    namespace: istio-system
+    namespace: monitoring
   syncPolicy:
     automated:
       prune: true

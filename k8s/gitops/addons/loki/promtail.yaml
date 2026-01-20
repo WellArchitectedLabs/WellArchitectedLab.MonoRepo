@@ -31,12 +31,22 @@ spec:
           # For getting back to track in case of restarts
           positions:
             # positions file location under tmp folder
-            filename: /tmp/positions.yaml
+            filename: /run/promtail/positions.yaml
+          
+          # Use default chart volume claims
+          defaultVolumes:
+            - name: run
+              emptyDir: {}
+
+          defaultVolumeMounts:
+            - name: run
+              # mount it to the above path
+              mountPath: /run/promtail
           
           snippets:
             # Scrape configs
-            scrape_configs:
-              # Watch Kubernetes pod logs using the ready to plug kubernetes-pods job
+            # Watch Kubernetes pod logs using the ready to plug kubernetes-pods job
+            scrapeConfigs: |
               - job_name: kubernetes-pods
                 kubernetes_sd_configs:
                   # Scrape all pods
@@ -92,6 +102,10 @@ spec:
                   - source_labels: [__meta_kubernetes_pod_label_environment]
                     target_label: environment
                   
+                  # Add source_workload_namespace
+                  - source_labels: [__meta_kubernetes_namespace]
+                    target_label: source_workload_namespace
+                  
                   # Construct source_workload (environment-appname)
                   - source_labels:
                       - __meta_kubernetes_pod_label_environment
@@ -101,29 +115,14 @@ spec:
                     replacement: "${1}-${2}"
                     target_label: source_workload
                   
-                  # Add source_workload_namespace
-                  - source_labels: [__meta_kubernetes_namespace]
-                    target_label: source_workload_namespace
-                  
-                  # Construct source_service (full DNS: dev-appname-service.namespace.svc.cluster.local)
-                  - source_labels: 
-                      - __meta_kubernetes_pod_label_environment
-                      - __meta_kubernetes_pod_label_app
-                      - __meta_kubernetes_namespace
-                    separator: ";"
-                    regex: "(.+);(.+);(.+)"
-                    replacement: "${1}-${2}-service.${3}.svc.cluster.local"
-                    target_label: source_service
-                  
                   # Construct destination_service (same format)
                   - source_labels: 
                       - __meta_kubernetes_pod_label_environment
                       - __meta_kubernetes_pod_label_app
-                      - __meta_kubernetes_namespace
                     separator: ";"
-                    regex: "(.+);(.+);(.+)"
-                    replacement: "${1}-${2}-service.${3}.svc.cluster.local"
-                    target_label: destination_service
+                    regex: "(.+);(.+)"
+                    replacement: "${1}-${2}"
+                    target_label: destination_service_name
                   
                   # Add node name
                   - source_labels: [__meta_kubernetes_pod_node_name]
@@ -138,6 +137,15 @@ spec:
                   - source_labels: [__meta_kubernetes_namespace]
                     regex: (kube-system|kube-public|kube-node-lease)
                     action: drop
+
+                  # Required: tell Promtail where container logs are
+                  - action: replace
+                    source_labels:
+                      - __meta_kubernetes_pod_uid
+                      - __meta_kubernetes_pod_container_name
+                    separator: /
+                    replacement: /var/log/pods/*$1/*.log
+                    target_label: __path__
         
         # Resources
         resources:

@@ -33,117 +33,111 @@ spec:
             # positions file location under tmp folder
             filename: /tmp/positions.yaml
           
-          # Scrape configs
-          scrape_configs:
-            # Watch Kubernetes pod logs using the ready to plug kubernetes-pods job
-            - job_name: kubernetes-pods
-              kubernetes_sd_configs:
-                # Scrape all pods
-                - role: pod
-              
-              pipeline_stages:
-                # Extract log level from JSON logs
-                - json:
-                    expressions:
-                      # We map the json formatted log level, message, and timestamp to their new json values
-                      level: level
-                      msg: msg
-                      timestamp: ts
+          snippets:
+            # Scrape configs
+            scrape_configs:
+              # Watch Kubernetes pod logs using the ready to plug kubernetes-pods job
+              - job_name: kubernetes-pods
+                kubernetes_sd_configs:
+                  # Scrape all pods
+                  - role: pod
                 
-                # Promtail gets timestamp from current timestamp
-                # this can be different from the logs reality which can have latency reaching Promtail
-                - timestamp:
-                    source: timestamp
-                    # Promtail expects RFC3339Nano format
-                    format: RFC3339Nano
-                
-                # We query logs by labels. So we need to promote log level to be added as a label
-                # a label = a dimension to filter logs
-                - labels:
-                    level:
+                pipeline_stages:
+                  # Extract log level from JSON logs
+                  - json:
+                      expressions:
+                        # We map the json formatted log level, message, and timestamp to their new json values
+                        level: level
+                        msg: msg
+                        timestamp: ts
+                  
+                  # Promtail gets timestamp from current timestamp
+                  # this can be different from the logs reality which can have latency reaching Promtail
+                  - timestamp:
+                      source: timestamp
+                      # Promtail expects RFC3339Nano format
+                      format: RFC3339Nano
+                  
+                  # We query logs by labels. So we need to promote log level to be added as a label
+                  # a label = a dimension to filter logs
+                  - labels:
+                      level:
 
-                # We don't need health logs
-                - drop:
-                    source: msg
-                    expression: ".*health.*"
-                    drop_counter_reason: health_check
+                  # We don't need health logs
+                  - drop:
+                      source: msg
+                      expression: ".*health.*"
+                      drop_counter_reason: health_check
+                  
+                  # We don't need ping logs neither
+                  - drop:
+                      source: msg
+                      expression: ".*ping.*"
+                      drop_counter_reason: ping_check
                 
-                # We don't need ping logs neither
-                - drop:
-                    source: msg
-                    expression: ".*ping.*"
-                    drop_counter_reason: ping_check
-              
-              relabel_configs:
-                # Map the necessary labels for Promtail
-
-                # Add namespace label
-                - source_labels: [__meta_kubernetes_namespace]
-                  target_label: namespace
-                
-                # Add pod name label
-                - source_labels: [__meta_kubernetes_pod_name]
-                  target_label: pod
-
-                # Add environment label
-                - source_labels: [__meta_kubernetes_pod_label_environment]
-                  target_label: environment
-                
-                # Add container name label
-                - source_labels: [__meta_kubernetes_pod_container_name]
-                  target_label: container
-                
-                # Add app label
-                - source_labels: [__meta_kubernetes_pod_label_app]
-                  target_label: app
-                
-                # Construct source_workload (environment-appname, e.g., dev-weather-forecast-bff)
-                - source_labels:
-                    - __meta_kubernetes_pod_label_environment
-                    - __meta_kubernetes_pod_label_app
-                  separator: "-"
-                  regex: "(.+);(.+)"
-                  replacement: "${1}-${2}"
-                  target_label: source_workload
-                
-                # Add source_workload_namespace
-                - source_labels: [__meta_kubernetes_namespace]
-                  target_label: source_workload_namespace
-                
-                # Construct source_service (full DNS: dev-appname-service.namespace.svc.cluster.local)
-                - source_labels: 
-                    - __meta_kubernetes_pod_label_environment
-                    - __meta_kubernetes_pod_label_app
-                    - __meta_kubernetes_namespace
-                  separator: ";"
-                  regex: "(.+);(.+);(.+)"
-                  replacement: "${1}-${2}-service.${3}.svc.cluster.local"
-                  target_label: source_service
-                
-                # Construct destination_service (same format as source_service)
-                - source_labels: 
-                    - __meta_kubernetes_pod_label_environment
-                    - __meta_kubernetes_pod_label_app
-                    - __meta_kubernetes_namespace
-                  separator: ";"
-                  regex: "(.+);(.+);(.+)"
-                  replacement: "${1}-${2}-service.${3}.svc.cluster.local"
-                  target_label: destination_service
-                
-                # Add node name
-                - source_labels: [__meta_kubernetes_pod_node_name]
-                  target_label: node
-                
-                # Only scrape running pods
-                - source_labels: [__meta_kubernetes_pod_phase]
-                  regex: Running
-                  action: keep
-                
-                # Drop logs from kube-system and argocd namespaces (optional)
-                # Comment out if you want these logs
-                - source_labels: [__meta_kubernetes_namespace]
-                  regex: (kube-system|kube-public|kube-node-lease)
-                  action: drop
+                relabel_configs:
+                  # Add namespace label
+                  - source_labels: [__meta_kubernetes_namespace]
+                    target_label: namespace
+                  
+                  # Add pod name label
+                  - source_labels: [__meta_kubernetes_pod_name]
+                    target_label: pod
+                  
+                  # Add container name label
+                  - source_labels: [__meta_kubernetes_pod_container_name]
+                    target_label: container
+                  
+                  # Add environment
+                  - source_labels: [__meta_kubernetes_pod_label_environment]
+                    target_label: environment
+                  
+                  # Construct source_workload (environment-appname)
+                  - source_labels:
+                      - __meta_kubernetes_pod_label_environment
+                      - __meta_kubernetes_pod_label_app
+                    separator: "-"
+                    regex: "(.+);(.+)"
+                    replacement: "${1}-${2}"
+                    target_label: source_workload
+                  
+                  # Add source_workload_namespace
+                  - source_labels: [__meta_kubernetes_namespace]
+                    target_label: source_workload_namespace
+                  
+                  # Construct source_service (full DNS: dev-appname-service.namespace.svc.cluster.local)
+                  - source_labels: 
+                      - __meta_kubernetes_pod_label_environment
+                      - __meta_kubernetes_pod_label_app
+                      - __meta_kubernetes_namespace
+                    separator: ";"
+                    regex: "(.+);(.+);(.+)"
+                    replacement: "${1}-${2}-service.${3}.svc.cluster.local"
+                    target_label: source_service
+                  
+                  # Construct destination_service (same format)
+                  - source_labels: 
+                      - __meta_kubernetes_pod_label_environment
+                      - __meta_kubernetes_pod_label_app
+                      - __meta_kubernetes_namespace
+                    separator: ";"
+                    regex: "(.+);(.+);(.+)"
+                    replacement: "${1}-${2}-service.${3}.svc.cluster.local"
+                    target_label: destination_service
+                  
+                  # Add node name
+                  - source_labels: [__meta_kubernetes_pod_node_name]
+                    target_label: node
+                  
+                  # Only scrape running pods
+                  - source_labels: [__meta_kubernetes_pod_phase]
+                    regex: Running
+                    action: keep
+                  
+                  # Drop logs from kube-system and argocd namespaces (optional)
+                  - source_labels: [__meta_kubernetes_namespace]
+                    regex: (kube-system|kube-public|kube-node-lease)
+                    action: drop
         
         # Resources
         resources:

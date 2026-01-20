@@ -11,6 +11,7 @@ spec:
   namespaceSelector:
     any: true
   podMetricsEndpoints:
+    # Pointing to the endpoint which is exposed by the istio-proxy metrics
     - port: http-envoy-prom
       path: /stats/prometheus
       interval: 15s

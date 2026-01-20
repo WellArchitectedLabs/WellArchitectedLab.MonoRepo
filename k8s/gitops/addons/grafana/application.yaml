@@ -7,7 +7,7 @@ metadata:
     workload: operations
     isGrafana: "true"
   annotations:
-    argocd.argoproj.io/sync-wave: "11" # We need the grafana server installed after database
+    argocd.argoproj.io/sync-wave: "16" # Install grafana at the last step after all dependencies are installed
 spec:
   project: default
   source:
@@ -29,11 +29,13 @@ spec:
         # Ideally, a separate node pool for monitoring (prometheus, grafana) and operations
         # Should be used.
         # We are hitting a quotas limitation so we are using only one node pool
-        tolerations:
-          - key: "workload"
-            operator: "Equal"
-            value: "weather-forecast"
-            effect: "NoSchedule"
+        # tolerations:
+        #   - key: "workload"
+        #     operator: "Equal"
+        #     value: "weather-forecast"
+        #     effect: "NoSchedule"
+        nodeSelector:
+            kubernetes.azure.com/mode: system
 
         # The datasource simply points to the prometheus service 
         # that is deployed via the prometheus argocd app
@@ -42,6 +44,7 @@ spec:
           datasources.yaml:
             apiVersion: 1
             datasources:
+
               # local prometheus service
               - name: Prometheus
                 type: prometheus
@@ -49,15 +52,85 @@ spec:
                 url: http://prometheus-server-kube-pro-prometheus.monitoring.svc.cluster.local:9090
                 isDefault: true
                 editable: false
-              # current kubernetes cluster
-              - name: Kubernetes
-                type: kubernetes
+                uid: prometheus-uid
+
+              - name: Tempo
+                type: tempo
                 access: proxy
-                url: https://kubernetes.default.svc
+                url: http://tempo.monitoring.svc.cluster.local:3100
+                uid: tempo-uid
                 jsonData:
-                  authType: serviceAccount
-                  tlsSkipVerify: true
+                  # # necessary section for mapping tempo traces to metrics
+                  # # this will allow advanced grafana features like metrics jump to metrics from a trace for more context on the service health when trace appeared
+                  # tracesToMetrics:
+                  #   datasourceUid: prometheus-uid
+                  #   spanStartTimeShift: -1h
+                  #   spanEndTimeShift: 1h
+                  #   tags:
+                  #   - key: service.name
+                  serviceMap:
+                    # map the tempo data source to the graph data source using the datasource uid
+                    # below is the graph data source configuration
+                    datasourceUid: prometheus-service-graph
+                  nodeGraph:
+                    enabled: true
+                  search:
+                    hide: false
+                  # metricsQueries:
+                  #   # just a test query for debugging 
+                  #   - name: "Sanity"
+                  #     query: up
+                  # Trace to logs correlation
+                  tracesToLogs:
+                    datasourceUid: loki-uid
+                    tags:
+                      - service
+                      - pod
+                      - namespace
+                      - container
+                    mappedTags:
+                      - key: service.name
+                        value: service
+                    spanStartTimeShift: -1h
+                    spanEndTimeShift: 1h
+                    filterByTraceID: true
+                    filterBySpanID: false
                 editable: false
+
+              # dedicated datasource for service graph
+              # uses the prometheus server url as a backend
+              # please note that it is intended to completely separate this data source from the "normal" prometheus datasource above.
+              - name: Prometheus-ServiceGraph
+                type: prometheus
+                access: proxy
+                url: http://prometheus-server-kube-pro-prometheus.monitoring.svc.cluster.local:9090
+                uid: prometheus-service-graph
+                editable: false
+
+              - name: Loki
+                type: loki
+                access: proxy
+                url: http://loki-gateway.monitoring.svc.cluster.local
+                uid: loki-uid
+                jsonData:
+                  maxLines: 1000
+                  derivedFields:
+                    - datasourceUid: tempo-uid
+                      matcherRegex: 'trace_id=(\w+)'
+                      name: TraceIDRegex1
+                      url: $${__value.raw}
+
+                    - datasourceUid: tempo-uid
+                      matcherRegex: 'traceID[":]\s*["'']?(\w+)'
+                      name: TraceIDRegex2
+                      url: $${__value.raw}
+
+                    - datasourceUid: tempo-uid
+                      matcherRegex: 'trace[_-]?id[":]\s*["'']?(\w+)'
+                      name: TraceIDRegex3
+                      url: $${__value.raw}
+                editable: false
+
         
         # Use the deployed postgres instance to store grafana data
 
@@ -72,7 +145,7 @@ spec:
           GF_DATABASE_USER: $__env{GF_POSTGRES_USER}
           GF_DATABASE_PASSWORD: $__env{GF_POSTGRES_PASSWORD}
           GF_DATABASE_SSL_MODE: disable
-        
+
         # It is important that grafana database is persisted
         # Otherwise, dashboards and data will be reset on cluster restart or any event happening in the nodes
         persistence:

@@ -5,6 +5,8 @@ metadata:
   namespace: argocd
   labels:
     workload: operations
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"   # Prometheus is a pillar stack. Install it first before all other addons
 spec:
   project: default
   source:
@@ -20,33 +22,72 @@ spec:
             logLevel: debug
             additionalAgs:
               - --log.level=debug
-            tolerations:
-              - key: workload
-                operator: Equal
-                value: weather-forecast
-                effect: NoSchedule
+            # tolerations:
+            #   - key: workload
+            #     operator: Equal
+            #     value: weather-forecast
+            #     effect: NoSchedule
+            nodeSelector:
+              kubernetes.azure.com/mode: system
             
             # Very important for istio integration
             # These configs allow prometheus to read istio specific metrics
             # Which are pushed by istio service monitors
             # F.e: one of the main metrics that are istio specific and that prometheus must read is istio_requests_total
-
             serviceMonitorSelectorNilUsesHelmValues: false
             podMonitorSelectorNilUsesHelmValues: false
+
+            # If this config does not exist, any team could create a ServiceMonitor
+            # Prometheus would scrape it automatically
+            # Metrics pollution, duplication, and security issues appear
+            # Multiple Prometheus instances would scrape the same targets
+            # In the above config, we are only settings service and pod monitors to be scraped by a specific helm release label
+
             serviceMonitorSelector: {}
             podMonitorSelector: {}
-        
+
+            # The default mode for intergrating metrics into prometheus is via operator
+            # The operator mode is a pull mode where prometheus scrapes metrics from the target via configurations that are called pod / service monitors
+            # pod monitors are plugged to pod level and service monitors are plugged to service level. It all depend on at what the level the monitored workload exposes its metrics
+            # The metrics are generally expose by pod or service via a /metrics endpoint
+            # Some metrics are not scraped by prometheus in the traditional way
+            # They are pushed to prometheus via the remote write receiver
+            # In the following two lines, we are enabling prometheus write receiver for these specific metrics to be pushed
+            # This is necessary for Tempo span metrics that integrated only push mode (example traces_spanmetrics_calls_total or traces_service_graph_request_total)
+            enableFeatures:
+              - remote-write-receiver
+
         alertmanager:
           enabled: false
 
         grafana:
           enabled: false
 
+        # node exporter enables pushing metrics related node pools status
+        # can be installed independtly, but in this instance, we are including it via the prometheus stack
+        # project url: https://github.com/prometheus/node_exporter
         nodeExporter:
-          enabled: false
+          enabled: true
+          serviceMonitors:
+            namespace: monitoring
+            selector:
+              matchLabels:
+                release: prometheus-server
 
+        # Kub state metrics compare kubernetes objects status to their desired status like stored in etcd
+        # can be installed independtly, but in this instance, we are including it via the prometheus stack
+        # project url: https://github.com/kubernetes/kube-state-metrics
         kubeStateMetrics:
-          enabled: false
+          enabled: true
+          serviceMonitors:
+            namespace: monitoring
+            additionalNamespaces:
+              - backend
+              - frontend
+              - operations
+            selector:
+              matchLabels:
+                release: prometheus-server
 
   destination:
     server: https://kubernetes.default.svc

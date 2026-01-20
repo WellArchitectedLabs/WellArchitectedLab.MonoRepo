@@ -16,6 +16,14 @@ spec:
         # necessary for kiali integration
         version: v1
     spec:
+      tolerations:
+      - key: workload
+        operator: 'Equal'
+        value: 'weather-forecast'
+        effect: 'NoSchedule'
+      nodeSelector:
+        kubernetes.azure.com/mode: user
+        
       containers:
       - name: redis
         image: redis:7.2

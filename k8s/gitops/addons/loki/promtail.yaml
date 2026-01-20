@@ -84,6 +84,10 @@ spec:
                 # Add pod name label
                 - source_labels: [__meta_kubernetes_pod_name]
                   target_label: pod
+
+                # Add environment label
+                - source_labels: [__meta_kubernetes_pod_label_environment]
+                  target_label: environment
                 
                 # Add container name label
                 - source_labels: [__meta_kubernetes_pod_container_name]
@@ -93,9 +97,38 @@ spec:
                 - source_labels: [__meta_kubernetes_pod_label_app]
                   target_label: app
                 
-                # Add service label (for service correlation)
-                - source_labels: [__meta_kubernetes_pod_label_app_kubernetes_io_name]
-                  target_label: service
+                # Construct source_workload (environment-appname, e.g., dev-weather-forecast-bff)
+                - source_labels:
+                    - __meta_kubernetes_pod_label_environment
+                    - __meta_kubernetes_pod_label_app
+                  separator: "-"
+                  regex: "(.+);(.+)"
+                  replacement: "${1}-${2}"
+                  target_label: source_workload
+                
+                # Add source_workload_namespace
+                - source_labels: [__meta_kubernetes_namespace]
+                  target_label: source_workload_namespace
+                
+                # Construct source_service (full DNS: dev-appname-service.namespace.svc.cluster.local)
+                - source_labels: 
+                    - __meta_kubernetes_pod_label_environment
+                    - __meta_kubernetes_pod_label_app
+                    - __meta_kubernetes_namespace
+                  separator: ";"
+                  regex: "(.+);(.+);(.+)"
+                  replacement: "${1}-${2}-service.${3}.svc.cluster.local"
+                  target_label: source_service
+                
+                # Construct destination_service (same format as source_service)
+                - source_labels: 
+                    - __meta_kubernetes_pod_label_environment
+                    - __meta_kubernetes_pod_label_app
+                    - __meta_kubernetes_namespace
+                  separator: ";"
+                  regex: "(.+);(.+);(.+)"
+                  replacement: "${1}-${2}-service.${3}.svc.cluster.local"
+                  target_label: destination_service
                 
                 # Add node name
                 - source_labels: [__meta_kubernetes_pod_node_name]

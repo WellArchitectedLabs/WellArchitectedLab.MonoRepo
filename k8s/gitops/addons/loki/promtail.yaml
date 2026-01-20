@@ -25,7 +25,7 @@ spec:
             - url: http://loki-gateway.monitoring.svc.cluster.local/loki/api/v1/push
               # The tenant is a workspace isolation mechanism in Loki
               # Here we are storing all logs in workspace number 1
-              tenant_id: 1
+              tenant_id: "wf-dev"
           
           # Promtail keeps track of the last processed log position
           # For getting back to track in case of restarts
@@ -110,19 +110,10 @@ spec:
                   - source_labels:
                       - __meta_kubernetes_pod_label_environment
                       - __meta_kubernetes_pod_label_app
-                    separator: "-"
-                    regex: "(.+);(.+)"
-                    replacement: "${1}-${2}"
-                    target_label: source_workload
-                  
-                  # Construct destination_service (same format)
-                  - source_labels: 
-                      - __meta_kubernetes_pod_label_environment
-                      - __meta_kubernetes_pod_label_app
                     separator: ";"
                     regex: "(.+);(.+)"
                     replacement: "${1}-${2}"
-                    target_label: destination_service_name
+                    target_label: source_workload
                   
                   # Add node name
                   - source_labels: [__meta_kubernetes_pod_node_name]

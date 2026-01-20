@@ -22,11 +22,13 @@ spec:
           istio: ingressgateway
           version: v1
 
-        tolerations:
-          - key: workload
-            operator: Equal
-            value: weather-forecast
-            effect: NoSchedule
+        # tolerations:
+        #   - key: workload
+        #     operator: Equal
+        #     value: weather-forecast
+        #     effect: NoSchedule
+        nodeSelector:
+            kubernetes.azure.com/mode: system
 
         autoscaling:
           enabled: true

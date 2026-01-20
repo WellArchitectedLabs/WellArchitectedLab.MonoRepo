@@ -1,0 +1,179 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: promtail
+  namespace: argocd
+  labels:
+    workload: operations
+  annotations:
+    argocd.argoproj.io/sync-wave: "14" # Deploy promtail before loki gateway
+spec:
+  project: default
+  source:
+    repoURL: https://grafana.github.io/helm-charts
+    chart: promtail
+    targetRevision: 6.15.5
+    helm:
+      values: |
+        # Promtail runs as DaemonSet to collect logs from all nodes
+        daemonset:
+          enabled: true
+        
+        config:
+          clients:
+            # send logs to loki gateway
+            - url: http://loki-gateway.monitoring.svc.cluster.local/loki/api/v1/push
+              # The tenant is a workspace isolation mechanism in Loki
+              # Here we are storing all logs in workspace number 1
+              tenant_id: "wf-dev"
+          
+          # Promtail keeps track of the last processed log position
+          # For getting back to track in case of restarts
+          positions:
+            # positions file location under tmp folder
+            filename: /run/promtail/positions.yaml
+          
+          # Use default chart volume claims
+          defaultVolumes:
+            - name: run
+              emptyDir: {}
+
+          defaultVolumeMounts:
+            - name: run
+              # mount it to the above path
+              mountPath: /run/promtail
+          
+          snippets:
+            # Scrape configs
+            # Watch Kubernetes pod logs using the ready to plug kubernetes-pods job
+            scrapeConfigs: |
+              - job_name: kubernetes-pods
+                kubernetes_sd_configs:
+                  # Scrape all pods
+                  - role: pod
+                
+                pipeline_stages:
+                  # Extract log level from JSON logs
+                  - json:
+                      expressions:
+                        # We map the json formatted log level, message, and timestamp to their new json values
+                        level: level
+                        msg: msg
+                        timestamp: ts
+                  
+                  # Promtail gets timestamp from current timestamp
+                  # this can be different from the logs reality which can have latency reaching Promtail
+                  - timestamp:
+                      source: timestamp
+                      # Promtail expects RFC3339Nano format
+                      format: RFC3339Nano
+                  
+                  # We query logs by labels. So we need to promote log level to be added as a label
+                  # a label = a dimension to filter logs
+                  - labels:
+                      level:
+
+                  # We don't need health logs
+                  - drop:
+                      source: msg
+                      expression: ".*health.*"
+                      drop_counter_reason: health_check
+                  
+                  # We don't need ping logs neither
+                  - drop:
+                      source: msg
+                      expression: ".*ping.*"
+                      drop_counter_reason: ping_check
+                
+                relabel_configs:
+                  # Add namespace label
+                  - source_labels: [__meta_kubernetes_namespace]
+                    target_label: namespace
+                  
+                  # Add pod name label
+                  - source_labels: [__meta_kubernetes_pod_name]
+                    target_label: pod
+                  
+                  # Add container name label
+                  - source_labels: [__meta_kubernetes_pod_container_name]
+                    target_label: container
+                  
+                  # Add environment
+                  - source_labels: [__meta_kubernetes_pod_label_environment]
+                    target_label: environment
+                  
+                  # Add source_workload_namespace
+                  - source_labels: [__meta_kubernetes_namespace]
+                    target_label: source_workload_namespace
+                  
+                  # Construct source_workload (environment-appname)
+                  - source_labels:
+                      - __meta_kubernetes_pod_label_environment
+                      - __meta_kubernetes_pod_label_app
+                    separator: ";"
+                    regex: "(.+);(.+)"
+                    replacement: "${1}-${2}"
+                    target_label: source_workload
+                  
+                  # Add node name
+                  - source_labels: [__meta_kubernetes_pod_node_name]
+                    target_label: node
+                  
+                  # Only scrape running pods
+                  - source_labels: [__meta_kubernetes_pod_phase]
+                    regex: Running
+                    action: keep
+                  
+                  # Drop logs from kube-system and argocd namespaces (optional)
+                  - source_labels: [__meta_kubernetes_namespace]
+                    regex: (kube-system|kube-public|kube-node-lease)
+                    action: drop
+
+                  # Required: tell Promtail where container logs are
+                  - action: replace
+                    source_labels:
+                      - __meta_kubernetes_pod_uid
+                      - __meta_kubernetes_pod_container_name
+                    separator: /
+                    replacement: /var/log/pods/*$1/*.log
+                    target_label: __path__
+        
+        # Resources
+        resources:
+          requests:
+            cpu: 50m
+            memory: 128Mi
+          limits:
+            cpu: 200m
+            memory: 256Mi
+        
+        # Tolerations to run on all nodes
+        # tolerations:
+        #   - effect: NoSchedule
+        #     operator: Exists
+        #   - effect: NoExecute
+        #     operator: Exists
+        nodeSelector:
+            kubernetes.azure.com/mode: system
+        
+        # Service monitor for exposing usage data to prometheus
+        serviceMonitor:
+          enabled: true
+          labels:
+            release: prometheus-server
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: monitoring
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+    retry:
+      limit: 5
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 3m

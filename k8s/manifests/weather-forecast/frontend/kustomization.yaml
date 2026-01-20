@@ -12,6 +12,3 @@ resources:
   - services/service.yaml
   - services/virtual-service.yaml
   - config/config-map.yaml
-
-configurations:
-  - kustomizeconfig.yaml

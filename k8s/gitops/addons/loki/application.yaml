@@ -1,0 +1,165 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: loki
+  namespace: argocd
+  labels:
+    workload: operations
+    isGrafana: "true"
+  annotations:
+    argocd.argoproj.io/sync-wave: "15" # Deploy loki gateway just before grafana starts
+spec:
+  project: default
+  source:
+    repoURL: https://grafana.github.io/helm-charts
+    chart: loki
+    targetRevision: 5.47.0
+    helm:
+      values: |
+        # Deployment mode - monolithic is simpler for most use cases
+        deploymentMode: SingleBinary
+        
+        loki:
+          # Disable authentication for simplicity
+          # We will enable it later
+          auth_enabled: false
+          
+          commonConfig:
+            replication_factor: 1
+          
+          # Storage configuration
+          storage:
+            # We will use the filesystem for simplicity
+            # In high scale production, consider using object storage like S3, GCS, or Azure Blob Storage
+            type: filesystem
+          
+          # Schema configuration
+          schemaConfig:
+            configs:
+              # This a is random date (should be inferior or equal to current date)
+              # this represents the current database version date
+              - from: 2026-01-19
+                # tsdb: time series database is loki's new generation database that supports high cardinality and high throughput
+                store: tsdb
+                # We will use the filesystem store declared above
+                object_store: filesystem
+                # should be equal to loki's tsdb schema version (v14 is unstable today)
+                schema: v13
+                # indexing logic
+                # we prefix indexes with index_ and create a new index every 24 hours for high query performance
+                index:
+                  prefix: index_
+                  # Index is recalculated everyday
+                  period: 24h
+          
+          # Limits configuration
+          limits_config:
+            retention_period: 24h  # 1 day retention period (for optimizing storage)
+            max_query_series: 10000
+            max_query_lookback: 24h # We go back to logs down to 1 day (compatible with retention period )
+            ingestion_rate_mb: 16 # Limit the ingestion rate to 16 MB/s, this security for over logs usage
+            ingestion_burst_size_mb: 32  # We allow logs ingestion rate limit to exceed to up to 32 MB (double the configured limit)
+            per_stream_rate_limit: 8MB # Every stream can send a max of 8 MB/s
+            per_stream_rate_limit_burst: 16MB # We allow a single stream to exceed to up to 16 MB (double the configured limit)
+
+          # Compactor is a separate background service for applying retention policies
+          compactor:
+            retention_enabled: true
+            # effectively delete the log two hours after it is marked as deleted
+            retention_delete_delay: 2h
+            # Number of threads performing the deletion
+            # use more workers for production (can be set to 150 for high volume contexts)
+            retention_delete_worker_count: 5
+        
+        # We are on single binary mode (loki monolith mode)
+        # Which is basically a single binary deployment of Loki
+        # Another mode is microservice mode which include 3 components: read, write and backend
+        singleBinary:
+          replicas: 1
+          
+          persistence:
+            enabled: true
+            storageClass: managed-csi
+            size: 10Gi
+          
+          resources:
+            requests:
+              cpu: 200m
+              memory: 256Mi
+            limits:
+              cpu: 1000m
+              memory: 1Gi
+          
+          # tolerations:
+          #   - key: "workload"
+          #     operator: "Equal"
+          #     value: "weather-forecast"
+          #     effect: "NoSchedule"
+          
+          nodeSelector:
+            kubernetes.azure.com/mode: system
+        
+        # Gateway configuration (nginx)
+        gateway:
+          enabled: true
+          replicas: 1
+          
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+          
+          # tolerations:
+          #   - key: "workload"
+          #     operator: "Equal"
+          #     value: "weather-forecast"
+          #     effect: "NoSchedule"
+          
+          nodeSelector:
+            kubernetes.azure.com/mode: system
+        
+        # We are in single binary mode so we disable all microservices components
+        read:
+          replicas: 0
+        
+        write:
+          replicas: 0
+        
+        backend:
+          replicas: 0
+        
+        # We push metrics in prometheus to monitor loki's health
+        monitoring:
+          serviceMonitor:
+            enabled: true
+
+        # Self monitoring is disabled
+        monitoring:
+          selfMonitoring:
+            enabled: false
+            grafanaAgent:
+              installOperator: false  # ← Le problème est ici
+        
+        # Loki canary is Loki's health checker
+        lokiCanary:
+          enabled: false
+        
+        # Test pod
+        test:
+          enabled: false
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: monitoring
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+    retry:
+      limit: 5
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 3m

@@ -1,0 +1,132 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: grafana-dashboard-backup
+  namespace: monitoring
+spec:
+  schedule: "0 2 * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: OnFailure
+          volumes:
+            - name: backup-volume
+              emptyDir: {}
+
+          # ===============================
+          # Init container: Grafana export
+          # ===============================
+          initContainers:
+            - name: grafana-backup
+              image: alpine:3.19
+              volumeMounts:
+                - mountPath: /backups
+                  name: backup-volume
+              env:
+                - name: GRAFANA_URL
+                  value: "http://grafana.monitoring.svc.cluster.local"
+                - name: GRAFANA_TOKEN
+                  valueFrom:
+                    secretKeyRef:
+                      name: dev-grafana-secrets
+                      key: GRAFANA_TOKEN
+              command:
+                - /bin/sh
+                - -c
+                - |
+                  set -euo pipefail
+                  apk add --no-cache curl jq
+
+                  echo "Fetching dashboard list"
+                  curl -sS -H "Authorization: Bearer ${GRAFANA_TOKEN}" \
+                    "${GRAFANA_URL}/api/search?type=dash-db" \
+                    > /backups/dashboards.json
+
+                  mkdir -p /backups/dashboards
+
+                  jq -r '.[] | "\(.uid) \(.title)"' /backups/dashboards.json | while read uid title; do
+                    safe_title=$(echo "$title" | tr -c '[:alnum:]._-' '_')
+                    echo "Exporting dashboard $title ($uid) -> $safe_title.json"
+                    dashboard=$(curl -sS -H "Authorization: Bearer ${GRAFANA_TOKEN}" \
+                      "${GRAFANA_URL}/api/dashboards/uid/${uid}")
+                    echo "$dashboard" | jq '.' > "/backups/dashboards/${safe_title}.json"
+                  done
+
+                  rm /backups/dashboards.json
+                  ls -lh /backups/dashboards
+
+          # ===============================
+          # Main container: Git + PR
+          # ===============================
+          containers:
+            - name: github-pr
+              image: bitnami/git:latest
+              volumeMounts:
+                - mountPath: /backups
+                  name: backup-volume
+              env:
+                - name: GITHUB_PAT
+                  valueFrom:
+                    secretKeyRef:
+                      name: dev-github-secrets
+                      key: GITHUB_PAT
+                - name: GIT_REPO
+                  value: "WellArchitectedLabs/WellArchitectedLab.MonoRepo"
+                - name: TARGET_BRANCH
+                  value: "develop"
+                - name: SOURCE_BRANCH
+                  value: "grafana-dashboard-backup"
+                - name: DASHBOARDS_REPO_LOCATION
+                  value: "k8s/gitops/addons/grafana/dashboard-backups"
+              command:
+                - /bin/sh
+                - -c
+                - |
+                  set -euo pipefail
+
+                  test -d /backups/dashboards
+
+                  # Install GitHub CLI
+                  GH_VERSION=2.35.0
+                  curl -sSL https://github.com/cli/cli/releases/download/v${GH_VERSION}/gh_${GH_VERSION}_linux_amd64.tar.gz \
+                    | tar -xz
+                  mv gh_${GH_VERSION}_linux_amd64/bin/gh /usr/local/bin/gh
+
+                  echo "${GITHUB_PAT}" | gh auth login --with-token
+
+                  cd /backups
+                  rm -rf repo
+                  git clone https://github.com/${GIT_REPO}.git repo
+                  cd repo
+
+                  git checkout -B ${SOURCE_BRANCH}
+
+                  mkdir -p ${DASHBOARDS_REPO_LOCATION}
+                  cp /backups/dashboards/*.json ${DASHBOARDS_REPO_LOCATION}/
+
+                  git config user.name "grafana-backup-bot"
+                  git config user.email "grafana-backup@org.local"
+
+                  git add ${DASHBOARDS_REPO_LOCATION}/
+                  git commit -m "Automated Grafana dashboards backup" || echo "No changes to commit"
+
+                  git push -f https://${GITHUB_PAT}@github.com/${GIT_REPO}.git ${SOURCE_BRANCH}
+
+                  # Create or update PR
+                  PR_URL=$(gh pr list --repo ${GIT_REPO} --head ${SOURCE_BRANCH} --json url -q '.[0].url' || true)
+
+                  if [ -n "$PR_URL" ]; then
+                    echo "PR already exists ($PR_URL), updating title/body"
+                    gh pr edit "$PR_URL" \
+                      --title "Automated Grafana dashboards backup" \
+                      --body "Automated Grafana dashboards backup" || true
+                  else
+                    echo "Creating new PR"
+                    gh pr create \
+                      --repo ${GIT_REPO} \
+                      --head ${SOURCE_BRANCH} \
+                      --base ${TARGET_BRANCH} \
+                      --title "Automated Grafana dashboards backup" \
+                      --body "Automated Grafana dashboards backup"
+                  fi

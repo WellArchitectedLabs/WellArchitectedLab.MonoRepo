@@ -1,0 +1,92 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: tempo
+  namespace: argocd
+  labels:
+    workload: operations
+    isGrafana: "true"
+  annotations:
+    argocd.argoproj.io/sync-wave: "12" # We need tempo to run just after open telemetry
+spec:
+  project: default
+  source:
+    repoURL: https://grafana.github.io/helm-charts
+    chart: tempo
+    targetRevision: 1.7.1
+    helm:
+      values: |
+        tempo:
+          # retention is the period of time
+          # for traces persistence
+          retention: 24h
+
+          # Define an OTLP receiver
+          # For receiving open telemetry from otlp collector
+          receivers:
+            otlp:
+              protocols:
+                grpc:
+                  endpoint: 0.0.0.0:4317
+                http:
+                  endpoint: 0.0.0.0:4318
+          
+          # Activate metrics generator
+          # Metrics generator is necessary for plugging Tempo to prometheus's metrics
+          # This will allow us to monitor Tempo (which is basically a traces system) via dedicated metrics that are pushed into prometheus db
+          metricsGenerator:
+            enabled: true
+            # metrics generator needs to circle back to prometheus in order to store span metrics or graph metrics or any other metric that it calculates
+            remoteWriteUrl: "http://prometheus-server-kube-pro-prometheus.monitoring.svc.cluster.local:9090/api/v1/write"
+            
+            processor:
+              # we also include the service_graph processor which correlates grafana metrics with their related traces
+              # that is necessary for grafana drill down functionality to traces from prometheus metrics
+              # traces pushed by this processor have name: traces_service_graph_*
+              service_graphs:
+                dimensions:
+                  # seperate trace_service_graph metrics are created by service.name and service.namespace
+                  # service.name and service.namespace are span attributes that are automatically created by the service graph processor
+                  # this will permit us to say "show me all calls from this service or to this service"
+                  - "service.name"
+                  - "service.namespace"
+                wait: 10s
+                max_items: 10000
+
+              # processor that will push metrics that are related to Tempo traces themselves (or what we call spans in Tempo terminology)
+              # these metrics are pushed under traces_spanmetrics_*
+              # these metrics will expose RED (Rate, Error and Duration) metrics related to tempo spans
+              # these metrics will permit to answer questions like "how many requests failed?" or "what is the average latency?"
+              span_metrics:
+                dimensions:
+                  # drilling the RED metric for every service, every namespace, method and status code
+                  # for example http.method will permit to answer questions like "what is the average latency for POST http method for this service?"
+                  - "service.name"
+                  - "service.namespace"
+                  - "http.method"
+                  - "http.status_code"
+
+        persistence:
+          enabled: true
+          size: 5Gi
+
+        resources:
+          requests:
+            cpu: 100m
+            memory: 50Mi
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: monitoring
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+    retry:
+      limit: 5
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 3m

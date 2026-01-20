@@ -52,10 +52,12 @@ spec:
         operator: 'Equal'
         value: 'weather-forecast'
         effect: 'NoSchedule'
+
       # Where will my pods will run, and in what node label
       # We should add a toleration because the user nodes are tainted and will be not schedule the pods if the taint is not provided
       nodeSelector:
         kubernetes.azure.com/mode: user
+
       affinity:
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
@@ -75,7 +77,7 @@ spec:
         imagePullPolicy: Always # Always pull latest version
         resources:
           requests:
-            # node should have 128 megabytes available for pod to run into it
+            # node should have 2 megabytes available for pod to run into it
             # metrics are constantly sent from kubelet into metrics api (api server)
             # which updates etcd, 
             # kubernetes scheduler would then read the metrics and decide in which node the pod will be ran

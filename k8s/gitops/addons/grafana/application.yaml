@@ -44,6 +44,7 @@ spec:
           datasources.yaml:
             apiVersion: 1
             datasources:
+
               # local prometheus service
               - name: Prometheus
                 type: prometheus
@@ -52,6 +53,7 @@ spec:
                 isDefault: true
                 editable: false
                 uid: prometheus-uid
+
               - name: Tempo
                 type: tempo
                 access: proxy
@@ -78,7 +80,23 @@ spec:
                   #   # just a test query for debugging 
                   #   - name: "Sanity"
                   #     query: up
+                  # Trace to logs correlation
+                  tracesToLogs:
+                    datasourceUid: loki-uid
+                    tags:
+                      - service
+                      - pod
+                      - namespace
+                      - container
+                    mappedTags:
+                      - key: service.name
+                        value: service
+                    spanStartTimeShift: -1h
+                    spanEndTimeShift: 1h
+                    filterByTraceID: true
+                    filterBySpanID: false
                 editable: false
+
               # dedicated datasource for service graph
               # uses the prometheus server url as a backend
               # please note that it is intended to completely separate this data source from the "normal" prometheus datasource above.
@@ -88,6 +106,31 @@ spec:
                 url: http://prometheus-server-kube-pro-prometheus.monitoring.svc.cluster.local:9090
                 uid: prometheus-service-graph
                 editable: false
+
+              - name: Loki
+                type: loki
+                access: proxy
+                url: http://loki-gateway.monitoring.svc.cluster.local
+                uid: loki-uid
+                jsonData:
+                  maxLines: 1000
+                  derivedFields:
+                    - datasourceUid: tempo-uid
+                      matcherRegex: 'trace_id=(\w+)'
+                      name: TraceIDRegex1
+                      url: $${__value.raw}
+
+                    - datasourceUid: tempo-uid
+                      matcherRegex: 'traceID[":]\s*["'']?(\w+)'
+                      name: TraceIDRegex2
+                      url: $${__value.raw}
+
+                    - datasourceUid: tempo-uid
+                      matcherRegex: 'trace[_-]?id[":]\s*["'']?(\w+)'
+                      name: TraceIDRegex3
+                      url: $${__value.raw}
+                editable: false
+
         
         # Use the deployed postgres instance to store grafana data
 

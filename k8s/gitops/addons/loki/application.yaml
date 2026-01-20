@@ -36,24 +36,27 @@ spec:
           # Schema configuration
           schemaConfig:
             configs:
-
+              # This a is random date (should be inferior or equal to current date)
+              # this represents the current database version date
               - from: 2026-01-19
                 # tsdb: time series database is loki's new generation database that supports high cardinality and high throughput
                 store: tsdb
                 # We will use the filesystem store declared above
                 object_store: filesystem
+                # should be equal to loki's tsdb schema version (v14 is unstable today)
                 schema: v13
                 # indexing logic
                 # we prefix indexes with index_ and create a new index every 24 hours for high query performance
                 index:
                   prefix: index_
+                  # Index is recalculated everyday
                   period: 24h
           
           # Limits configuration
           limits_config:
-            retention_period: 168h  # 7 days retention
+            retention_period: 24h  # 1 day retention period (for optimizing storage)
             max_query_series: 10000
-            max_query_lookback: 168h # We go back to logs down to 7 days (compatible with retention period )
+            max_query_lookback: 24h # We go back to logs down to 1 day (compatible with retention period )
             ingestion_rate_mb: 16 # Limit the ingestion rate to 16 MB/s, this security for over logs usage
             ingestion_burst_size_mb: 32  # We allow logs ingestion rate limit to exceed to up to 32 MB (double the configured limit)
             per_stream_rate_limit: 8MB # Every stream can send a max of 8 MB/s

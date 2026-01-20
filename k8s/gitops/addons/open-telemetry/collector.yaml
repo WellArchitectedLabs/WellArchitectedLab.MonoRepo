@@ -6,7 +6,7 @@ metadata:
   labels:
     workload: operations
   annotations:
-    argocd.argoproj.io/sync-wave: "13" # We need open telemetry to deploy after Tempo and before grafana is started
+    argocd.argoproj.io/sync-wave: "11" # We need open telemetry to deploy before Tempo for receivers to be up
 spec:
   project: default
   source:
@@ -17,11 +17,11 @@ spec:
       values: |
         mode: deployment
 
-        tolerations:
-          - key: "workload"
-            operator: "Equal"
-            value: "weather-forecast"
-            effect: "NoSchedule"
+        # tolerations:
+        #   - key: "workload"
+        #     operator: "Equal"
+        #     value: "weather-forecast"
+        #     effect: "NoSchedule"
         nodeSelector:
             kubernetes.azure.com/mode: system
 

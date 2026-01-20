@@ -7,7 +7,7 @@ metadata:
     workload: operations
     isGrafana: "true"
   annotations:
-    argocd.argoproj.io/sync-wave: "14" # We need the grafana server installed after database, otlp collector and Tempo tracing db
+    argocd.argoproj.io/sync-wave: "16" # Install grafana at the last step after all dependencies are installed
 spec:
   project: default
   source:
@@ -29,11 +29,11 @@ spec:
         # Ideally, a separate node pool for monitoring (prometheus, grafana) and operations
         # Should be used.
         # We are hitting a quotas limitation so we are using only one node pool
-        tolerations:
-          - key: "workload"
-            operator: "Equal"
-            value: "weather-forecast"
-            effect: "NoSchedule"
+        # tolerations:
+        #   - key: "workload"
+        #     operator: "Equal"
+        #     value: "weather-forecast"
+        #     effect: "NoSchedule"
         nodeSelector:
             kubernetes.azure.com/mode: system
 

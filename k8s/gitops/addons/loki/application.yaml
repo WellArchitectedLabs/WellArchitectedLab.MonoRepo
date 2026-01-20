@@ -7,7 +7,7 @@ metadata:
     workload: operations
     isGrafana: "true"
   annotations:
-    argocd.argoproj.io/sync-wave: "12" # Deploy after Tempo, before Grafana
+    argocd.argoproj.io/sync-wave: "15" # Deploy loki gateway just before grafana starts
 spec:
   project: default
   source:
@@ -90,11 +90,11 @@ spec:
               cpu: 1000m
               memory: 1Gi
           
-          tolerations:
-            - key: "workload"
-              operator: "Equal"
-              value: "weather-forecast"
-              effect: "NoSchedule"
+          # tolerations:
+          #   - key: "workload"
+          #     operator: "Equal"
+          #     value: "weather-forecast"
+          #     effect: "NoSchedule"
           
           nodeSelector:
             kubernetes.azure.com/mode: system
@@ -109,11 +109,11 @@ spec:
               cpu: 50m
               memory: 64Mi
           
-          tolerations:
-            - key: "workload"
-              operator: "Equal"
-              value: "weather-forecast"
-              effect: "NoSchedule"
+          # tolerations:
+          #   - key: "workload"
+          #     operator: "Equal"
+          #     value: "weather-forecast"
+          #     effect: "NoSchedule"
           
           nodeSelector:
             kubernetes.azure.com/mode: system

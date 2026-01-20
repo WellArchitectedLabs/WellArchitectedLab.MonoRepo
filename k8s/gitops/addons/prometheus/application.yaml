@@ -5,6 +5,8 @@ metadata:
   namespace: argocd
   labels:
     workload: operations
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"   # Prometheus is a pillar stack. Install it first before all other addons
 spec:
   project: default
   source:
@@ -20,11 +22,11 @@ spec:
             logLevel: debug
             additionalAgs:
               - --log.level=debug
-            tolerations:
-              - key: workload
-                operator: Equal
-                value: weather-forecast
-                effect: NoSchedule
+            # tolerations:
+            #   - key: workload
+            #     operator: Equal
+            #     value: weather-forecast
+            #     effect: NoSchedule
             nodeSelector:
               kubernetes.azure.com/mode: system
             

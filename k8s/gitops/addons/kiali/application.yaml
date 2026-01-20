@@ -16,11 +16,11 @@ spec:
         deployment:
           accessible_namespaces:
             - "**"
-          tolerations:
-            - key: "workload"
-              operator: "Equal"
-              value: "weather-forecast"
-              effect: "NoSchedule"
+          # tolerations:
+          #   - key: "workload"
+          #     operator: "Equal"
+          #     value: "weather-forecast"
+          #     effect: "NoSchedule"
           nodeSelector:
             kubernetes.azure.com/mode: system
             

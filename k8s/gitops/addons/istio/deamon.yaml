@@ -19,11 +19,11 @@ spec:
         # Pilot (istiod) configuration
         pilot:
           # Node tolerations for weather-forecast nodepool
-          tolerations:
-            - key: workload
-              operator: Equal
-              value: weather-forecast
-              effect: NoSchedule
+          # tolerations:
+          #   - key: workload
+          #     operator: Equal
+          #     value: weather-forecast
+          #     effect: NoSchedule
           nodeSelector:
             kubernetes.azure.com/mode: system
 

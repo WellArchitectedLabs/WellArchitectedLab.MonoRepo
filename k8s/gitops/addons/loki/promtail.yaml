@@ -6,7 +6,7 @@ metadata:
   labels:
     workload: operations
   annotations:
-    argocd.argoproj.io/sync-wave: "13" # Deploy after Loki
+    argocd.argoproj.io/sync-wave: "14" # Deploy promtail before loki gateway
 spec:
   project: default
   source:
@@ -148,11 +148,13 @@ spec:
             memory: 256Mi
         
         # Tolerations to run on all nodes
-        tolerations:
-          - effect: NoSchedule
-            operator: Exists
-          - effect: NoExecute
-            operator: Exists
+        # tolerations:
+        #   - effect: NoSchedule
+        #     operator: Exists
+        #   - effect: NoExecute
+        #     operator: Exists
+        nodeSelector:
+            kubernetes.azure.com/mode: system
         
         # Service monitor for exposing usage data to prometheus
         serviceMonitor:

@@ -47,11 +47,11 @@ spec:
             enabled: true
             storageClass: managed-csi
             size: 10Gi
-          tolerations:
-            - key: "workload"
-              operator: "Equal"
-              value: "weather-forecast"
-              effect: "NoSchedule"
+          # tolerations:
+          #   - key: "workload"
+          #     operator: "Equal"
+          #     value: "weather-forecast"
+          #     effect: "NoSchedule"
           nodeSelector:
             kubernetes.azure.com/mode: system
 

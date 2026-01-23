@@ -1,6 +1,7 @@
 import csv
 import time
-from datetime import timedelta
+from datetime import date, timedelta
+from typing import Optional
 from dateutil.relativedelta import relativedelta
 from tqdm import tqdm
 
@@ -25,17 +26,6 @@ class _NoopProgress:
 
     def update(self, n=1):
         return
-
-
-def _write_row_to_db(lon, lat, t, temp, wind, rain):
-    return {
-        "longitude": lon,
-        "latitude": lat,
-        "timestamp_utc": t,
-        "temperature_c": temp,
-        "wind_speed": wind,
-        "precipitation": rain
-    }
 
 def load_locations_from_csv(path):
     locations = []
@@ -76,14 +66,17 @@ def month_ranges_between(start, end):
 
     return ranges
 
-def run(from_date, to_date, input_csv=None, db_adapter=None, export_to_csv=True, export_to_postgres=False):
+def import_wf_actuals(from_date: date, to_date: date, db_dsn: str, cities_csv_input: Optional[str] = None, export_to_csv: bool = False, export_to_postgres: bool = True) -> None:
+    from db_adapter.adapter import PostgresDbAdapter
+    db_adapter = None
 
-    if db_adapter is not None:
+    if not db_dsn.strip() == "":
+        db_adapter = PostgresDbAdapter(db_dsn)
         locations = load_locations_from_db(db_adapter)
     else:
-        if not input_csv:
-            raise SystemExit("--input is required when no db adapter is provided")
-        locations = load_locations_from_csv(input_csv)
+        if cities_csv_input.strip() == "" or cities_csv_input is None:
+            raise SystemExit("cities --input is required when no db adapter is provided")
+        locations = load_locations_from_csv(cities_csv_input)
     months = month_ranges_between(from_date, to_date)
 
     total_requests = (
@@ -179,3 +172,30 @@ def run(from_date, to_date, input_csv=None, db_adapter=None, export_to_csv=True,
     if export_to_postgres and db_adapter is not None and db_buffer:
         # insert in one shot using optimized method
         db_adapter.insert_wfactuals(db_buffer)
+
+def import_cities(input_path: str, dsn: str) -> int:
+
+    if dsn.strip() == "":
+        raise ValueError("Invalid DSN")
+
+    """Import capitals CSV into the `cities` table using the DB adapter.
+
+    Returns the number of imported rows.
+    """
+    # lazy imports so module import is cheap
+    from datasource.csv_reader import load_locations
+    from db_adapter.adapter import PostgresDbAdapter
+
+    locations = load_locations(input_path)  # list of (lon, lat, name)
+    adapter = PostgresDbAdapter(dsn)
+
+    items = []
+    for lon, lat, name in locations:
+        items.append({
+            "name": name,
+            "longitude": lon,
+            "latitude": lat
+        })
+
+    adapter.insert_cities(items)
+    return len(items)

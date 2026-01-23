@@ -3,7 +3,7 @@ import psycopg2.extras
 from typing import List, Dict, Any, Iterable
 
 
-class PostgresDbAdapter:
+class WeatherForecastDbAdapter:
     BULK_THRESHOLD = 1000
 
     def __init__(self, dsn: str):

@@ -27,7 +27,7 @@ class _NoopProgress:
     def update(self, n=1):
         return
 
-def load_locations_from_csv(path):
+def load_cities_from_csv(path):
     locations = []
     with open(path, newline="", encoding="utf-8") as f:
         reader = csv.DictReader(f)
@@ -38,7 +38,7 @@ def load_locations_from_csv(path):
             ))
     return locations
 
-def load_locations_from_db(db_adapter):
+def load_cities_from_db(db_adapter):
     # Expect db_adapter.read_cities to return list of dicts with latitude/longitude
     rows = db_adapter.read_all_cities()
     # return list of tuples (id, latitude, longitude)
@@ -67,16 +67,16 @@ def month_ranges_between(start, end):
     return ranges
 
 def import_wf_actuals(from_date: date, to_date: date, db_dsn: str, cities_csv_input: Optional[str] = None, export_to_csv: bool = False, export_to_postgres: bool = True) -> None:
-    from db_adapter.adapter import PostgresDbAdapter
+    from adapters import WeatherForecastDbAdapter
     db_adapter = None
 
     if not db_dsn.strip() == "":
-        db_adapter = PostgresDbAdapter(db_dsn)
-        locations = load_locations_from_db(db_adapter)
+        db_adapter = WeatherForecastDbAdapter(db_dsn)
+        locations = load_cities_from_db(db_adapter)
     else:
         if cities_csv_input.strip() == "" or cities_csv_input is None:
             raise SystemExit("cities --input is required when no db adapter is provided")
-        locations = load_locations_from_csv(cities_csv_input)
+        locations = load_cities_from_csv(cities_csv_input)
     months = month_ranges_between(from_date, to_date)
 
     total_requests = (
@@ -178,16 +178,16 @@ def import_cities(input_path: str, dsn: str) -> int:
     if dsn.strip() == "":
         raise ValueError("Invalid DSN")
 
-    """Import capitals CSV into the `cities` table using the DB adapter.
+    """Import cities CSV into the `cities` table using the DB adapter.
 
     Returns the number of imported rows.
     """
     # lazy imports so module import is cheap
-    from datasource.csv_reader import load_locations
-    from db_adapter.adapter import PostgresDbAdapter
+    from adapters import WeatherForecastDbAdapter
+    from adapters import load_cities_from_csv
 
-    locations = load_locations(input_path)  # list of (lon, lat, name)
-    adapter = PostgresDbAdapter(dsn)
+    locations = load_cities_from_csv(input_path)  # list of (lon, lat, name)
+    adapter = WeatherForecastDbAdapter(dsn)
 
     items = []
     for lon, lat, name in locations:

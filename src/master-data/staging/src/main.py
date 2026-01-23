@@ -10,16 +10,16 @@ def main():
     sub = p.add_subparsers(dest="cmd", required=True)
 
     # cities import entrypoint
-    cities_import = sub.add_parser("cities_import", help="Import capitals CSV into cities table")
-    cities_import.add_argument("--input", required=True, help="Path to capitals csv")
+    cities_import = sub.add_parser("cities_import", help="Import cities CSV into cities table")
+    cities_import.add_argument("--input", required=True, help="Path to cities csv")
 
     # fetch entrypoint
-    wf_imports = sub.add_parser("wf_imports", help="Import hourly weather data for cities from the provided date range. Supports up to 2 years of historical data for all world capitals.")
+    wf_imports = sub.add_parser("wf_imports", help="Import hourly weather data for cities from the provided date range. Supports up to 2 years of historical data for all world cities.")
     wf_imports.add_argument("--from-date", required=True)
     wf_imports.add_argument("--to-date", required=True)
     wf_imports.add_argument("--export-to-csv", action="store_true", default=False)
     wf_imports.add_argument("--export-to-postgres", action="store_true", default=False)
-    wf_imports.add_argument("--cities-input", required=True, help="Path to capitals csv")
+    wf_imports.add_argument("--cities-input", required=True, help="Path to cities csv")
 
     args = p.parse_args()
 

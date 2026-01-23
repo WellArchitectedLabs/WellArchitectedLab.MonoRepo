@@ -19,7 +19,7 @@ def cities_import(input_path: str, dsn: str) -> int:
     from . import importer
 
     # importer.run will load locations from DB when db_adapter is provided
-    importer.import_cities(
+    return importer.import_cities(
         input_path=input_path,
         dsn=dsn
     )

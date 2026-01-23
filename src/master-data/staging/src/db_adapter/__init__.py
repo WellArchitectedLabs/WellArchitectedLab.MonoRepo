@@ -1,3 +1,3 @@
-from .adapter import insert, read_cities
+from .adapter import PostgresDbAdapter
 
-__all__ = ["insert", "read_cities"]
+__all__ = ["PostgresDbAdapter"]

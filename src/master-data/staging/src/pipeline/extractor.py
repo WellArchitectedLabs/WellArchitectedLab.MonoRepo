@@ -12,6 +12,31 @@ from config import TIMEZONE
 from config import MAX_RETRIES
 from config import HOURLY_VARS 
 
+
+class _NoopProgress:
+    def __init__(self, *a, **kw):
+        pass
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc, tb):
+        return False
+
+    def update(self, n=1):
+        return
+
+
+def _write_row_to_db(lon, lat, t, temp, wind, rain):
+    return {
+        "longitude": lon,
+        "latitude": lat,
+        "timestamp_utc": t,
+        "temperature_c": temp,
+        "wind_speed": wind,
+        "precipitation": rain
+    }
+
 def load_locations_from_csv(path):
     locations = []
     with open(path, newline="", encoding="utf-8") as f:
@@ -23,9 +48,11 @@ def load_locations_from_csv(path):
             ))
     return locations
 
-def load_locations_from_db():
-    # Implement database loading logic here
-    pass
+def load_locations_from_db(db_adapter):
+    # Expect db_adapter.read_cities to return list of dicts with latitude/longitude
+    rows = db_adapter.read_all_cities()
+    # return list of tuples (id, latitude, longitude)
+    return [(r["id"], r["latitude"], r["longitude"]) for r in rows]
 
 def chunked(seq, size):
     for i in range(0, len(seq), size):
@@ -49,9 +76,14 @@ def month_ranges_between(start, end):
 
     return ranges
 
-def run(from_date, to_date, input_csv):
+def run(from_date, to_date, input_csv=None, db_adapter=None, export_to_csv=True, export_to_postgres=False):
 
-    locations = load_locations_from_csv(input_csv)
+    if db_adapter is not None:
+        locations = load_locations_from_db(db_adapter)
+    else:
+        if not input_csv:
+            raise SystemExit("--input is required when no db adapter is provided")
+        locations = load_locations_from_csv(input_csv)
     months = month_ranges_between(from_date, to_date)
 
     total_requests = (
@@ -60,8 +92,11 @@ def run(from_date, to_date, input_csv):
     )
 
 
-    with open(OUTPUT_CSV, "w", newline="", encoding="utf-8") as out:
-        writer = csv.writer(out)
+    # prepare CSV writer if requested
+    csv_out = None
+    if export_to_csv:
+        csv_out = open(OUTPUT_CSV, "w", newline="", encoding="utf-8")
+        writer = csv.writer(csv_out)
         writer.writerow([
             "longitude",
             "latitude",
@@ -71,15 +106,23 @@ def run(from_date, to_date, input_csv):
             "precipitation_mm"
         ])
 
-        with tqdm(
-            total=total_requests,
-            desc="Fetching Open-Meteo data",
-            unit="request"
-        ) as pbar:
+    # buffer rows for DB bulk insert
+    db_buffer = []
+
+    pbar_ctx = tqdm(total=total_requests, desc="Fetching Open-Meteo data", unit="request") if tqdm else _NoopProgress()
+    with pbar_ctx as pbar:
 
             for batch in chunked(locations, BATCH_SIZE):
-                lats = [x[0] for x in batch]
-                lons = [x[1] for x in batch]
+                # support two shapes:
+                # - CSV loader: (lat, lon)
+                # - DB loader: (id, latitude, longitude)
+                first = batch[0]
+                if isinstance(first, tuple) and len(first) == 3:
+                    lats = [x[1] for x in batch]
+                    lons = [x[2] for x in batch]
+                else:
+                    lats = [x[0] for x in batch]
+                    lons = [x[1] for x in batch]
 
                 for start, end in months:
                     data = fetch_hourly(
@@ -92,15 +135,16 @@ def run(from_date, to_date, input_csv):
                         max_retries=MAX_RETRIES
                     )
 
-                    for idx, location_data in enumerate(data):
-                        hourly = location_data["hourly"]
+                for idx, location_data in enumerate(data):
+                    hourly = location_data["hourly"]
 
-                        for t, temp, wind, rain in zip(
-                            hourly["time"],
-                            hourly["temperature_2m"],
-                            hourly["wind_speed_10m"],
-                            hourly["precipitation"]
-                        ):
+                    for t, temp, wind, rain in zip(
+                        hourly["time"],
+                        hourly["temperature_2m"],
+                        hourly["wind_speed_10m"],
+                        hourly["precipitation"]
+                    ):
+                        if export_to_csv:
                             writer.writerow([
                                 lons[idx],
                                 lats[idx],
@@ -110,5 +154,28 @@ def run(from_date, to_date, input_csv):
                                 rain
                             ])
 
-                    pbar.update(1)
-                    time.sleep(THROTTLE_SECONDS)
+                        if export_to_postgres and db_adapter is not None:
+                            # when DB adapter is present we expect locations to be tuples (city_id, lat, lon)
+                            cid = None
+                            try:
+                                cid = batch[idx][0]
+                            except Exception:
+                                cid = None
+
+                            db_buffer.append({
+                                "city_id": cid,
+                                "timestamp_utc": t,
+                                "temperature_c": temp,
+                                "wind_speed": wind,
+                                "precipitation": rain
+                            })
+
+                pbar.update(1)
+                time.sleep(THROTTLE_SECONDS)
+
+    if export_to_csv:
+        csv_out.close()
+
+    if export_to_postgres and db_adapter is not None and db_buffer:
+        # insert in one shot using optimized method
+        db_adapter.insert_wfactuals(db_buffer)

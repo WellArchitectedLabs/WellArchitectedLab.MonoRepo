@@ -9,6 +9,6 @@ def load_locations(path: str) -> List[Tuple[float, float, str]]:
             locations.append((
                 float(row["Longitude"]),
                 float(row["Latitude"]),
-                row.get("Location", "")
+                row.get("Name", "")
             ))
     return locations

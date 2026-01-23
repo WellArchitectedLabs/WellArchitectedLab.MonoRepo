@@ -238,73 +238,77 @@ def import_wf_actuals_from_csv(
         # if we cannot read cities, abort
         raise SystemExit("Failed to read cities from database. Cannot resolve city ids.")
 
+    # determine total rows for progress bar
+    total_rows = 0
+    with open(wf_actual_csv_input, newline="", encoding="utf-8") as fcount:
+        for _ in fcount:
+            total_rows += 1
+    if total_rows > 0:
+        total_rows = max(0, total_rows - 1)
+
     data_buffer = []
     BATCH_WRITE = 10000
 
-    with open(wf_actual_csv_input, newline="", encoding="utf-8") as f:
-        reader = csv.DictReader(f)
-        for row in reader:
-            # extract longitude/latitude from common possible column names
-            lon_val = None
-            lat_val = None
-            for k in ("longitude", "Longitude", "lon", "Lon"):
-                if k in row and row[k] not in (None, ""):
-                    lon_val = row[k]
-                    break
-            for k in ("latitude", "Latitude", "lat", "Lat"):
-                if k in row and row[k] not in (None, ""):
-                    lat_val = row[k]
-                    break
+    pbar_ctx = tqdm(total=total_rows, desc="Importing wf_actuals from CSV", unit="row") if tqdm else _NoopProgress()
+    with pbar_ctx as pbar:
+        with open(wf_actual_csv_input, newline="", encoding="utf-8") as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                lon_val = None
+                lat_val = None
+                for k in ("longitude", "Longitude", "lon", "Lon"):
+                    if k in row and row[k] not in (None, ""):
+                        lon_val = row[k]; break
+                for k in ("latitude", "Latitude", "lat", "Lat"):
+                    if k in row and row[k] not in (None, ""):
+                        lat_val = row[k]; break
 
-            if lon_val is None or lat_val is None:
-                # skip rows without coordinates
-                continue
+                if lon_val is None or lat_val is None:
+                    pbar.update(1); continue
 
-            try:
-                lon_f = float(lon_val)
-                lat_f = float(lat_val)
-            except Exception:
-                continue
+                try:
+                    lon_f = float(lon_val); lat_f = float(lat_val)
+                except Exception:
+                    pbar.update(1); continue
 
-            key = (round(lon_f, 6), round(lat_f, 6))
-            cid = lookup_by_lonlat.get(key)
-            if cid is None:
-                # no matching city found; skip the row
-                continue
+                key = (round(lon_f, 6), round(lat_f, 6))
+                cid = lookup_by_lonlat.get(key)
+                if cid is None:
+                    pbar.update(1); continue
 
-            timestamp = row.get("timestamp_utc") or row.get("time") or row.get("timestamp")
+                timestamp = row.get("timestamp_utc") or row.get("time") or row.get("timestamp")
+                temp_s = row.get("temperature_c") or row.get("temperature")
+                wind_s = row.get("wind_speed_m_s") or row.get("wind_speed")
+                precip_s = row.get("precipitation_mm") or row.get("precipitation")
 
-            temp_s = row.get("temperature_c") or row.get("temperature")
-            wind_s = row.get("wind_speed_m_s") or row.get("wind_speed")
-            precip_s = row.get("precipitation_mm") or row.get("precipitation")
+                try:
+                    temperature_c = float(temp_s) if temp_s not in (None, "") else None
+                except Exception:
+                    temperature_c = None
+                try:
+                    wind_speed = float(wind_s) if wind_s not in (None, "") else None
+                except Exception:
+                    wind_speed = None
+                try:
+                    precipitation = float(precip_s) if precip_s not in (None, "") else None
+                except Exception:
+                    precipitation = None
 
-            try:
-                temperature_c = float(temp_s) if temp_s not in (None, "") else None
-            except Exception:
-                temperature_c = None
-            try:
-                wind_speed = float(wind_s) if wind_s not in (None, "") else None
-            except Exception:
-                wind_speed = None
-            try:
-                precipitation = float(precip_s) if precip_s not in (None, "") else None
-            except Exception:
-                precipitation = None
+                data_buffer.append({
+                    "city_id": cid,
+                    "timestamp_utc": timestamp,
+                    "temperature_c": temperature_c,
+                    "wind_speed": wind_speed,
+                    "precipitation": precipitation
+                })
 
-            data_buffer.append({
-                "city_id": cid,
-                "timestamp_utc": timestamp,
-                "temperature_c": temperature_c,
-                "wind_speed": wind_speed,
-                "precipitation": precipitation
-            })
+                if len(data_buffer) >= BATCH_WRITE:
+                    db_adapter.insert_wfactuals(data_buffer)
+                    data_buffer = []
 
-            # flush in batches to avoid large memory usage
-            if len(data_buffer) >= BATCH_WRITE:
-                db_adapter.insert_wfactuals(data_buffer)
-                data_buffer = []
+                pbar.update(1)
 
-    # final flush
+     # final flush
     if data_buffer:
         db_adapter.insert_wfactuals(data_buffer)
 

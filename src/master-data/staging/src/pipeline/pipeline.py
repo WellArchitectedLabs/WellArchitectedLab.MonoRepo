@@ -25,7 +25,14 @@ def cities_import(input_path: str, dsn: str) -> int:
     )
 
 
-def wf_imports(from_date: date, to_date: date, dsn: Optional[str] = None, cities_csv_input: Optional[str] = None, export_to_csv: bool = False, export_to_postgres: bool = True) -> None:
+def wf_imports(
+        from_date: Optional[date], 
+        to_date: Optional[date], 
+        dsn: Optional[str] = None, 
+        cities_csv_input: Optional[str] = None, 
+        export_to_csv: bool = False, 
+        export_to_postgres: bool = True,
+        weather_csv_input: Optional[str] = None) -> None:
     """Run the hourly fetch pipeline.
 
     - If export_to_postgres is True, `dsn` is required and locations are loaded from DB.
@@ -33,8 +40,16 @@ def wf_imports(from_date: date, to_date: date, dsn: Optional[str] = None, cities
     """
     from . import importer
 
-    # importer.run will load locations from DB when db_adapter is provided
-    importer.import_wf_actuals(
+    if(weather_csv_input is not None and weather_csv_input.strip() != ""):
+        importer.import_wf_actuals_from_csv(
+            wf_actual_csv_input=weather_csv_input,
+            db_dsn=dsn
+        )
+        return
+    # importer.import_wf_actuals will load locations from DB
+    # Contacts open meteo API for collecting weather actuals then
+    # Then store them into database
+    importer.import_wf_actuals_from_open_meteo(
         from_date=from_date,
         to_date=to_date,
         db_dsn=dsn,

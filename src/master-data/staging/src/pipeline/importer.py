@@ -27,7 +27,7 @@ class _NoopProgress:
     def update(self, n=1):
         return
 
-def load_cities_from_csv(path):
+def load_cities_from_csv(path: str):
     locations = []
     with open(path, newline="", encoding="utf-8") as f:
         reader = csv.DictReader(f)
@@ -38,8 +38,10 @@ def load_cities_from_csv(path):
             ))
     return locations
 
-def load_cities_from_db(db_adapter):
+def load_cities_from_db(db_dsn: str):
     # Expect db_adapter.read_cities to return list of dicts with latitude/longitude
+    from adapters import WeatherForecastDbAdapter
+    db_adapter = WeatherForecastDbAdapter(db_dsn)
     rows = db_adapter.read_all_cities()
     # return list of tuples (id, latitude, longitude)
     return [(r["id"], r["latitude"], r["longitude"]) for r in rows]
@@ -66,17 +68,24 @@ def month_ranges_between(start, end):
 
     return ranges
 
-def import_wf_actuals(from_date: date, to_date: date, db_dsn: str, cities_csv_input: Optional[str] = None, export_to_csv: bool = False, export_to_postgres: bool = True) -> None:
-    from adapters import WeatherForecastDbAdapter
-    db_adapter = None
+def import_wf_actuals_from_open_meteo(
+        from_date: date, 
+        to_date: date, 
+        db_dsn: str, 
+        cities_csv_input: Optional[str] = None, 
+        export_to_csv: bool = False, 
+        export_to_postgres: bool = True) -> None:
 
-    if not db_dsn.strip() == "":
-        db_adapter = WeatherForecastDbAdapter(db_dsn)
-        locations = load_cities_from_db(db_adapter)
-    else:
-        if cities_csv_input.strip() == "" or cities_csv_input is None:
-            raise SystemExit("cities --input is required when no db adapter is provided")
-        locations = load_cities_from_csv(cities_csv_input)
+    # guard against missing or incompatible inputs
+    if db_dsn.strip() == "" and (cities_csv_input.strip() == "" or cities_csv_input is None):
+        raise SystemExit("No cities csv input is provided, neither a connection string. Cities cannot be loaded. Please provide a valid input.")
+
+    # guard against incompatible database inputs
+    if(db_dsn.strip() == "" and export_to_postgres):
+        raise SystemExit("Exporting to Postgres is not supported without a valid db connection string. Please provide a valid connection string.")
+
+    locations = load_locations(db_dsn, cities_csv_input)
+
     months = month_ranges_between(from_date, to_date)
 
     total_requests = (
@@ -84,6 +93,9 @@ def import_wf_actuals(from_date: date, to_date: date, db_dsn: str, cities_csv_in
         * len(months)
     )
 
+    from adapters import WeatherForecastDbAdapter 
+    if db_dsn.strip() != "":
+        db_adapter = WeatherForecastDbAdapter(db_dsn)
 
     # prepare CSV writer if requested
     csv_out = None
@@ -173,10 +185,136 @@ def import_wf_actuals(from_date: date, to_date: date, db_dsn: str, cities_csv_in
         # insert in one shot using optimized method
         db_adapter.insert_wfactuals(db_buffer)
 
+def load_locations(
+        db_dsn: Optional[str], 
+        cities_csv_input: Optional[str]):
+
+    if cities_csv_input.strip() == "" and db_dsn.strip() == "":
+        raise SystemExit("Cities CSV input or DB DSN must be provided")
+
+    if not db_dsn.strip() == "":
+        locations = load_cities_from_db(db_dsn)
+    else:
+        locations = load_cities_from_csv(cities_csv_input)
+    return locations
+
+def import_wf_actuals_from_csv(
+        wf_actual_csv_input: str,
+        db_dsn: Optional[str] = None) -> None:
+    """Import weather forecast actuals from CSV file and insert into Postgres.
+
+    The input CSV is expected to contain columns similar to:
+      longitude, latitude, timestamp_utc, temperature_c, wind_speed_m_s, precipitation_mm
+
+    This function requires a valid db_dsn because we resolve city_id by matching
+    longitude/latitude against the cities table. Rows without a matching city_id
+    are skipped.
+    """
+    if not wf_actual_csv_input or wf_actual_csv_input.strip() == "":
+        raise SystemExit("No weather CSV input provided.")
+
+    if not db_dsn or db_dsn.strip() == "":
+        raise SystemExit("Importing wf_actuals into Postgres requires a valid db_dsn.")
+
+    # lazy import to keep module import cheap
+    from adapters import WeatherForecastDbAdapter
+
+    db_adapter = WeatherForecastDbAdapter(db_dsn)
+
+    # Build lookup from (rounded_lon, rounded_lat) -> city_id for exact/near-exact matching
+    lookup_by_lonlat = {}
+    try:
+        rows = db_adapter.read_all_cities()
+        for r in rows:
+            try:
+                lon = float(r.get("longitude"))
+                lat = float(r.get("latitude"))
+                cid = r.get("id") or r.get("city_id")
+                lookup_by_lonlat[(round(lon, 6), round(lat, 6))] = cid
+            except Exception:
+                # skip malformed rows
+                continue
+    except Exception:
+        # if we cannot read cities, abort
+        raise SystemExit("Failed to read cities from database. Cannot resolve city ids.")
+
+    data_buffer = []
+    BATCH_WRITE = 10000
+
+    with open(wf_actual_csv_input, newline="", encoding="utf-8") as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            # extract longitude/latitude from common possible column names
+            lon_val = None
+            lat_val = None
+            for k in ("longitude", "Longitude", "lon", "Lon"):
+                if k in row and row[k] not in (None, ""):
+                    lon_val = row[k]
+                    break
+            for k in ("latitude", "Latitude", "lat", "Lat"):
+                if k in row and row[k] not in (None, ""):
+                    lat_val = row[k]
+                    break
+
+            if lon_val is None or lat_val is None:
+                # skip rows without coordinates
+                continue
+
+            try:
+                lon_f = float(lon_val)
+                lat_f = float(lat_val)
+            except Exception:
+                continue
+
+            key = (round(lon_f, 6), round(lat_f, 6))
+            cid = lookup_by_lonlat.get(key)
+            if cid is None:
+                # no matching city found; skip the row
+                continue
+
+            timestamp = row.get("timestamp_utc") or row.get("time") or row.get("timestamp")
+
+            temp_s = row.get("temperature_c") or row.get("temperature")
+            wind_s = row.get("wind_speed_m_s") or row.get("wind_speed")
+            precip_s = row.get("precipitation_mm") or row.get("precipitation")
+
+            try:
+                temperature_c = float(temp_s) if temp_s not in (None, "") else None
+            except Exception:
+                temperature_c = None
+            try:
+                wind_speed = float(wind_s) if wind_s not in (None, "") else None
+            except Exception:
+                wind_speed = None
+            try:
+                precipitation = float(precip_s) if precip_s not in (None, "") else None
+            except Exception:
+                precipitation = None
+
+            data_buffer.append({
+                "city_id": cid,
+                "timestamp_utc": timestamp,
+                "temperature_c": temperature_c,
+                "wind_speed": wind_speed,
+                "precipitation": precipitation
+            })
+
+            # flush in batches to avoid large memory usage
+            if len(data_buffer) >= BATCH_WRITE:
+                db_adapter.insert_wfactuals(data_buffer)
+                data_buffer = []
+
+    # final flush
+    if data_buffer:
+        db_adapter.insert_wfactuals(data_buffer)
+
+    return
+
+
 def import_cities(input_path: str, dsn: str) -> int:
 
     if dsn.strip() == "":
-        raise ValueError("Invalid DSN")
+        raise SystemExit("Invalid DSN")
 
     """Import cities CSV into the `cities` table using the DB adapter.
 

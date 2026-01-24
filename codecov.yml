@@ -1,9 +1,9 @@
 coverage:
   status:
     project:
-      weather-forecast-api:
+      insights-bff:
         paths:
-          - src/weather-forecast-api/**
+          - src/insights/bff/**
         flag_coverage_not_uploaded_behavior: exclude # don't send status checks that don't have flag 
         # do not tolerate any drift compared to the set coverage target below
         threshold: "0%"
@@ -15,10 +15,10 @@ coverage:
         informational: false
         only_pulls: false
 
-      weather-forecast-frontend:
+      insights-frontend:
         flag_coverage_not_uploaded_behavior: exclude
         paths:
-          - src/weather-forecast-frontend/**
+          - src/insights/frontend/**
         # do not tolerate any drift compared to the set coverage target below
         threshold: "0%"
         # coverage target

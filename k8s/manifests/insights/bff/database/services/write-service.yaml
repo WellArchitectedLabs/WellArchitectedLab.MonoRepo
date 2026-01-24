@@ -1,0 +1,17 @@
+# This is a cluster IP service that points to the specific redis primary pod (redis-0)
+apiVersion: v1
+kind: Service
+metadata:
+  name: insights-bff-redis-primary
+  namespace: backend
+  labels:
+    app: insights-bff-redis
+    version: v1
+spec:
+  ports:
+  - name: redis
+    port: 6379
+  selector:
+    # writes are directed to insights-bff-redis-0 pod
+    statefulset.kubernetes.io/pod-name: dev-insights-bff-redis-0
+  type: ClusterIP

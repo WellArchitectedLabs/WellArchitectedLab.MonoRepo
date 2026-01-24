@@ -80,7 +80,7 @@ Please access the compraison table here: https://claude.ai/share/d690d781-211e-4
 │ Original Trace (in Tempo)                               │
 │ {                                                        │
 │   "attributes": {                                        │
-│     "service.name": "weather-forecast-bff",             │
+│     "service.name": "insights-bff     │
 │     "http.method": "POST",                              │
 │     "http.status_code": 500                             │
 │   }                                                      │
@@ -111,7 +111,7 @@ Tags can be found is spans:
 Trace ID: abc123
 ├─ Span: POST /weather
    ├─ Attributes:
-   │  ├─ service.name: weather-forecast-bff
+   │  ├─ service.name: insights-bff
    │  ├─ service.namespace: backend
    │  ├─ http.method: POST
    │  ├─ http.status_code: 500

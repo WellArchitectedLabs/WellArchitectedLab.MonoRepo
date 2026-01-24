@@ -1,0 +1,23 @@
+name: CI - Build & Push Insights Frontend
+
+on:
+    push:
+        branches: [ "main" ]
+        paths:
+          - src/insights/frontend/**
+    pull_request:
+        paths:
+          - src/insights/frontend/**
+    workflow_dispatch:
+
+jobs:
+    Frontend-BuildAndPush:
+        uses: ./.github/workflows/template_ci.yml
+        with:
+            service_name: insights-frontend
+            service_path: src/insights/frontend
+            gitversion_config_path: src/insights/frontend/GitVersion.yml
+        secrets:
+            ACR_LOGIN_SERVER: ${{ secrets.ACR_LOGIN_SERVER }}
+            ACR_USERNAME: ${{ secrets.ACR_USERNAME }}
+            ACR_PASSWORD: ${{ secrets.ACR_PASSWORD }}

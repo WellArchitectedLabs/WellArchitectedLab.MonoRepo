@@ -31,8 +31,8 @@ jobs:
 
             // I - Wf-team auto-assignment
             const wfTouched = files.some(file =>
-              file.filename.startsWith("src/weather-forecast-api/") ||
-              file.filename.startsWith("src/weather-forecast-frontend/")
+              file.filename.startsWith("src/insights/bff/") ||
+              file.filename.startsWith("src/insights/frontend/")
             );
             if (wfTouched) teams.push("wf-dev-team");
 
@@ -40,7 +40,8 @@ jobs:
             const devOpsTouched = files.some(file =>
               file.filename.startsWith("k8s") ||
               file.filename.startsWith("iac") ||
-              file.filename.startsWith(".github")
+              file.filename.startsWith(".github") ||
+              file.filename.startsWith("src/docker-compose.yml")
             );
             if (devOpsTouched) teams.push("devops-team");
 

@@ -71,7 +71,7 @@ spec:
       # can be multiple containers since one pod scan contain multiple containers
       - name: insights-frontend
         # test image from docker registry, provided by nginx project
-        image: acrdevtshpwn.azurecr.io/insights-frontend:0.1.0-singleNodePool.1-55a41ad
+        image: acrdevtshpwn.azurecr.io/insights-frontend:0.1.0-PullRequest0083.417-9c6ad1e
         ports:
         - containerPort: 80
         imagePullPolicy: Always # Always pull latest version

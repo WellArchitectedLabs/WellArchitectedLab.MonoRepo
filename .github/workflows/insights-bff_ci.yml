@@ -1,4 +1,4 @@
-name: CI - Build & Push Weather Forecast Backend
+name: CI - Build & Push Insights Bff
 
 on:
     push:
@@ -12,7 +12,7 @@ on:
 
 jobs:
 
-    # Package and push weather forecast backend image
+    # Package and push Insights Bff image
     Backend-buildAndPush:
         uses: ./.github/workflows/template_ci.yml
         name: Package and push image to ACR

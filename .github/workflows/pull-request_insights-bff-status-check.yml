@@ -1,4 +1,4 @@
-name: Status Check - Backend Pull Request Build
+name: Status Check - Insights Bff Pull Request Build
 
 on:
     pull_request:

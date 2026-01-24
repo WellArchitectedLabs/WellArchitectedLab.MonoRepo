@@ -1,4 +1,4 @@
-name: Status Check - Frontend Pull Request Build Check
+name: Status Check - Insights Frontend Pull Request Build Check
 
 on:
     pull_request:

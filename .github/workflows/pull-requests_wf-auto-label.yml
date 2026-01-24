@@ -44,18 +44,30 @@ jobs:
               }
             );
 
-            // 1 - Weather-Forecast
+            // 1 - Weather Insights Label
             const wfTouched = files.some(file =>
-              file.filename.startsWith("src/weather-forecast-api/") ||
-              file.filename.startsWith("src/weather-forecast-frontend/")
+              file.filename.startsWith("src/insights/")
             );
-            if (wfTouched) labels.push("weather-forecast");
+            if (wfTouched) labels.push("insights");
 
-            // 2 - DevOps team
+            // 2 - Weather Master Data Label
+            const wfTouched = files.some(file =>
+              file.filename.startsWith("src/master-data/")
+            );
+            if (wfTouched) labels.push("master-data");
+
+            // 3 - Weather Master Data Label
+            const wfTouched = files.some(file =>
+              file.filename.startsWith("src/calibration/")
+            );
+            if (wfTouched) labels.push("calibration");
+
+            // 4 - DevOps team
             const isDevOpsTouched = files.some(file =>
               file.filename.startsWith("k8s") ||
               file.filename.startsWith("iac") ||
-              file.filename.startsWith(".github")
+              file.filename.startsWith(".github") ||
+              file.filename.startsWith("src/docker-compose.yml")
             );
             if (isDevOpsTouched) labels.push("devops");
 

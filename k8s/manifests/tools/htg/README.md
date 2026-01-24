@@ -1,2 +1,2 @@
 Tools folder contain deployment and services and all manifests that are used as tools rather than production grade applications.
-F.e: one of the tools developed is the heavy-traffic-geenrator which is used in order to generator a traffix that is heavy enough to trigger prometheus, kiali and grafana data.
+F.e: one of the tools developed is the heavy-traffic-generator which is used in order to generator a traffix that is heavy enough to trigger prometheus, kiali and grafana data.

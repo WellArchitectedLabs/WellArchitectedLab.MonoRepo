@@ -1,0 +1,36 @@
+name: CI - Build & Push Weather Forecast Backend
+
+on:
+    push:
+        branches:
+            - main
+            - develop
+            - 'release/**'
+        paths:
+          - src/insights/bff/**
+    workflow_dispatch:
+
+jobs:
+
+    # Package and push weather forecast backend image
+    Backend-buildAndPush:
+        uses: ./.github/workflows/template_ci.yml
+        name: Package and push image to ACR
+        with:
+            service_name: insights-bff
+            service_path: src/insights/bff
+            gitversion_config_path: src/insights/bff/GitVersion.yml
+        secrets:
+            ACR_LOGIN_SERVER: ${{ secrets.ACR_LOGIN_SERVER }}
+            ACR_USERNAME: ${{ secrets.ACR_USERNAME }}
+            ACR_PASSWORD: ${{ secrets.ACR_PASSWORD }}
+    
+    # coverage check
+    run-UnitTests:
+      uses: ./.github/workflows/template_codecov-dotnet.yml
+      name: Run Unit Tests & Calculate coverage
+      with:
+        test_project_folder: src/insights/bff/Tests
+      secrets:
+        codecov_token: ${{ secrets.CODECOV_TOKEN }}
+            

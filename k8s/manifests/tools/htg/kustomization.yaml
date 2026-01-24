@@ -2,5 +2,5 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 resources:
-  - deployment_heavy-traffic-geenrator.yaml
-  - service_heavy-traffic-geenrator.yaml
+  - deployment_heavy-traffic-generator.yaml
+  - service_heavy-traffic-generator.yaml

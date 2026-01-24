@@ -4,11 +4,11 @@ kind: Kustomization
 # reference all manifests from base folder
 resources:
   - ../../manifests/operations
-  - ../../manifests/weather-forecast/bff
-  - ../../manifests/weather-forecast/frontend
+  - ../../manifests/insights/bff
+  - ../../manifests/insights/frontend
   - ../../manifests/shared
-  - ../../manifests/weather-forecast/bff/database
-  - weather-forecast-bff_config-map.yaml
+  - ../../manifests/insights/bff/database
+  - insights-bff_config-map.yaml
   - ../../manifests/tools/htg
 
 
@@ -30,7 +30,7 @@ configMapGenerator:
     namespace: backend
     literals:
       # used by redis in order to configure the replication mecanism
-      - REDIS_HEADLESS_SERVICE=dev-weather-forecast-bff-redis
+      - REDIS_HEADLESS_SERVICE=dev-insights-bff-redis
     # this is necessary in order to avoid non conventional resource name with naming RFCs
     options:
       disableNameSuffixHash: true

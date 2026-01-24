@@ -78,11 +78,11 @@ def import_wf_actuals_from_open_meteo(
 
     # guard against missing or incompatible inputs
     if db_dsn.strip() == "" and (cities_csv_input.strip() == "" or cities_csv_input is None):
-        raise SystemExit("No cities csv input is provided, neither a connection string. Cities cannot be loaded. Please provide a valid input.")
+        raise SystemError("No cities csv input is provided, neither a connection string. Cities cannot be loaded. Please provide a valid input.")
 
     # guard against incompatible database inputs
     if(db_dsn.strip() == "" and export_to_postgres):
-        raise SystemExit("Exporting to Postgres is not supported without a valid db connection string. Please provide a valid connection string.")
+        raise SystemError("Exporting to Postgres is not supported without a valid db connection string. Please provide a valid connection string.")
 
     locations = load_locations(db_dsn, cities_csv_input)
 

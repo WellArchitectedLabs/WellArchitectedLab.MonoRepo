@@ -20,6 +20,10 @@ spec:
           prometheusSpec:
             enableAdminAPI: true
             logLevel: debug
+            # we remove all metrics that exceed 5d old
+            retention: 5d
+            # size based retention too for not exceeding allowed quotas
+            retentionSize: "10GB"
             additionalAgs:
               - --log.level=debug
             # tolerations:

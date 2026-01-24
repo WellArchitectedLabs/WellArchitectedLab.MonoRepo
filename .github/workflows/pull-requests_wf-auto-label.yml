@@ -44,23 +44,23 @@ jobs:
               }
             );
 
-            // 1 - Weather Insights Label
-            const wfTouched = files.some(file =>
+            // 1 - Insights Label
+            const insightsFilesTouched = files.some(file =>
               file.filename.startsWith("src/insights/")
             );
-            if (wfTouched) labels.push("insights");
+            if (insightsFilesTouched) labels.push("insights");
 
             // 2 - Weather Master Data Label
-            const wfTouched = files.some(file =>
+            const masterDataFilesTouched = files.some(file =>
               file.filename.startsWith("src/master-data/")
             );
-            if (wfTouched) labels.push("master-data");
+            if (masterDataFilesTouched) labels.push("master-data");
 
             // 3 - Weather Master Data Label
-            const wfTouched = files.some(file =>
+            const calibrationFilesTouched = files.some(file =>
               file.filename.startsWith("src/calibration/")
             );
-            if (wfTouched) labels.push("calibration");
+            if (calibrationFilesTouched) labels.push("calibration");
 
             // 4 - DevOps team
             const isDevOpsTouched = files.some(file =>

@@ -27,7 +27,7 @@
 This mono-repo demonstrates a production-minded, full-stack microservices reference platform. It was assembled to teach and prove the complete delivery lifecycle: local development, automated testing, containerization, infrastructure provisioning (IaC), Kubernetes cluster management (AKS), CI using GitHub Actions, and continuous delivery using GitOps (Argo CD). The repo is intentionally opinionated.
 
 Key intentions:
-- Keep a single repository containing all technologies needed to build, test, package and deploy a sample weather forecast app.
+- Keep a single repository containing all technologies needed to build, test, package and deploy the weather forecast app.
 - Provide IaC templates so the platform can be provisioned in Azure (AKS, ACR, networking, RGs, etc.).
 - Illustrate a modern GitHub Actions-based CI and GitOps with Argo CD for delivery.
 - Implement an enterprise grade shitft-left workflows for securely packaging, testing and deploying docker images into AKS clusters.
@@ -158,17 +158,17 @@ Status check workflow files are prefixed by pull-request:
 - `pull-requests_checklist-enforcer.yml`: Enforces pull creator clicked on all PR template checkboxes.
 - `pull-requests-wf-auto-assign.yml`: Auto assigns responsable teams to PRs based on the modified code. Very useful for mono repo setups. Teams are added on github organization level. In our case a parent team named wf-team is added with two child teams: wf-backend-team and wf-frontend-team. A deveops-team is also created in the same hierarchy as wf-team.
 - `pull-requests_wf-codeql-analysis.yml`: Runs CodeQL, github's security check tool.
-- `pull-requests_wf-auto-label.yml`: Add label to pull requests based on the changed file. Typically the weather forecast api pull requests will be labeled as backend and weather-forecast. Labels are very useful for PR grouping and filtering.
-- `pull-request_weather-forecast-api-status-check.yml`: Runs a dry-run for weather forecast backend API CI workflow are is later launched on develop / main pushes.
-- `pull-request_weather-forecast-frontend-status-check.yml`: Runs a dry-run for weather forecast frontend CI workflow are is later launched on develop / main pushes.
+- `pull-requests_wf-auto-label.yml`: Add label to pull requests based on the changed file. The weather forecast source pull requests will be labeled accordingly to the feature teams owning the changed code. Labels are very useful for PR grouping and filtering.
+- `pull-request_insight-bff-status-check.yml`: Runs a dry-run for Insights Bff CI workflow are is later launched on develop / main pushes.
+- `pull-request_insights-frontend-status-check.yml`: Runs a dry-run for Insights frontend CI workflow are is later launched on develop / main pushes.
 
 *All these pipeliens are triggered by pull requests that target develop and main branch.*
 
 > Note: This repository is only for demonstration purposes. When implementing a devops process, we generally chose the processes that fits more with the desired delivery caracteristics. Typically, if you search for more of a "rapid" or "flexible" devops process, or > if your runner processes are rare, implementing all these checks may be overkill.
 
 ### Contrinous Integration workflows:
-- `weather-forecast-api_ci.yml`: Packages and pushes weather forecast API image into ACR registry. Calls wf api docker file.
-- `weather-forecast-frontend_ci.yml`: Runs a CI for weather forecast frontend on develop / main push. Calls wf frontend docker file.
+- `insights-bff_ci.yml`: Packages and pushes insights bff API image into ACR registry. Calls wf api docker file.
+- `insights-frontend_ci.yml`: Runs a CI for insights frontend on develop / main push. Calls wf frontend docker file.
   
 *Both CI pipelines use GitVersion in order to correctly version the pushed images. A GitVersion.yml file is added under every microservice folder.*
 

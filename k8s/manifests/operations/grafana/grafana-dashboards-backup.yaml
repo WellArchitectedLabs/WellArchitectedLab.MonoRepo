@@ -78,7 +78,7 @@ spec:
                 - name: SOURCE_BRANCH
                   value: "grafana-dashboard-backup"
                 - name: DASHBOARDS_REPO_LOCATION
-                  value: "k8s/gitops/addons/grafana/dashboard-backups"
+                  value: "src/operations/dashboard-backups"
               command:
                 - /bin/sh
                 - -c

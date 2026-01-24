@@ -1,1 +1,4 @@
+# Windows exe files
 **/*.exe
+# Mac desktop service store files
+.DS_Store

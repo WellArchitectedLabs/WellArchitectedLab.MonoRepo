@@ -93,11 +93,11 @@
       }
     },
     {
-      "label": "WF API Source Code",
+      "label": "Insights Source Code",
       "type": "shell",
       "command": "exec $SHELL",
       "options": {
-        "cwd": "${workspaceFolder}/src/weather-forecast-api"
+        "cwd": "${workspaceFolder}/src/insights"
       },
       "presentation": {
         "panel": "dedicated",
@@ -105,11 +105,23 @@
       }
     },
     {
-      "label": "WF Frontend Source Code",
+      "label": "Calibration Source Code",
       "type": "shell",
       "command": "exec $SHELL",
       "options": {
-        "cwd": "${workspaceFolder}/src/weather-forecast-frontend"
+        "cwd": "${workspaceFolder}/src/calibration"
+      },
+      "presentation": {
+        "panel": "dedicated",
+        "group": "source code"
+      }
+    },
+     {
+      "label": "Calibration Source Code",
+      "type": "shell",
+      "command": "exec $SHELL",
+      "options": {
+        "cwd": "${workspaceFolder}/src/master-data"
       },
       "presentation": {
         "panel": "dedicated",

@@ -19,5 +19,11 @@ WF_IMPORT_TIMEZONE = "UTC"
 WF_IMPORT_CSV_INPUT_READ_BATCH_SIZE = 10000
 
 ## DATABASE CONFIG
+import os
 
-POSTGRES_DSN = "postgresql://postgres:postgres@localhost:5432/master_data?sslmode=disable"
+# Allow overriding the DSN via environment for containers / k8s jobs.
+# Default kept for local dev convenience but containers should set POSTGRES_DSN.
+POSTGRES_DSN = os.environ.get(
+    "POSTGRES_DSN",
+    "postgresql://postgres:postgres@localhost:5432/master_data?sslmode=disable",
+)

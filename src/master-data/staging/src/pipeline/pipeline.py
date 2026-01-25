@@ -25,7 +25,7 @@ def cities_import(input_path: str, dsn: str) -> int:
     )
 
 
-def wf_imports(
+def wf_import(
         from_date: Optional[date], 
         to_date: Optional[date], 
         dsn: Optional[str] = None, 

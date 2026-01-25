@@ -4,8 +4,8 @@ metadata:
   name: tempo-prometheus-servicemonitors
   namespace: argocd
   labels:
-    isGrafana: "true"
     workload: operations
+    stack: grafana
   annotations:
     argocd.argoproj.io/sync-wave: "13" # We need service monitor to deploy just after tempo app
 spec:

@@ -1,5 +1,6 @@
 import psycopg2
 import psycopg2.extras
+from psycopg2 import sql
 from typing import List, Dict, Any, Iterable
 
 
@@ -25,7 +26,6 @@ class WeatherForecastDbAdapter:
         """Insert city records. Items are dicts with keys: name, longitude, latitude"""
         if not items:
             return
-
         columns = ["name", "longitude", "latitude"]
         values = [tuple(item[c] for c in columns) for item in items]
         query = f"INSERT INTO cities ({', '.join(columns)}) VALUES %s"
@@ -38,7 +38,7 @@ class WeatherForecastDbAdapter:
         """Insert wfactuals records. Items should match wfactuals columns."""
         if not items:
             return
-
+        
         columns = list(items[0].keys())
         column_list = ", ".join(columns)
         values = (tuple(item[col] for col in columns) for item in items)

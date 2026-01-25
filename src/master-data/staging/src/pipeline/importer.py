@@ -4,14 +4,15 @@ from datetime import date, timedelta
 from typing import Optional
 from dateutil.relativedelta import relativedelta
 from tqdm import tqdm
+from config import WF_IMPORT_CSV_INPUT_READ_BATCH_SIZE
 
 from open_meteo import fetch_hourly
-from config import OUTPUT_CSV
-from config import BATCH_SIZE
-from config import THROTTLE_SECONDS
-from config import TIMEZONE
-from config import MAX_RETRIES
-from config import HOURLY_VARS 
+from config import WF_IMPORT_OUTPUT_CSV
+from config import OPEN_METEO_BATCH_SIZE
+from config import OPEN_METEO_THROTTLE_SECONDS
+from config import WF_IMPORT_TIMEZONE
+from config import OPEN_METEO_MAX_RETRIES
+from config import OPEN_METEO_HOURLY_VARS 
 
 
 class _NoopProgress:
@@ -89,7 +90,7 @@ def import_wf_actuals_from_open_meteo(
     months = month_ranges_between(from_date, to_date)
 
     total_requests = (
-        ((len(locations) + BATCH_SIZE - 1) // BATCH_SIZE)
+        ((len(locations) + OPEN_METEO_BATCH_SIZE - 1) // OPEN_METEO_BATCH_SIZE)
         * len(months)
     )
 
@@ -100,7 +101,7 @@ def import_wf_actuals_from_open_meteo(
     # prepare CSV writer if requested
     csv_out = None
     if export_to_csv:
-        csv_out = open(OUTPUT_CSV, "w", newline="", encoding="utf-8")
+        csv_out = open(WF_IMPORT_OUTPUT_CSV, "w", newline="", encoding="utf-8")
         writer = csv.writer(csv_out)
         writer.writerow([
             "longitude",
@@ -117,7 +118,7 @@ def import_wf_actuals_from_open_meteo(
     pbar_ctx = tqdm(total=total_requests, desc="Fetching Open-Meteo data", unit="request") if tqdm else _NoopProgress()
     with pbar_ctx as pbar:
 
-            for batch in chunked(locations, BATCH_SIZE):
+            for batch in chunked(locations, OPEN_METEO_BATCH_SIZE):
                 # support two shapes:
                 # - CSV loader: (lat, lon)
                 # - DB loader: (id, latitude, longitude)
@@ -135,9 +136,9 @@ def import_wf_actuals_from_open_meteo(
                         longitudes=lons,
                         start_date=start,
                         end_date=end,
-                        variables=HOURLY_VARS,
-                        timezone=TIMEZONE,
-                        max_retries=MAX_RETRIES
+                        variables=OPEN_METEO_HOURLY_VARS,
+                        timezone=WF_IMPORT_TIMEZONE,
+                        max_retries=OPEN_METEO_MAX_RETRIES
                     )
 
                 for idx, location_data in enumerate(data):
@@ -176,7 +177,7 @@ def import_wf_actuals_from_open_meteo(
                             })
 
                 pbar.update(1)
-                time.sleep(THROTTLE_SECONDS)
+                time.sleep(OPEN_METEO_THROTTLE_SECONDS)
 
     if export_to_csv:
         csv_out.close()
@@ -189,7 +190,7 @@ def load_locations(
         db_dsn: Optional[str], 
         cities_csv_input: Optional[str]):
 
-    if cities_csv_input.strip() == "" and db_dsn.strip() == "":
+    if (cities_csv_input is None or cities_csv_input.strip()  == "") and (db_dsn is None or db_dsn.strip() == ""):
         raise SystemExit("Cities CSV input or DB DSN must be provided")
 
     if not db_dsn.strip() == "":
@@ -215,6 +216,7 @@ def import_wf_actuals_from_csv(
 
     if not db_dsn or db_dsn.strip() == "":
         raise SystemExit("Importing wf_actuals into Postgres requires a valid db_dsn.")
+    
 
     # lazy import to keep module import cheap
     from adapters import WeatherForecastDbAdapter
@@ -247,7 +249,6 @@ def import_wf_actuals_from_csv(
         total_rows = max(0, total_rows - 1)
 
     data_buffer = []
-    BATCH_WRITE = 10000
 
     pbar_ctx = tqdm(total=total_rows, desc="Importing wf_actuals from CSV", unit="row") if tqdm else _NoopProgress()
     with pbar_ctx as pbar:
@@ -302,16 +303,18 @@ def import_wf_actuals_from_csv(
                     "precipitation": precipitation
                 })
 
-                if len(data_buffer) >= BATCH_WRITE:
+                ## INSERT BATCH BY BATCH SIZE
+                ## RATHER THAN ONE-TIME INSERT
+                if len(data_buffer) >= WF_IMPORT_CSV_INPUT_READ_BATCH_SIZE:
                     db_adapter.insert_wfactuals(data_buffer)
                     data_buffer = []
 
+                ## INCREMENT PROGRESS BAR ON EVERY BATCH INSERT
                 pbar.update(1)
-
-     # final flush
+    
+    # INSERT LAST BATCH RESIDUE
     if data_buffer:
         db_adapter.insert_wfactuals(data_buffer)
-
     return
 
 

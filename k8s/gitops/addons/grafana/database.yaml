@@ -5,8 +5,8 @@ metadata:
   namespace: argocd
   labels:
     workload: operations
-    isGrafana: "true"
-    isDatabase: "true"
+    stack: grafana
+    workload-type: database
   annotations:
     argocd.argoproj.io/sync-wave: "10"
 spec:

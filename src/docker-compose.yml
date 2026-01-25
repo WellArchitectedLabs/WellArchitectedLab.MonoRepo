@@ -13,8 +13,8 @@ services:
       retries: 10
   insights-bff:
     build:
-      context: ./insights-bff
-      dockerfile: DockerFile
+      context: ./insights/bff
+      dockerfile: Dockerfile
     container_name: insights-bff
     depends_on:
       - redis
@@ -28,8 +28,8 @@ services:
     command: ["/app/wait-for.sh", "redis", "6379", "dotnet", "WeatherForecast.Api.dll"]
   insights-frontend:
     build:
-      context: ./insights-frontend
-      dockerfile: DockerFile
+      context: ./insights/frontend
+      dockerfile: Dockerfile
     depends_on:
       - insights-bff
     environment:

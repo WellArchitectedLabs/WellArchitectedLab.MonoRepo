@@ -52,14 +52,10 @@ Kubernetes / Job Runner guidance
   - Mount a PVC (or blobfuse/csi secret) to a path like `/data` and supply `--input /data/...`.
   - Run with a non-root user (images already switch to `appuser`).
 
-Examples (conceptual):
+Examples:
 
 - Argo CD/Workflow YAML can set `command: ["python","src/main.py"]` and `args: ["wf_import","--export-to-postgres","--from-date","$(params.from)","--to-date","$(params.to)"]`.
 - For initializers, set `args: ["wf_import","--input","/data/file.csv"]` and mount the PVC at `/data`.
 
 Safety / concurrency notes
-- Images are independent; they don't use a shared working directory or system-level state. Concurrency safety depends on the database and how `main.py` behaves; prefer creating jobs that don't overlap the same DB rows/time ranges.
-
-If you want
-- I can: create example Kubernetes Job manifests for each workload that show how to mount PVCs and pass parameters.
-- Or change the images to use an ENTRYPOINT script that sources dates from environment variables and validates inputs before invoking `main.py`.
+- Images are independent; they don't use a shared working directory or system-level state. We prefer creating jobs that don't overlap the same DB rows/time ranges.

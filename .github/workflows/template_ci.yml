@@ -79,8 +79,9 @@ jobs:
                 password: ${{ secrets.ACR_PASSWORD }}
 
             - name: Build image
+              working-directory: ${{ inputs.service_path }}
               run: |
-                docker build -t $IMAGE -f ${{ inputs.dockerfile_name }}  ${{ inputs.service_path }}
+                docker build -t $IMAGE -f ${{ inputs.dockerfile_name }} .
                 docker push $IMAGE
 
             -  name: Push image

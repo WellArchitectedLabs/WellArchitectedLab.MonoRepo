@@ -14,6 +14,10 @@ on:
             gitversion_config_path:
               required: true
               type: string
+            dockerfile_name:
+              required: false
+              type: string
+              default: Dockerfile
         secrets:
           ACR_LOGIN_SERVER:
             required: true
@@ -76,7 +80,7 @@ jobs:
 
             - name: Build image
               run: |
-                docker build -t $IMAGE ${{ inputs.service_path }}
+                docker build -t $IMAGE -f ${{ inputs.dockerfile_name }}  ${{ inputs.service_path }}
                 docker push $IMAGE
 
             -  name: Push image

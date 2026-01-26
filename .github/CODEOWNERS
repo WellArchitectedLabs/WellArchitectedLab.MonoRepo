@@ -4,18 +4,16 @@
 # GitHub will request these users/teams for review automatically
 
 # All backend repo files require weather forecast backend team
-src/insights/bff/**       wf-backend-team
-src/insights/collector/**       wf-backend-team
-src/master-data/staging/**       wf-backend-team
-src/master-data/api/**       wf-backend-team
-
-# All frontend repo files require weather forecast frontend team
-src/insights/frontend/**     wf-frontend-team
-src/calibration/frontend/**     wf-frontend-team
+src/insights/bff/**         wf-insights-team
+src/insights/collector/**   wf-insights-team
+src/insights/frontend/**    wf-insights-team
+src/master-data/**          wf-masterdata-team
+src/calibration/**          wf-calibration-team
 
 # Data science team is owner of the insights engine
-src/insights/engine/**     wf-datascience-team
+src/insights/engine/**      wf-datascience-team
 
 # Kubernetes and IAC files require DevOps team
-k8s/**  devops-team
-iac/**  devops-team
+k8s/**                      devops-team
+iac/**                      devops-team
+.github/workflows/**        devops-team

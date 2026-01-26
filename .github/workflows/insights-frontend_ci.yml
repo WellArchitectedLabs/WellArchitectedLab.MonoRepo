@@ -2,9 +2,12 @@ name: CI - Build & Push Insights Frontend
 
 on:
     push:
-        branches: [ "main" ]
-        paths:
-          - src/insights/frontend/**
+       branches:
+            - main
+            - develop
+            - 'release/**'
+       paths:
+        - src/insights/frontend/**
     pull_request:
         paths:
           - src/insights/frontend/**

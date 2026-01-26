@@ -84,6 +84,9 @@ def import_wf_actuals_from_open_meteo(
     # guard against incompatible database inputs
     if(db_dsn.strip() == "" and export_to_postgres):
         raise SystemError("Exporting to Postgres is not supported without a valid db connection string. Please provide a valid connection string.")
+    
+    if(from_date >= to_date):
+        raise SystemError("Please provide a valid from date that is stricly inferior to to date.")
 
     locations = load_locations(db_dsn, cities_csv_input)
 

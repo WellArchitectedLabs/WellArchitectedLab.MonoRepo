@@ -39,3 +39,84 @@ services:
     ports:
       - "8080:80"
     restart: always
+  masterdata-postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: master_data
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      retries: 10
+
+  # We apply the latest migrations
+  migrate:
+    # using flyway migration docker image that we pull from dockerhub
+    image: flyway/flyway:9
+    depends_on:
+      - masterdata-postgres
+    volumes:
+      # we mount the local master-data/data/migrations folder to flyway/sql folder
+      - ./master-data/data/migrations:/flyway/sql
+    # we point to the local postgres db
+    command: -url=jdbc:postgresql://masterdata-postgres:5432/master_data -user=postgres -password=postgres migrate
+    # very important in order to execute migration only once
+    restart: "no"
+  cities-import:
+    tty: true
+    stdin_open: true
+    build:
+      context: ./master-data/staging
+      dockerfile: Dockerfile.cities-initializer
+    depends_on:
+      - masterdata-postgres
+    environment:
+      - POSTGRES_DSN=postgresql://postgres:postgres@masterdata-postgres:5432/master_data?sslmode=disable
+    volumes:
+      # mount the local file in the image and mark it as read only
+      - ./master-data/data/imports:/data:ro
+    command: ["--input", "/data/capitals.csv"]
+    ports:
+      - "8080:8001"
+    # the init script needs to be ran once
+    restart: "no"
+  wf-actuals-import:
+    tty: true
+    stdin_open: true
+    build:
+      context: ./master-data/staging
+      dockerfile: Dockerfile.wf-actuals-initializer
+    depends_on:
+      - masterdata-postgres
+    environment:
+      - POSTGRES_DSN=postgresql://postgres:postgres@masterdata-postgres:5432/master_data?sslmode=disable
+    volumes:
+      - ./master-data/data/imports:/data:ro
+    command: ["--input", "/data/weather_hourly-full.csv"]
+    ports:
+      - "8080:8002"
+    restart: "no"
+  wf-actuals-range-db-import:
+    tty: true
+    stdin_open: true
+    build:
+      context: ./master-data/staging
+      dockerfile: Dockerfile.wf-actuals-range
+    depends_on:
+        - masterdata-postgres
+    environment:
+      - POSTGRES_DSN=postgresql://postgres:postgres@masterdata-postgres:5432/master_data?sslmode=disable
+    command:
+      - "--from-date"
+      - "${FROM_DATE:-2026-01-01}"
+      - "--to-date"
+      - "${TO_DATE:-2026-01-02}"
+    ports:
+      - "8080:8003"
+    restart: "no"
+
+# necessary for postgres persistence
+volumes:
+  postgres-data:

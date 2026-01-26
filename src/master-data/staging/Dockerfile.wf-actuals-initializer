@@ -1,0 +1,21 @@
+FROM python:3.14.2-slim AS base
+
+LABEL workload="wf-actuals-initializer"
+LABEL maintainer="masterdata@weatherly.io"
+
+WORKDIR /app
+
+COPY requirements.txt requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
+COPY src/ ./src
+
+# copy entrypoint and configure default behavior so callers can pass flags first
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+RUN useradd -m appuser || true && chown -R appuser:appuser /app /entrypoint.sh
+USER appuser
+# Setting this variable to 1 is necessary in order to have the outputs in kube level as soon as they are written
+ENV PYTHONUNBUFFERED=1
+ENV DEFAULT_CMD="wf_import"
+ENTRYPOINT ["/entrypoint.sh"]

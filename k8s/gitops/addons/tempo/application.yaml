@@ -5,7 +5,7 @@ metadata:
   namespace: argocd
   labels:
     workload: operations
-    isGrafana: "true"
+    stack: grafana
   annotations:
     argocd.argoproj.io/sync-wave: "12" # We need tempo to run just after open telemetry
 spec:

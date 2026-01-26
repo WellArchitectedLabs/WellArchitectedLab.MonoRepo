@@ -12,7 +12,7 @@ on:
 
 jobs:
   frontend-buildCheck:
-    name: Frontend Status Check - Try package docker image
+    name: Insights Frontend Status Check - Try package docker image
     uses: ./.github/workflows/template_ci.yml
     with:
       service_name: insights-frontend

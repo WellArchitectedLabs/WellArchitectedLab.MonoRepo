@@ -1,4 +1,3 @@
-from .db_adapter import WeatherForecastDbAdapter
-from .csv_adapter import load_cities_from_csv
+from .db_adapter import WeatherForecastPgDbAdapter
 
-__all__ = ["load_cities_from_csv", "WeatherForecastDbAdapter"]
+__all__ = ["WeatherForecastPgDbAdapter"]

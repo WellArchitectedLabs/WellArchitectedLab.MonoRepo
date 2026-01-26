@@ -15,7 +15,7 @@ jobs:
   # build check
   backend-buildCheck:
     uses: ./.github/workflows/template_ci.yml
-    name: Backend Status Check - Try package docker image
+    name: Insights Bff Status Check - Try package docker image
     with:
         service_name: insights-bff
         gitversion_config_path: src/insights/bff/GitVersion.yml
@@ -30,7 +30,7 @@ jobs:
   # coverage check
   run-UnitTests:
       uses: ./.github/workflows/template_codecov-dotnet.yml
-      name: Backend Status Check - Tests & Coverage
+      name: Insights Bff Status Check - Tests & Coverage
       with:
         test_project_folder: src/insights/bff/Tests
       secrets:

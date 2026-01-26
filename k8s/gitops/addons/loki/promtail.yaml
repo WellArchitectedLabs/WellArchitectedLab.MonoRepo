@@ -5,6 +5,7 @@ metadata:
   namespace: argocd
   labels:
     workload: operations
+    stack: grafana
   annotations:
     argocd.argoproj.io/sync-wave: "14" # Deploy promtail before loki gateway
 spec:

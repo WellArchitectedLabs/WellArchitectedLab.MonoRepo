@@ -1,0 +1,22 @@
+FROM python:3.14.2-slim AS base
+
+LABEL workload="wf-actuals-range"
+LABEL maintainer="masterdata@weatherly.io"
+
+WORKDIR /app
+
+# Copy built app from base image layers by repeating steps (keeps files self-contained)
+COPY requirements.txt requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
+COPY src/ ./src
+
+# copy entrypoint that accepts flags-first ergonomics
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+RUN useradd -m appuser || true && chown -R appuser:appuser /app /entrypoint.sh
+USER appuser
+# Setting this variable to 1 is necessary in order to have the outputs in kube level as soon as they are written
+ENV PYTHONUNBUFFERED=1
+ENV DEFAULT_CMD="wf_import --export-to-postgres"
+ENTRYPOINT ["/entrypoint.sh"]

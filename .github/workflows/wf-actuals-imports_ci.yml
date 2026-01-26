@@ -1,4 +1,4 @@
-name: CI - Build & Push Insights Frontend
+name: CI - Build & Push MasterData Staging - WF Actuals Import
 
 on:
     push:

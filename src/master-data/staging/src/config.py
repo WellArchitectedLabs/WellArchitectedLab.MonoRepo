@@ -27,3 +27,21 @@ POSTGRES_DSN = os.environ.get(
     "POSTGRES_DSN",
     "postgresql://postgres:postgres@localhost:5432/master_data?sslmode=disable",
 )
+
+## AZURE CONFIGS
+
+## DATABASE CONFIG
+import os
+
+# Allow overriding the DSN via environment for containers / k8s jobs.
+# Default kept for local dev convenience but containers should set POSTGRES_DSN.
+AZ_BLOB_CONNECTION_STRING = os.environ.get(
+    "AZ_BLOB_CONNECTION_STRING",
+    # This is not a security leak, this is the default connection string for azurite created storages
+    # Codeql analysis will be overriden in github by consequence
+    "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://127.0.0.1:10000/devstoreaccount1;",
+)
+
+# Allow overriding the DSN via environment for containers / k8s jobs.
+# Default kept for local dev convenience but containers should set POSTGRES_DSN.
+AZ_BLOB_CONTAINER = "imports"

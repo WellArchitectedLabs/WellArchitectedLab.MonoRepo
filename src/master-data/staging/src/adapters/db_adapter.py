@@ -4,7 +4,7 @@ from psycopg2 import sql
 from typing import List, Dict, Any, Iterable
 
 
-class WeatherForecastDbAdapter:
+class WeatherForecastPgDbAdapter:
     BULK_THRESHOLD = 1000
 
     def __init__(self, dsn: str):

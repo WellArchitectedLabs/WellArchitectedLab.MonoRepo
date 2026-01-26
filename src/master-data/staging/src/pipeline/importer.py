@@ -1,10 +1,12 @@
 import csv
+import os
 import time
 from datetime import date, timedelta
 from typing import Optional
 from dateutil.relativedelta import relativedelta
 from tqdm import tqdm
 from config import WF_IMPORT_CSV_INPUT_READ_BATCH_SIZE
+from azure.storage.blob import BlobServiceClient
 
 from open_meteo import fetch_hourly
 from config import WF_IMPORT_OUTPUT_CSV
@@ -13,6 +15,7 @@ from config import OPEN_METEO_THROTTLE_SECONDS
 from config import WF_IMPORT_TIMEZONE
 from config import OPEN_METEO_MAX_RETRIES
 from config import OPEN_METEO_HOURLY_VARS 
+from config import AZ_BLOB_CONTAINER, AZ_BLOB_CONNECTION_STRING
 
 
 class _NoopProgress:
@@ -28,21 +31,50 @@ class _NoopProgress:
     def update(self, n=1):
         return
 
+def _read_csv_from_blob(blob_name: str):
+    """
+    Read CSV from Azure Blob Storage using connection string from environment variable.
+    """
+    if not AZ_BLOB_CONNECTION_STRING:
+        raise SystemExit("AZURE_STORAGE_CONNECTION_STRING environment variable not set")
+
+    blob_service_client = BlobServiceClient.from_connection_string(AZ_BLOB_CONNECTION_STRING)
+    container_client = blob_service_client.get_container_client(AZ_BLOB_CONTAINER)
+    blob_client = container_client.get_blob_client(blob_name)
+
+    stream = blob_client.download_blob()
+    text = stream.readall().decode("utf-8")
+    reader = csv.DictReader(text.splitlines())
+    return list(reader)
+
 def load_cities_from_csv(path: str):
     locations = []
-    with open(path, newline="", encoding="utf-8") as f:
-        reader = csv.DictReader(f)
-        for row in reader:
+
+    # Detect if path is from Azure Blob Storage
+    if path.startswith("blob://"):
+        blob_name = path[len("blob://"):]
+        rows = _read_csv_from_blob(blob_name)
+        for row in rows:
             locations.append((
                 float(row["Latitude"]),
-                float(row["Longitude"])
+                float(row["Longitude"]),
+                row["Name"]
             ))
+    else:
+        with open(path, newline="", encoding="utf-8") as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                locations.append((
+                    float(row["Latitude"]),
+                    float(row["Longitude"]),
+                    row["Name"]
+                ))
     return locations
 
 def load_cities_from_db(db_dsn: str):
     # Expect db_adapter.read_cities to return list of dicts with latitude/longitude
-    from adapters import WeatherForecastDbAdapter
-    db_adapter = WeatherForecastDbAdapter(db_dsn)
+    from adapters import WeatherForecastPgDbAdapter
+    db_adapter = WeatherForecastPgDbAdapter(db_dsn)
     rows = db_adapter.read_all_cities()
     # return list of tuples (id, latitude, longitude)
     return [(r["id"], r["latitude"], r["longitude"]) for r in rows]
@@ -97,9 +129,9 @@ def import_wf_actuals_from_open_meteo(
         * len(months)
     )
 
-    from adapters import WeatherForecastDbAdapter 
+    from adapters import WeatherForecastPgDbAdapter 
     if db_dsn.strip() != "":
-        db_adapter = WeatherForecastDbAdapter(db_dsn)
+        db_adapter = WeatherForecastPgDbAdapter(db_dsn)
 
     # prepare CSV writer if requested
     csv_out = None
@@ -202,6 +234,7 @@ def load_locations(
         locations = load_cities_from_csv(cities_csv_input)
     return locations
 
+
 def import_wf_actuals_from_csv(
         wf_actual_csv_input: str,
         db_dsn: Optional[str] = None) -> None:
@@ -219,12 +252,10 @@ def import_wf_actuals_from_csv(
 
     if not db_dsn or db_dsn.strip() == "":
         raise SystemExit("Importing wf_actuals into Postgres requires a valid db_dsn.")
-    
 
-    # lazy import to keep module import cheap
-    from adapters import WeatherForecastDbAdapter
+    from adapters import WeatherForecastPgDbAdapter
 
-    db_adapter = WeatherForecastDbAdapter(db_dsn)
+    db_adapter = WeatherForecastPgDbAdapter(db_dsn)
 
     # Build lookup from (rounded_lon, rounded_lat) -> city_id for exact/near-exact matching
     lookup_by_lonlat = {}
@@ -237,87 +268,82 @@ def import_wf_actuals_from_csv(
                 cid = r.get("id") or r.get("city_id")
                 lookup_by_lonlat[(round(lon, 6), round(lat, 6))] = cid
             except Exception:
-                # skip malformed rows
                 continue
     except Exception:
-        # if we cannot read cities, abort
         raise SystemExit("Failed to read cities from database. Cannot resolve city ids.")
-
-    # determine total rows for progress bar
-    total_rows = 0
-    with open(wf_actual_csv_input, newline="", encoding="utf-8") as fcount:
-        for _ in fcount:
-            total_rows += 1
-    if total_rows > 0:
-        total_rows = max(0, total_rows - 1)
 
     data_buffer = []
 
+    # Read CSV either from Azure Blob or local path
+    if wf_actual_csv_input.startswith("blob://"):
+        blob_name = wf_actual_csv_input[len("blob://"):] 
+        rows = _read_csv_from_blob(blob_name)
+    else:
+        with open(wf_actual_csv_input, newline="", encoding="utf-8") as f:
+            rows = list(csv.DictReader(f))
+
+    total_rows = len(rows)
+
     pbar_ctx = tqdm(total=total_rows, desc="Importing wf_actuals from CSV", unit="row") if tqdm else _NoopProgress()
     with pbar_ctx as pbar:
-        with open(wf_actual_csv_input, newline="", encoding="utf-8") as f:
-            reader = csv.DictReader(f)
-            for row in reader:
-                lon_val = None
-                lat_val = None
-                for k in ("longitude", "Longitude", "lon", "Lon"):
-                    if k in row and row[k] not in (None, ""):
-                        lon_val = row[k]; break
-                for k in ("latitude", "Latitude", "lat", "Lat"):
-                    if k in row and row[k] not in (None, ""):
-                        lat_val = row[k]; break
+        for row in rows:
+            lon_val = None
+            lat_val = None
+            for k in ("longitude", "Longitude", "lon", "Lon"):
+                if k in row and row[k] not in (None, ""):
+                    lon_val = row[k]; break
+            for k in ("latitude", "Latitude", "lat", "Lat"):
+                if k in row and row[k] not in (None, ""):
+                    lat_val = row[k]; break
 
-                if lon_val is None or lat_val is None:
-                    pbar.update(1); continue
+            if lon_val is None or lat_val is None:
+                pbar.update(1); continue
 
-                try:
-                    lon_f = float(lon_val); lat_f = float(lat_val)
-                except Exception:
-                    pbar.update(1); continue
+            try:
+                lon_f = float(lon_val); lat_f = float(lat_val)
+            except Exception:
+                pbar.update(1); continue
 
-                key = (round(lon_f, 6), round(lat_f, 6))
-                cid = lookup_by_lonlat.get(key)
-                if cid is None:
-                    pbar.update(1); continue
+            key = (round(lon_f, 6), round(lat_f, 6))
+            cid = lookup_by_lonlat.get(key)
+            if cid is None:
+                pbar.update(1); continue
 
-                timestamp = row.get("timestamp_utc") or row.get("time") or row.get("timestamp")
-                temp_s = row.get("temperature_c") or row.get("temperature")
-                wind_s = row.get("wind_speed_m_s") or row.get("wind_speed")
-                precip_s = row.get("precipitation_mm") or row.get("precipitation")
+            timestamp = row.get("timestamp_utc") or row.get("time") or row.get("timestamp")
+            temp_s = row.get("temperature_c") or row.get("temperature")
+            wind_s = row.get("wind_speed_m_s") or row.get("wind_speed")
+            precip_s = row.get("precipitation_mm") or row.get("precipitation")
 
-                try:
-                    temperature_c = float(temp_s) if temp_s not in (None, "") else None
-                except Exception:
-                    temperature_c = None
-                try:
-                    wind_speed = float(wind_s) if wind_s not in (None, "") else None
-                except Exception:
-                    wind_speed = None
-                try:
-                    precipitation = float(precip_s) if precip_s not in (None, "") else None
-                except Exception:
-                    precipitation = None
+            try:
+                temperature_c = float(temp_s) if temp_s not in (None, "") else None
+            except Exception:
+                temperature_c = None
+            try:
+                wind_speed = float(wind_s) if wind_s not in (None, "") else None
+            except Exception:
+                wind_speed = None
+            try:
+                precipitation = float(precip_s) if precip_s not in (None, "") else None
+            except Exception:
+                precipitation = None
 
-                data_buffer.append({
-                    "city_id": cid,
-                    "timestamp_utc": timestamp,
-                    "temperature_c": temperature_c,
-                    "wind_speed": wind_speed,
-                    "precipitation": precipitation
-                })
+            data_buffer.append({
+                "city_id": cid,
+                "timestamp_utc": timestamp,
+                "temperature_c": temperature_c,
+                "wind_speed": wind_speed,
+                "precipitation": precipitation
+            })
 
-                ## INSERT BATCH BY BATCH SIZE
-                ## RATHER THAN ONE-TIME INSERT
-                if len(data_buffer) >= WF_IMPORT_CSV_INPUT_READ_BATCH_SIZE:
-                    db_adapter.insert_wfactuals(data_buffer)
-                    data_buffer = []
+            if len(data_buffer) >= WF_IMPORT_CSV_INPUT_READ_BATCH_SIZE:
+                db_adapter.insert_wfactuals(data_buffer)
+                data_buffer = []
 
-                ## INCREMENT PROGRESS BAR ON EVERY BATCH INSERT
-                pbar.update(1)
-    
-    # INSERT LAST BATCH RESIDUE
+            pbar.update(1)
+
     if data_buffer:
         db_adapter.insert_wfactuals(data_buffer)
+
     return
 
 
@@ -331,11 +357,10 @@ def import_cities(input_path: str, dsn: str) -> int:
     Returns the number of imported rows.
     """
     # lazy imports so module import is cheap
-    from adapters import WeatherForecastDbAdapter
-    from adapters import load_cities_from_csv
+    from adapters import WeatherForecastPgDbAdapter
 
     locations = load_cities_from_csv(input_path)  # list of (lon, lat, name)
-    adapter = WeatherForecastDbAdapter(dsn)
+    adapter = WeatherForecastPgDbAdapter(dsn)
 
     items = []
     for lon, lat, name in locations:

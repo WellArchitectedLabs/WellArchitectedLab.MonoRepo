@@ -8,7 +8,7 @@ resources:
   - ../../manifests/insights/frontend
   - ../../manifests/insights/bff/database
   - insights-bff_config-map.yaml
-  - ../../master-data/staging
+  - ../../manifests/master-data/staging
   - ../../manifests/shared
   - ../../manifests/tools/htg
 

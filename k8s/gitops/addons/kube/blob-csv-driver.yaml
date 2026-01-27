@@ -1,3 +1,6 @@
+# Integrates Kubernetes with Azure Blob Storage
+# Implements how volumes are mounted/unmounted
+# Handles auth (MSI, secrets), protocol (fuse/NFS), lifecycle hooks
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:

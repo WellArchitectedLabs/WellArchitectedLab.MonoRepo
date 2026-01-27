@@ -1,0 +1,27 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: cities-import2
+  namespace: backend
+  labels:
+    app: cities-import2
+spec:
+  template:
+    metadata:
+      name: cities-import2
+      labels:
+        app: cities-import2
+    spec:
+      containers:
+      - name: cities-import2
+        image: acrdevtshpwn.azurecr.io/cities-initializer:0.1.0-PullRequest0086.436-47c597f
+        command: ["--input", "/mnt/blob/weather_hourly-full.csv"]
+        volumeMounts:
+        - name: imports-blob2
+          mountPath: "/mnt/blob"
+          readOnly: true
+      volumes:
+        - name: imports-blob2
+          persistentVolumeClaim:
+            claimName: az-blob-storage-imports
+      restartPolicy: Never

@@ -5,5 +5,5 @@ metadata:
   name: master-data-staging-kustomization
 resources:
   - job/cities-import2.yaml
-  - storage-class/imports_stoclass.yaml
+  - pv/imports-sa_pv.yaml
   - pvc/imports-storage_claim.yaml

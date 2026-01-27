@@ -133,7 +133,7 @@ resource "azurerm_role_assignment" "cluster-registry-access" {
 
 ####################################################################################
 # Enterprise App Creation
-# The enterprise application will be used for weather forecast acr push rights assignment
+# The enterprise application will be used for CI/CD acr push rights assignment
 ####################################################################################
 
 resource "azuread_application" "acr_push_app" {

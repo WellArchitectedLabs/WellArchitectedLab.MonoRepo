@@ -31,3 +31,10 @@ module "compute" {
   resource_group_name = module.global.resource_group_name
   environment         = local.environment
 }
+
+module "storage" {
+  source = "../../storage"
+  region = local.region
+  environment = local.environment
+  resource_group_name = module.global.resource_group_name
+}

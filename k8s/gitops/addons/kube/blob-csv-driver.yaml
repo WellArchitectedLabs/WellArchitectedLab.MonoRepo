@@ -9,7 +9,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://raw.githubusercontent.com/kubernetes-sigs/blob-csi-driver/master/charts
+    repoURL: https://kubernetes-sigs.github.io/blob-csi-driver
     chart: blob-csi-driver
     targetRevision: "1.27.1"
     helm:

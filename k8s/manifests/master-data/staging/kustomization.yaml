@@ -6,5 +6,4 @@ metadata:
 resources:
   - job/cities-import.yaml
   - storage-class/imports_storage-account.yaml
-  - pvc/staging-imports-storage_claim.yaml
   - pvc/imports-storage_claim.yaml

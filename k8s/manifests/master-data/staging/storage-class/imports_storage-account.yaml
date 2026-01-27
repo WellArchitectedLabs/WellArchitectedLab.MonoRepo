@@ -21,7 +21,7 @@ parameters:
   # Other candidates are SAS Keys, Access tokens based auth (with connection strings and sealed secrets)
   # We grant kubelet identity (which is used by kubernetes pods) access to the storage account scope as Azure Blob Data Contributor
   # Please check terraform security module for more details
-  authType: MSI
+  authType: msi
   # container name in storage account
   containerName: imports
   # resource group in which storage account is created

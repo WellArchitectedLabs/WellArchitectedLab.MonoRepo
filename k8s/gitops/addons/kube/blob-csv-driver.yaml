@@ -1,0 +1,52 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: blob-csi-driver
+  namespace: argocd
+  labels:
+    workload: operations
+    stack: kube
+spec:
+  project: default
+  source:
+    repoURL: https://raw.githubusercontent.com/kubernetes-sigs/blob-csi-driver/master/charts
+    chart: blob-csi-driver
+    targetRevision: "1.27.1"
+    helm:
+      values: |
+        controller:
+          nodeSelector: 
+            kubernetes.azure.com/mode: system
+          replicas: 1
+          resources:
+            requests:
+              cpu: 10m
+              memory: 300Mi
+            limits:
+              cpu: 50m
+              memory: 1Gi
+        node:
+          nodeSelector: 
+            kubernetes.azure.com/mode: system
+          resources:
+            requests:
+              cpu: 10m
+              memory: 300Mi
+            limits:
+              cpu: 50m
+              memory: 1Gi
+  destination:
+    namespace: kube-system
+    server: https://kubernetes.default.svc
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+    retry:
+      limit: 5
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 3m

@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: azure-blob-storage-imports
+  namespace: backend
+  labels:
+    app: azure-blob-storage-imports
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+  volumeName: azure-blob-storage-imports
+  storageClassName: managed-csi

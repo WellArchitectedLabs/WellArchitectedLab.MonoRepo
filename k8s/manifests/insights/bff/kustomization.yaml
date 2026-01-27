@@ -3,7 +3,6 @@ kind: Kustomization
 metadata:
   namespace: backend
   name: insights-bff-kustomization
-
 resources:
   - namespace/backend_namespace.yaml
   - deployment.yaml

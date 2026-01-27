@@ -6,7 +6,8 @@ apiVersion: storage.k8s.io/v1
 # A storage class does not mount the file itself. It is just the definition of a storage connection that plugs with CSI driver.
 kind: StorageClass
 metadata:
-  name: azureblob-fuse-msi
+  name: azblob-fuse-msi
+  namespace: backend
 # This storage class is plugged to blob csi driver that is installed on cluster startup via argocd
 provisioner: blob.csi.azure.com
 parameters:

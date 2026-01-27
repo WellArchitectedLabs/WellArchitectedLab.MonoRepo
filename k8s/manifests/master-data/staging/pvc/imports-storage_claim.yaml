@@ -11,4 +11,4 @@ spec:
   resources:
     requests:
       storage: 500Mi
-  storageClassName: dev-azureblob-fuse-msi
+  storageClassName: dev-azblob-fuse-msi

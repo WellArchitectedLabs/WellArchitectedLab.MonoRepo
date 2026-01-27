@@ -1,0 +1,14 @@
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: azureblob-fuse-msi
+provisioner: blob.csi.azure.com
+parameters:
+  protocol: fuse
+  # Managed System Identity for authentication
+  authType: MSI
+  containerName: imports
+  resourceGroup: rg-kubernetes-dev-001
+  storageAccount: stwfimportsdev
+reclaimPolicy: Retain
+volumeBindingMode: Immediate

@@ -21,8 +21,7 @@ spec:
           mountPath: "/mnt/blob"
           readOnly: true
       volumes:
-      - name: imports-blob
-        persistentVolumeClaim:
-          claimName: pvc-blob
+        - name: imports-blob
+          persistentVolumeClaim:
+            claimName: azure-blob-storage-imports
       restartPolicy: Never
-      dnsPolicy: ClusterFirst

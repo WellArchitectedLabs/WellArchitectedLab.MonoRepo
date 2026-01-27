@@ -13,12 +13,6 @@ terraform {
       version = "~> 2.50"
     }
   }
-  backend "azurerm" {
-    key                  = "kubernetes.terraform.tfstate"
-    storage_account_name = "devwaltstate"
-    resource_group_name  = "dev-rg-terraforminit"
-    container_name       = "tfstate"
-  }
 }
 
 provider "azurerm" {

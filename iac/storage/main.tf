@@ -8,7 +8,7 @@ terraform {
 }
 
 resource "azurerm_storage_account" "stwfimports" {
-  name = "stwfimports-${var.environment}"
+  name = "stwfimports${var.environment}"
   account_tier = "Standard"
   resource_group_name = var.resource_group_name
   location = var.region

@@ -1,14 +1,19 @@
 terraform {
- required_providers {
+  required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
       version = "=4.1.0"
+    }
+    azuread = {
+      source  = "hashicorp/azuread"
+      version = "~> 2.50"
     }
   }
 }
 
 provider "azurerm" {
   features {}
+  subscription_id = var.subscription
 }
 
 ####################################################################################
@@ -42,7 +47,7 @@ resource "azurerm_role_assignment" "acr_push" {
   principal_id         = azuread_service_principal.acr_push_sp.id
   role_definition_name = local.acr_push_role
   scope                = var.acr_registry_id
-  depends_on           = [azuread_service_principal.acr_push_sp, azurerm_container_registry.acr-kubernetes-001]
+  depends_on           = [azuread_service_principal.acr_push_sp]
 }
 
 # Used for getting the tenant ID for outputs

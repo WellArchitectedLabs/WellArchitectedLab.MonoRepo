@@ -33,6 +33,13 @@ module "compute" {
   environment         = local.environment
 }
 
+module "security" {
+  source = "../../security"
+  environment = local.environment
+  acr_registry_id = module.compute.acr_resource_id
+  subscription = local.subscription
+}
+
 module "storage" {
   source = "../../storage"
   region = local.region

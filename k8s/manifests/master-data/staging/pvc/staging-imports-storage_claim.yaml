@@ -7,11 +7,8 @@ metadata:
     app: azure-blob-storage-imports
 spec:
   accessModes:
-  - ReadWriteOnce
+    - ReadWriteOnce
   resources:
     requests:
-      # requests 500 Megabytes
       storage: 500Mi
-  volumeName: azure-blob-storage-imports
-  # References the storage class defined in this same folder
   storageClassName: azureblob-fuse-msi

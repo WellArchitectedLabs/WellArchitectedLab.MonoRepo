@@ -125,42 +125,6 @@ resource "azurerm_role_assignment" "cluster-registry-access" {
   skip_service_principal_aad_check = true
 }
 
-####################################################################################
-# Enterprise App Creation
-# The enterprise application will be used for CI/CD acr push rights assignment
-####################################################################################
-
-resource "azuread_application" "acr_push_app" {
-  display_name = "ea-acr-push-weather-forecast-${var.environment}"
-}
-
-resource "azuread_application_password" "acr_push_app_password" {
-  # secret is consultable in secrets screen on the enterprise application level
-  application_id = azuread_application.acr_push_app.id
-}
-
-##################################################
-# Associate a service principal to the enterprise app
-##################################################
-
-resource "azuread_service_principal" "acr_push_sp" {
-  client_id = azuread_application.acr_push_app.client_id
-}
-
-##################################################
-# Assign role 
-##################################################
-
-resource "azurerm_role_assignment" "acr_push" {
-  principal_id         = azuread_service_principal.acr_push_sp.id
-  role_definition_name = "AcrPush"
-  scope                = azurerm_container_registry.acr-kubernetes-001.id
-  depends_on           = [azuread_service_principal.acr_push_sp, azurerm_container_registry.acr-kubernetes-001]
-}
-
-# Used for getting the tenant ID for outputs
-data "azurerm_client_config" "current" {}
-
 # # In our case: the consumer is the AKS cluster and the resource if the container resgitry
 # # When this private endpoint config is applied, we can say that we enabled the AKS cluster integration with other azure services using private endpoints, which a majot security enhancement since we no longer need to exposes the dependant services publically to the internet
 # # Please note the restriction on azure level that requires that the subnet running the consumer resource (the AKS cluster or App Service or any compute service) need to be 'delegated' for the given service. This means that the subnet will only support aks cluster resources and nothing else

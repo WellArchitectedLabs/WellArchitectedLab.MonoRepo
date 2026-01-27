@@ -1,3 +1,8 @@
+output "acr_resource_id" {
+  value = azurerm_container_registry.acr-kubernetes-001.id
+  description = "Output the ACR Id for usage in security and other purposes"
+}
+
 output "acr_push_user_name" {
   value = azuread_application.acr_push_app.client_id
   description = "Enterprise Application ID (used by github actions pipelines)"

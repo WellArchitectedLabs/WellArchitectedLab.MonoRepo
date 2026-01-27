@@ -19,14 +19,14 @@ provider "azurerm" {
 }
 
 module "global" {
-  source       = "../../global"
+  source       = "../../modules/global"
   region       = local.region
   subscription = local.subscription
   environment  = local.environment
 }
 
 module "compute" {
-  source              = "../../compute"
+  source              = "../../modules/compute"
   region              = local.region
   subscription        = local.subscription
   resource_group_name = module.global.resource_group_name
@@ -34,14 +34,14 @@ module "compute" {
 }
 
 module "security" {
-  source = "../../security"
+  source = "../../modules/security"
   environment = local.environment
   acr_registry_id = module.compute.acr_resource_id
   subscription = local.subscription
 }
 
 module "storage" {
-  source = "../../storage"
+  source = "../../modules/storage"
   region = local.region
   environment = local.environment
   resource_group_name = module.global.resource_group_name

@@ -12,14 +12,17 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://kubernetes-sigs.github.io/blob-csi-driver
+    repoURL: https://raw.githubusercontent.com/kubernetes-sigs/blob-csi-driver/master/charts
     chart: blob-csi-driver
     targetRevision: "1.27.1"
     helm:
       values: |
         controller:
-          nodeSelector: 
-            kubernetes.azure.com/mode: system
+          tolerations:
+          - key: "workload"
+            operator: "Equal"
+            value: "weather-forecast"
+            effect: "NoSchedule"
           replicas: 1
           resources:
             requests:
@@ -29,8 +32,11 @@ spec:
               cpu: 50m
               memory: 1Gi
         node:
-          nodeSelector: 
-            kubernetes.azure.com/mode: system
+          tolerations:
+          - key: "workload"
+            operator: "Equal"
+            value: "weather-forecast"
+            effect: "NoSchedule"
           resources:
             requests:
               cpu: 10m

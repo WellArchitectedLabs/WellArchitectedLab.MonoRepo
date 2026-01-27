@@ -34,3 +34,8 @@ One-line definitions
 - PersistentVolume → Concrete storage reference (This is a reference. It does not store the real data. The metadata include the endpoint and some details that are used by the CSI driver for doing the mounting)
 - PersistentVolumeClaim → Binding contract (The consumer needs a contract for accessing that persistent volume. Contract should be satisfied by the cluster)
 - Pod → Consumer
+
+
+Mention is the big difference between:
+- Connecting to storage accounts using the azure sdk in python code
+- Connecting to storage accounts just using the mounted path using CSI driver

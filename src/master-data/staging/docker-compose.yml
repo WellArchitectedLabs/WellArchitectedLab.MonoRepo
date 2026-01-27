@@ -25,72 +25,6 @@ services:
     command: -url=jdbc:postgresql://masterdata-postgres:5432/master_data -user=postgres -password=postgres migrate
     # very important in order to execute migration only once
     restart: "no"
-  # simulates a local blob storage
-  # using azurite
-  azurite:
-    image: mcr.microsoft.com/azure-storage/azurite:3.30.0
-    command: >
-      azurite-blob
-      --blobHost 0.0.0.0
-      --blobPort 10000
-      --location /data
-      --loose
-      --skipApiVersionCheck
-    ports:
-      - "10000:10000"
-    volumes:
-      - azurite-data:/data
-    healthcheck:
-      test: ["CMD-SHELL", "wget -qO- http://localhost:10000/ || true"]
-      interval: 5s
-      retries: 10
-
-  azurite-seed:
-    image: python:3.11-alpine
-    depends_on:
-      azurite:
-        condition: service_healthy
-    volumes:
-      - ./data/imports:/seed:ro
-    entrypoint: /bin/sh
-    command:
-      - -c
-      - |
-        echo "Installing Azure Storage Blob SDK..."
-        pip install --no-cache-dir azure-storage-blob==12.19.0
-        
-        echo "Seeding Azurite blob storage..."
-        python3 << 'EOF'
-        from azure.storage.blob import BlobServiceClient
-        import os
-        
-        connection_string = "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://azurite:10000/devstoreaccount1;"
-        
-        blob_service_client = BlobServiceClient.from_connection_string(connection_string)
-        
-        # Create container
-        try:
-            container_client = blob_service_client.create_container("imports")
-            print("Container 'imports' created successfully")
-        except Exception as e:
-            print(f"Container might already exist: {e}")
-            container_client = blob_service_client.get_container_client("imports")
-        
-        # Upload files
-        files = ["capitals.csv", "weather_hourly-full.csv"]
-        for filename in files:
-            filepath = f"/seed/{filename}"
-            if os.path.exists(filepath):
-                with open(filepath, "rb") as data:
-                    blob_client = container_client.get_blob_client(filename)
-                    blob_client.upload_blob(data, overwrite=True)
-                    print(f"Uploaded {filename}")
-            else:
-                print(f"Warning: {filename} not found")
-        
-        print("Seeding complete.")
-        EOF
-    restart: "no"
 
   cities-import:
     tty: true
@@ -103,16 +37,12 @@ services:
         condition: service_healthy
       migrate:
         condition: service_completed_successfully
-      azurite-seed:
-        condition: service_completed_successfully
     environment:
       - POSTGRES_DSN=postgresql://postgres:postgres@masterdata-postgres:5432/master_data?sslmode=disable
-      - AZ_BLOB_CONNECTION_STRING=DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://azurite:10000/devstoreaccount1;
-      - AZ_BLOB_CONTAINER=imports
     volumes:
       # mount the local file in the image and mark it as read only
       - ./data/imports:/data:ro
-    command: ["--input", "blob://capitals.csv"]
+    command: ["--input", "/data/capitals.csv"]
     # the init script needs to be ran once
     restart: "no"
   wf-actuals-import:
@@ -130,8 +60,6 @@ services:
         condition: service_completed_successfully
     environment:
       - POSTGRES_DSN=postgresql://postgres:postgres@masterdata-postgres:5432/master_data?sslmode=disable
-      - AZ_BLOB_CONNECTION_STRING=DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://azurite:10000/devstoreaccount1;
-      - AZ_BLOB_CONTAINER=imports
     volumes:
       - ./data/imports:/data:ro
     command: ["--input", "/data/weather_hourly-full.csv"]
@@ -163,4 +91,3 @@ services:
 # necessary for postgres persistence
 volumes:
   postgres-data:
-  azurite-data:

@@ -1,14 +1,14 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: azure-blob-storage-imports
+  name: az-blob-storage-imports
   namespace: backend
   labels:
-    app: azure-blob-storage-imports
+    app: az-blob-storage-imports
 spec:
   accessModes:
     - ReadWriteOnce
   resources:
     requests:
       storage: 500Mi
-  storageClassName: azureblob-fuse-msi
+  storageClassName: dev-azureblob-fuse-msi

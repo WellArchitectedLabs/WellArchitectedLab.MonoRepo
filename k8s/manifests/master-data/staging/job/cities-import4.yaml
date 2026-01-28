@@ -23,7 +23,7 @@ spec:
         kubernetes.azure.com/mode: user
       containers:
       - name: cities-import
-        image: acrdevtshpwn.azurecr.io/cities-initializer:0.1.0-PullRequest0086.436-47c597f
+        image: acrdevtshpwn.azurecr.io/cities-initializer:0.1.0-feaure-staging-k8s.1-cd03d2d
         command: ["--input", "/mnt/blob/weather_hourly-full.csv"]
         volumeMounts:
         - name: imports-blob

@@ -283,6 +283,7 @@ def import_cities(input_path: str, dsn: str) -> int:
     Returns the number of imported rows.
     """
     # lazy imports so module import is cheap    from adapters import WeatherForecastPgDbAdapter
+    from adapters import WeatherForecastPgDbAdapter
     adapter = WeatherForecastPgDbAdapter(dsn)
 
     locations = load_cities_from_csv(input_path)

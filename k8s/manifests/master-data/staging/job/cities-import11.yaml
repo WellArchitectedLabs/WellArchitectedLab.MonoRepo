@@ -1,7 +1,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: cities-import4
+  name: cities-import5
   namespace: backend
   labels:
     app: cities-import
@@ -10,9 +10,9 @@ metadata:
 spec:
   template:
     metadata:
-      name: cities-import4
+      name: cities-import5
       labels:
-        app: cities-import4
+        app: cities-import5
     spec:
       tolerations:
       - key: workload

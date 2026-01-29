@@ -1,0 +1,17 @@
+auth:
+  username: masterdata_app
+  password: app_password
+  database: master_data
+
+primary:
+  persistence:
+    enabled: true
+    size: 1Gi
+
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi

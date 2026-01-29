@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: master-data-initdb-configmap
+  namespace: backend
+data:
+  init.sql.template: |
+    -- Owner role
+    CREATE ROLE ${DB_OWNER_USER} LOGIN PASSWORD '${DB_OWNER_PASSWORD}';
+    ALTER ROLE ${DB_OWNER_USER} CREATEDB;
+
+    -- Application role
+    CREATE ROLE ${DB_APP_USER} LOGIN PASSWORD '${DB_APP_PASSWORD}';
+
+    -- Create database owned by owner
+    CREATE DATABASE master_data OWNER ${DB_OWNER_USER};
+
+    -- Connect to database
+    \c master_data
+
+    -- Grant privileges to app user
+    GRANT CONNECT ON DATABASE master_data TO ${DB_APP_USER};
+    GRANT USAGE ON SCHEMA public TO ${DB_APP_USER};
+    GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public;
+    ALTER DEFAULT PRIVILEGES IN SCHEMA public
+      GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO ${DB_APP_USER};

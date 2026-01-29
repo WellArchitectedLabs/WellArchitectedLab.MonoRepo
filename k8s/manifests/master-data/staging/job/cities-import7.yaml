@@ -1,0 +1,36 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: cities-import2
+  namespace: backend
+  labels:
+    app: cities-import
+spec:
+  template:
+    metadata:
+      name: cities-import2
+      labels:
+        app: cities-import2
+    spec:
+      tolerations:
+      - key: workload
+        operator: 'Equal'
+        value: 'weather-forecast'
+        effect: 'NoSchedule'
+      # Where will my pods will run, and in what node label
+      # We should add a toleration because the user nodes are tainted and will be not schedule the pods if the taint is not provided
+      nodeSelector:
+        kubernetes.azure.com/mode: user
+      containers:
+      - name: cities-import
+        image: acrdevtshpwn.azurecr.io/cities-initializer:0.1.0-feaure-staging-k8s.1-cd03d2d
+        args: ["--input", "/mnt/blob/weather_hourly-full.csv"]
+        volumeMounts:
+        - name: imports-blob
+          mountPath: "/mnt/blob"
+          readOnly: true
+      volumes:
+      - name: imports-blob
+        persistentVolumeClaim:
+          claimName: pvc-az-blob-imports
+      restartPolicy: Never

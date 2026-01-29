@@ -1,0 +1,30 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: master-data-postgres-staging
+  namespace: argocd
+spec:
+  project: default
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: backend
+  source:
+    repoURL: https://charts.bitnami.com/bitnami
+    chart: postgresql
+    targetRevision: 15.5.0
+    helm:
+      releaseName: master-data
+      values: |
+        auth:
+          username: masterdata_app
+          password: app_password
+          database: master_data
+
+        primary:
+          persistence:
+            enabled: true
+            size: 10Gi
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true

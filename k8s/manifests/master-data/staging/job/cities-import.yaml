@@ -1,27 +1,41 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: cities-import
+  name: cities-import5
   namespace: backend
   labels:
     app: cities-import
+  annotations:
+    sidecar.istio.io/inject: "false"  # Pas d'Istio pour le debug
 spec:
   template:
     metadata:
-      name: cities-import
+      name: cities-import5
       labels:
-        app: cities-import
+        app: cities-import5
     spec:
+      securityContext:
+        runAsUser: 0
+        runAsGroup: 0
+        fsGroup: 0
+      tolerations:
+      - key: workload
+        operator: 'Equal'
+        value: 'weather-forecast'
+        effect: 'NoSchedule'
+      # Where will my pods will run, and in what node label
+      # We should add a toleration because the user nodes are tainted and will be not schedule the pods if the taint is not provided
+      nodeSelector:
+        kubernetes.azure.com/mode: user
       containers:
       - name: cities-import
-        image: acrdevtshpwn.azurecr.io/cities-initializer:0.1.0-PullRequest0086.436-47c597f
-        command: ["--input", "/mnt/blob/weather_hourly-full.csv"]
+        image: acrdevtshpwn.azurecr.io/cities-initializer:0.1.0-feaure-staging-k8s.1-12860ec
+        args: ["--input", "/mnt/blob/capitals.csv"]
         volumeMounts:
         - name: imports-blob
           mountPath: "/mnt/blob"
-          readOnly: true
       volumes:
       - name: imports-blob
         persistentVolumeClaim:
-          claimName: pvc-azure-blob-imports
+          claimName: dev-pvc-az-blob-imports
       restartPolicy: Never

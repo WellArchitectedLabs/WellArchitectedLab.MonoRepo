@@ -35,18 +35,20 @@ spec:
 
         auth:
           username: postgres
-          password: "" # Superuser password empty, will be mounted via secret
+          password: ""  # superuser password is provided by secret
 
         primary:
           persistence:
             enabled: true
             storageClass: managed-csi
             size: 10Gi
+
           tolerations:
             - key: "workload"
               operator: "Equal"
               value: "weather-forecast"
               effect: "NoSchedule"
+
           nodeSelector:
             kubernetes.azure.com/mode: user
 
@@ -58,44 +60,50 @@ spec:
               cpu: 500m
               memory: 512Mi
 
-          initContainers:
-            - name: init-sql
-              image: bitnamilegacy/os-shell:10.4.1-debian-11-r17
-              command: ["/bin/sh", "-c"]
-              args:
-                - envsubst < /init/init.sql.template > /docker-entrypoint-initdb.d/init.sql
-              volumeMounts:
-                - name: init-sql
-                  mountPath: /initdb
-              env:
-                - name: DB_OWNER_USER
-                  valueFrom:
-                    secretKeyRef:
-                      name: master-data-db-secrets
-                      key: DB_OWNER_USER
-                - name: DB_OWNER_PASSWORD
-                  valueFrom:
-                    secretKeyRef:
-                      name: master-data-db-secrets
-                      key: DB_OWNER_PASSWORD
-                - name: DB_APP_USER
-                  valueFrom:
-                    secretKeyRef:
-                      name: master-data-db-secrets
-                      key: DB_APP_USER
-                - name: DB_APP_PASSWORD
-                  valueFrom:
-                    secretKeyRef:
-                      name: master-data-db-secrets
-                      key: DB_APP_PASSWORD
-          volumes:
+          # Mount the init SQL template and inject secrets
+          extraVolumes:
             - name: init-sql
               configMap:
                 name: master-data-initdb-configmap
 
+          extraVolumeMounts:
+            - name: init-sql
+              mountPath: /initdb
+
+          initContainers:
+          - name: init-sql
+            image: alpine:3.18
+            command: ["/bin/sh", "-c"]
+            args:
+              - |
+                apk add --no-cache gettext \
+                && envsubst < /initdb/init.sql.template > /docker-entrypoint-initdb.d/init.sql
+            env:
+              - name: DB_OWNER_USER
+                valueFrom:
+                  secretKeyRef:
+                    name: master-data-db-secrets
+                    key: DB_OWNER_USER
+              - name: DB_OWNER_PASSWORD
+                valueFrom:
+                  secretKeyRef:
+                    name: master-data-db-secrets
+                    key: DB_OWNER_PASSWORD
+              - name: DB_APP_USER
+                valueFrom:
+                  secretKeyRef:
+                    name: master-data-db-secrets
+                    key: DB_APP_USER
+              - name: DB_APP_PASSWORD
+                valueFrom:
+                  secretKeyRef:
+                    name: master-data-db-secrets
+                    key: DB_APP_PASSWORD
+
   destination:
     namespace: backend
     server: https://kubernetes.default.svc
+
   syncPolicy:
     automated:
       prune: true

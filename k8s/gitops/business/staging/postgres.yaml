@@ -34,13 +34,9 @@ spec:
             tag: "10.4.1-debian-11-r17"
 
         auth:
-          username: grafana                    # Hardcode the username
-          database: grafana                    # Hardcode the database name
-          existingSecret: grafana-secrets      # Use secret ONLY for passwords
-          secretKeys:
-            adminPasswordKey: password         # postgres superuser (postgres) password from secret
-            userPasswordKey: password          # grafana user password from secret, equals to the super user password
-            replicationPasswordKey: password   # replication password from secret
+          username: masterdata_app
+          password: app_password
+          database: master_data
 
         primary:
           persistence:

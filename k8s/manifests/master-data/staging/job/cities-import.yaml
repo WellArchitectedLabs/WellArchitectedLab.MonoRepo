@@ -5,8 +5,6 @@ metadata:
   namespace: backend
   labels:
     app: cities-import
-  annotations:
-    sidecar.istio.io/inject: "false"  # Pas d'Istio pour le debug
 spec:
   template:
     metadata:

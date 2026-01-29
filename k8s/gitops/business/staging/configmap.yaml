@@ -4,23 +4,23 @@ metadata:
   name: master-data-initdb-configmap
   namespace: backend
 data:
-  init.sql.template: |
-    -- Owner role
-    CREATE ROLE ${DB_OWNER_USER} LOGIN PASSWORD '${DB_OWNER_PASSWORD}';
-    ALTER ROLE ${DB_OWNER_USER} CREATEDB;
+  init.sql: |
+    \set DB_OWNER_USER :'DB_OWNER_USER'
+    \set DB_OWNER_PASSWORD :'DB_OWNER_PASSWORD'
+    \set DB_APP_USER :'DB_APP_USER'
+    \set DB_APP_PASSWORD :'DB_APP_PASSWORD'
 
-    -- Application role
-    CREATE ROLE ${DB_APP_USER} LOGIN PASSWORD '${DB_APP_PASSWORD}';
+    CREATE ROLE :DB_OWNER_USER LOGIN PASSWORD :'DB_OWNER_PASSWORD';
+    ALTER ROLE :DB_OWNER_USER CREATEDB;
 
-    -- Create database owned by owner
-    CREATE DATABASE master_data OWNER ${DB_OWNER_USER};
+    CREATE ROLE :DB_APP_USER LOGIN PASSWORD :'DB_APP_PASSWORD';
 
-    -- Connect to database
+    CREATE DATABASE master_data OWNER :DB_OWNER_USER;
+
     \c master_data
 
-    -- Grant privileges to app user
-    GRANT CONNECT ON DATABASE master_data TO ${DB_APP_USER};
-    GRANT USAGE ON SCHEMA public TO ${DB_APP_USER};
+    GRANT CONNECT ON DATABASE master_data TO :DB_APP_USER;
+    GRANT USAGE ON SCHEMA public TO :DB_APP_USER;
     GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public;
     ALTER DEFAULT PRIVILEGES IN SCHEMA public
-      GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO ${DB_APP_USER};
+      GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO :DB_APP_USER;

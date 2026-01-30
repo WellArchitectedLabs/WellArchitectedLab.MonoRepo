@@ -87,7 +87,6 @@ spec:
   destination:
     namespace: backend
     server: https://kubernetes.default.svc
-
   syncPolicy:
     automated:
       prune: true

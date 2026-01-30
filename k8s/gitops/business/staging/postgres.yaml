@@ -37,7 +37,7 @@ spec:
           database: master_data
 
         primary:
-           podAnnotations:
+          podAnnotations:
             sidecar.istio.io/inject: "false"
           persistence:
             enabled: true

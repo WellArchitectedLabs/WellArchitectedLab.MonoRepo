@@ -91,7 +91,7 @@ On-demand weather actuals import for a specific date range.
 #### Command
 
 ```bash
-FROM_DATE=2026-01-01 TO_DATE=2026-01-01 \
+FROM_DATE=2026-01-01 TO_DATE=2026-01-02 \
 docker compose --profile manual run --rm wf-actuals-range-db-import
 ```
 

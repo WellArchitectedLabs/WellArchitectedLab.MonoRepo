@@ -6,9 +6,10 @@ resources:
   - ../../manifests/operations
   - ../../manifests/insights/bff
   - ../../manifests/insights/frontend
-  - ../../manifests/shared
   - ../../manifests/insights/bff/database
   - insights-bff_config-map.yaml
+  - ../../manifests/master-data/staging
+  - ../../manifests/shared
   - ../../manifests/tools/htg
 
 

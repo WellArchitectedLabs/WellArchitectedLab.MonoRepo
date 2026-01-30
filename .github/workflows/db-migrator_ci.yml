@@ -1,0 +1,27 @@
+name: CI - Build & Push Master Data Db Migrator - Database
+
+on:
+    push:
+        branches:
+          - main
+          - develop
+          - 'release/**'
+        paths:
+          - src/master-data/staging/**
+    pull_request:
+        paths:
+          - src/master-data/staging/**
+    workflow_dispatch:
+
+jobs:
+    FlyWayDbMigrator-BuildAndPush:
+        uses: ./.github/workflows/template_ci.yml
+        with:
+            service_name: db-migrator
+            service_path: src/master-data
+            gitversion_config_path: src/master-data/staging/GitVersion.yml
+            dockerfile_name: Dockerfile.db-migrator
+        secrets:
+            ACR_LOGIN_SERVER: ${{ secrets.ACR_LOGIN_SERVER }}
+            ACR_USERNAME: ${{ secrets.ACR_USERNAME }}
+            ACR_PASSWORD: ${{ secrets.ACR_PASSWORD }}

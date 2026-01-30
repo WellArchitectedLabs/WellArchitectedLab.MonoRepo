@@ -1,0 +1,100 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: master-data-database
+  namespace: argocd
+  labels:
+    workload: business
+    stack: business
+    workload-type: database
+  annotations:
+    argocd.argoproj.io/sync-wave: "20"
+spec:
+  project: default
+  source:
+    repoURL: https://charts.bitnami.com/bitnami
+    chart: postgresql
+    targetRevision: "15.5.0"
+    helm:
+      values: |
+        image:
+          registry: docker.io
+          repository: bitnamilegacy/postgresql
+          tag: "15.5.0-debian-11-r0"
+          pullPolicy: IfNotPresent
+
+        metrics:
+          image:
+            repository: bitnamilegacy/postgres-exporter
+            tag: "0.11.1-debian-11-r0"
+
+        auth:
+          username: postgres
+          existingSecret: master-data-db-secrets
+          secretKeys:
+            adminPasswordKey: POSTGRES_SUPERUSER_PASSWORD
+          # Database to create on initialization
+          database: master_data
+
+        primary:
+           podAnnotations:
+            sidecar.istio.io/inject: "false"
+          persistence:
+            enabled: true
+            storageClass: managed-csi
+            size: 10Gi
+
+          tolerations:
+            - key: "workload"
+              operator: "Equal"
+              value: "weather-forecast"
+              effect: "NoSchedule"
+
+          nodeSelector:
+            kubernetes.azure.com/mode: user
+
+          resources:
+            requests:
+              cpu: 25m
+              memory: 50Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+
+          # Correct initdb configuration for Bitnami chart 15.5.0
+          initdb:
+            scriptsConfigMap: master-data-initdb-configmap
+            user: postgres
+
+          # Pass app user credentials as environment variables for the init scripts
+          extraEnvVars:
+            - name: DB_APP_USER
+              valueFrom:
+                secretKeyRef:
+                  name: master-data-db-secrets
+                  key: DB_APP_USER
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: master-data-db-secrets
+                  key: POSTGRES_SUPERUSER_PASSWORD
+            - name: DB_APP_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: master-data-db-secrets
+                  key: DB_APP_PASSWORD
+
+  destination:
+    namespace: backend
+    server: https://kubernetes.default.svc
+
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+    retry:
+      limit: 2
+      backoff:
+        duration: 5s

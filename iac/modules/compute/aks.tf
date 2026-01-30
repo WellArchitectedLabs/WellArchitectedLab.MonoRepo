@@ -1,52 +1,9 @@
-terraform {
-  required_providers {
-    azurerm = {
-      source  = "hashicorp/azurerm"
-      version = "=4.1.0"
-    }
-    random = {
-      source  = "hashicorp/random"
-      version = "~> 3.1"
-    }
-    azuread = {
-      source  = "hashicorp/azuread"
-      version = "~> 2.50"
-    }
-  }
-  backend "azurerm" {
-    key                  = "kubernetes.terraform.tfstate"
-    storage_account_name = "devwaltstate"
-    resource_group_name  = "dev-rg-terraforminit"
-    container_name       = "tfstate"
-  }
-}
-
-provider "azurerm" {
-  features {}
-  subscription_id = var.subscription
-}
-
-resource "random_string" "acr_suffix" {
-  length  = 6
-  special = false
-  lower   = true
-  numeric = true
-}
-
-resource "azurerm_container_registry" "acr-kubernetes-001" {
-  name                = "acr${var.environment}${random_string.acr_suffix.result}"
-  sku                 = "Standard"
-  resource_group_name = var.resource_group_name
-  location            = var.region
-  admin_enabled       = false
-}
-
-resource "azurerm_virtual_network" "vnet-kubernetes-dev-001" {
-  address_space       = ["10.0.0.0/16"]
-  name                = "vnet-kubernetes-${var.environment}-001"
-  location            = var.region
-  resource_group_name = var.resource_group_name
-}
+# resource "azurerm_virtual_network" "vnet-kubernetes-dev-001" {
+#   address_space       = local.vnet_addressing_space
+#   name                = "vnet-kubernetes-${var.environment}-001"
+#   location            = var.region
+#   resource_group_name = var.resource_group_name
+# }
 
 # resource "azurerm_subnet" "snet-kubernetes-dev-001" {
 #   resource_group_name  = var.resource_group_name
@@ -70,8 +27,8 @@ resource "azurerm_kubernetes_cluster" "aks-kubernetes-001" {
   location            = var.region
   resource_group_name = var.resource_group_name
   default_node_pool {
-    name       = "npkube001"
-    vm_size    = "Standard_B2s_v2"
+    name       = local.system_node_pool_name
+    vm_size    = local.node_pools_vm_size
     node_count = 1
     # link aks cluster to the subnet in question
     # temporary_name_for_rotation = "npkubtemp"
@@ -86,13 +43,13 @@ resource "azurerm_kubernetes_cluster" "aks-kubernetes-001" {
 
 resource "azurerm_kubernetes_cluster_node_pool" "npuser001" {
   kubernetes_cluster_id = azurerm_kubernetes_cluster.aks-kubernetes-001.id
-  name                  = "npuser001"
-  node_taints           = ["workload=weather-forecast:NoSchedule"]
+  name                  = local.user_node_pool_name
+  node_taints           = local.user_node_pool_taints
   node_count            = 1
   depends_on            = [azurerm_kubernetes_cluster.aks-kubernetes-001]
-  vm_size               = "Standard_B2s_v2"
+  vm_size               = local.node_pools_vm_size
   node_labels = {
-    istio = "pilot"
+    istio = local.istio_label_marker
   }
 }
 
@@ -122,50 +79,6 @@ resource "azurerm_kubernetes_cluster_node_pool" "npuser001" {
 #     istio    = "pilot"
 #   }
 # }
-
-resource "azurerm_role_assignment" "cluster-registry-access" {
-  principal_id                     = azurerm_kubernetes_cluster.aks-kubernetes-001.kubelet_identity[0].object_id
-  scope                            = azurerm_container_registry.acr-kubernetes-001.id
-  role_definition_name             = "AcrPull"
-  depends_on                       = [azurerm_container_registry.acr-kubernetes-001, azurerm_kubernetes_cluster.aks-kubernetes-001]
-  skip_service_principal_aad_check = true
-}
-
-####################################################################################
-# Enterprise App Creation
-# The enterprise application will be used for weather forecast acr push rights assignment
-####################################################################################
-
-resource "azuread_application" "acr_push_app" {
-  display_name = "ea-acr-push-weather-forecast-${var.environment}"
-}
-
-resource "azuread_application_password" "acr_push_app_password" {
-  # secret is consultable in secrets screen on the enterprise application level
-  application_id = azuread_application.acr_push_app.id
-}
-
-##################################################
-# Associate a service principal to the enterprise app
-##################################################
-
-resource "azuread_service_principal" "acr_push_sp" {
-  client_id = azuread_application.acr_push_app.client_id
-}
-
-##################################################
-# Assign role 
-##################################################
-
-resource "azurerm_role_assignment" "acr_push" {
-  principal_id         = azuread_service_principal.acr_push_sp.id
-  role_definition_name = "AcrPush"
-  scope                = azurerm_container_registry.acr-kubernetes-001.id
-  depends_on           = [azuread_service_principal.acr_push_sp, azurerm_container_registry.acr-kubernetes-001]
-}
-
-# Used for getting the tenant ID for outputs
-data "azurerm_client_config" "current" {}
 
 # # In our case: the consumer is the AKS cluster and the resource if the container resgitry
 # # When this private endpoint config is applied, we can say that we enabled the AKS cluster integration with other azure services using private endpoints, which a majot security enhancement since we no longer need to exposes the dependant services publically to the internet

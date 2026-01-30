@@ -117,7 +117,7 @@
       }
     },
      {
-      "label": "Calibration Source Code",
+      "label": "Master Data Source Code",
       "type": "shell",
       "command": "exec $SHELL",
       "options": {

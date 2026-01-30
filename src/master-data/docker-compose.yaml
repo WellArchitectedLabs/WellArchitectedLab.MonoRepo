@@ -1,0 +1,29 @@
+services:
+  masterdata-postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: master_data
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      retries: 10
+
+  # We apply the latest migrations
+  migrate:
+    # using flyway migration docker image that we pull from dockerhub
+    build:
+      context: ./
+      dockerfile: Dockerfile.db-migrator
+    depends_on:
+      masterdata-postgres:
+        condition: service_healthy
+    # we point to the local postgres db
+    command: -url=jdbc:postgresql://masterdata-postgres:5432/master_data -user=postgres -password=postgres migrate
+    # very important in order to execute migration only once
+    restart: "no"
+
+volumes:
+  postgres-data:

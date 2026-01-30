@@ -1,0 +1,62 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: dev-cities-import-debug
+  namespace: backend
+spec:
+  template:
+    metadata:
+      annotations:
+        sidecar.istio.io/inject: "false"
+      labels:
+        app: cities-import-debug
+        environment: dev
+    spec:
+      tolerations:
+      - key: workload
+        operator: 'Equal'
+        value: 'weather-forecast'
+        effect: 'NoSchedule'
+      nodeSelector:
+        kubernetes.azure.com/mode: user
+      containers:
+      - name: debug
+        image: busybox:1.36
+        command:
+        - sh
+        - -c
+        - |
+          echo "=== T+0s: Checking immediately ==="
+          ls -la /mnt/blob/ || echo "Mount point empty or not ready"
+          echo ""
+          
+          echo "=== Waiting 5 seconds ==="
+          sleep 5
+          
+          echo "=== T+5s: Checking again ==="
+          ls -la /mnt/blob/
+          
+          echo ""
+          echo "=== Waiting 5 more seconds ==="
+          sleep 5
+          
+          echo "=== T+10s: Final check ==="
+          ls -la /mnt/blob/
+          
+          if [ -f /mnt/blob/capitals.csv ]; then
+            echo ""
+            echo "✅ SUCCESS: File found after waiting"
+            wc -l /mnt/blob/capitals.csv
+          else
+            echo ""
+            echo "❌ FAILURE: File still not found"
+            exit 1
+          fi
+        volumeMounts:
+        - name: imports-blob
+          mountPath: "/mnt/blob"
+      volumes:
+      - name: imports-blob
+        persistentVolumeClaim:
+          claimName: dev-pvc-az-blob-imports
+      restartPolicy: Never

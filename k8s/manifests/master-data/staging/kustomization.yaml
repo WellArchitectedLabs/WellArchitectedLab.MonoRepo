@@ -1,0 +1,9 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+metadata:
+  namespace: backend
+  name: master-data-staging-kustomization
+resources:
+  - job/cities-import.yaml
+  - pv/imports-sa_pv.yaml
+  - pvc/imports-storage_claim.yaml

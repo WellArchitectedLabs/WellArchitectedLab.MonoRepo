@@ -2,7 +2,14 @@
 
 Provides two functions used by the CLI in `main.py`:
 - cities_import(input_path, dsn)
-- fetch(from_date, to_date, dsn, export_to_csv, export_to_postgres)
+- wf_import(
+        from_date: Optional[date], 
+        to_date: Optional[date], 
+        dsn: Optional[str] = None, 
+        cities_csv_input: Optional[str] = None, 
+        export_to_csv: bool = False, 
+        export_to_postgres: bool = True,
+        weather_csv_input: Optional[str] = None)
 
 This keeps CLI small and centralises logic here for testability.
 """

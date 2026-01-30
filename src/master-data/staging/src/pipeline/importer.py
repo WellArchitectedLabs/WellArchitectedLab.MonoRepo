@@ -1,3 +1,10 @@
+"""
+This implementation compares development experience between:
+- Accessing CSV files via Kubernetes CSI-mounted volumes (local filesystem)
+- No usage of Azure Sdk. Implementation is relying on CSI driver for blob storage connection
+
+"""
+
 import csv
 import os
 import time
@@ -5,17 +12,18 @@ from datetime import date, timedelta
 from typing import Optional
 from dateutil.relativedelta import relativedelta
 from tqdm import tqdm
-from config import WF_IMPORT_CSV_INPUT_READ_BATCH_SIZE
-from azure.storage.blob import BlobServiceClient
+
+from config import (
+    WF_IMPORT_CSV_INPUT_READ_BATCH_SIZE,
+    WF_IMPORT_OUTPUT_CSV,
+    OPEN_METEO_BATCH_SIZE,
+    OPEN_METEO_THROTTLE_SECONDS,
+    WF_IMPORT_TIMEZONE,
+    OPEN_METEO_MAX_RETRIES,
+    OPEN_METEO_HOURLY_VARS,
+)
 
 from open_meteo import fetch_hourly
-from config import WF_IMPORT_OUTPUT_CSV
-from config import OPEN_METEO_BATCH_SIZE
-from config import OPEN_METEO_THROTTLE_SECONDS
-from config import WF_IMPORT_TIMEZONE
-from config import OPEN_METEO_MAX_RETRIES
-from config import OPEN_METEO_HOURLY_VARS 
-from config import AZ_BLOB_CONTAINER, AZ_BLOB_CONNECTION_STRING
 
 
 class _NoopProgress:
@@ -31,97 +39,93 @@ class _NoopProgress:
     def update(self, n=1):
         return
 
-def _read_csv_from_blob(blob_name: str):
-    """
-    Read CSV from Azure Blob Storage using connection string from environment variable.
-    """
-    if not AZ_BLOB_CONNECTION_STRING:
-        raise SystemExit("AZURE_STORAGE_CONNECTION_STRING environment variable not set")
 
-    blob_service_client = BlobServiceClient.from_connection_string(AZ_BLOB_CONNECTION_STRING)
-    container_client = blob_service_client.get_container_client(AZ_BLOB_CONTAINER)
-    blob_client = container_client.get_blob_client(blob_name)
-
-    stream = blob_client.download_blob()
-    text = stream.readall().decode("utf-8")
-    reader = csv.DictReader(text.splitlines())
-    return list(reader)
+# -----------------------------
+# CSV LOADERS (LOCAL FILESYSTEM)
+# -----------------------------
 
 def load_cities_from_csv(path: str):
-    locations = []
+    """
+    Load cities from a local CSV file.
 
-    # Detect if path is from Azure Blob Storage
-    if path.startswith("blob://"):
-        blob_name = path[len("blob://"):]
-        rows = _read_csv_from_blob(blob_name)
-        for row in rows:
+    The file must be provided via a CSI-mounted volume.
+    """
+    if not path or path.strip() == "":
+        raise SystemExit("Cities CSV path is empty")
+
+    if not os.path.exists(path):
+        raise SystemExit(f"Cities CSV file not found: {path}")
+
+    locations = []
+    with open(path, newline="", encoding="utf-8") as f:
+        reader = csv.DictReader(f)
+        for row in reader:
             locations.append((
                 float(row["Latitude"]),
                 float(row["Longitude"]),
                 row["Name"]
             ))
-    else:
-        with open(path, newline="", encoding="utf-8") as f:
-            reader = csv.DictReader(f)
-            for row in reader:
-                locations.append((
-                    float(row["Latitude"]),
-                    float(row["Longitude"]),
-                    row["Name"]
-                ))
     return locations
 
+
 def load_cities_from_db(db_dsn: str):
-    # Expect db_adapter.read_cities to return list of dicts with latitude/longitude
     from adapters import WeatherForecastPgDbAdapter
     db_adapter = WeatherForecastPgDbAdapter(db_dsn)
     rows = db_adapter.read_all_cities()
-    # return list of tuples (id, latitude, longitude)
     return [(r["id"], r["latitude"], r["longitude"]) for r in rows]
+
+
+# -----------------------------
+# HELPERS
+# -----------------------------
 
 def chunked(seq, size):
     for i in range(0, len(seq), size):
         yield seq[i:i + size]
+
 
 def month_ranges_between(start, end):
     ranges = []
     current = start.replace(day=1)
 
     while current <= end:
-        month_end = (
-            current + relativedelta(months=1)
-        ) - timedelta(days=1)
-
-        ranges.append((
-            max(start, current),
-            min(end, month_end)
-        ))
-
+        month_end = (current + relativedelta(months=1)) - timedelta(days=1)
+        ranges.append((max(start, current), min(end, month_end)))
         current += relativedelta(months=1)
 
     return ranges
 
+
+def load_locations(db_dsn: Optional[str], cities_csv_input: Optional[str]):
+    if (not cities_csv_input or cities_csv_input.strip() == "") and (not db_dsn or db_dsn.strip() == ""):
+        raise SystemExit("Cities CSV input or DB DSN must be provided")
+
+    if db_dsn and db_dsn.strip() != "":
+        return load_cities_from_db(db_dsn)
+
+    return load_cities_from_csv(cities_csv_input)
+
+
+# -----------------------------
+# MAIN IMPORT LOGIC
+# -----------------------------
+
 def import_wf_actuals_from_open_meteo(
-        from_date: date, 
-        to_date: date, 
-        db_dsn: str, 
-        cities_csv_input: Optional[str] = None, 
-        export_to_csv: bool = False, 
-        export_to_postgres: bool = True) -> None:
+    from_date: date,
+    to_date: date,
+    db_dsn: str,
+    cities_csv_input: Optional[str] = None,
+    export_to_csv: bool = False,
+    export_to_postgres: bool = True
+) -> None:
 
-    # guard against missing or incompatible inputs
-    if db_dsn.strip() == "" and (cities_csv_input.strip() == "" or cities_csv_input is None):
-        raise SystemError("No cities csv input is provided, neither a connection string. Cities cannot be loaded. Please provide a valid input.")
+    if from_date >= to_date:
+        raise SystemError("from_date must be strictly before to_date")
 
-    # guard against incompatible database inputs
-    if(db_dsn.strip() == "" and export_to_postgres):
-        raise SystemError("Exporting to Postgres is not supported without a valid db connection string. Please provide a valid connection string.")
-    
-    if(from_date >= to_date):
-        raise SystemError("Please provide a valid from date that is stricly inferior to to date.")
+    if export_to_postgres and not db_dsn.strip():
+        raise SystemError("Postgres export requires a valid db_dsn")
 
     locations = load_locations(db_dsn, cities_csv_input)
-
     months = month_ranges_between(from_date, to_date)
 
     total_requests = (
@@ -129,12 +133,13 @@ def import_wf_actuals_from_open_meteo(
         * len(months)
     )
 
-    from adapters import WeatherForecastPgDbAdapter 
-    if db_dsn.strip() != "":
+    db_adapter = None
+    if db_dsn.strip():
+        from adapters import WeatherForecastPgDbAdapter
         db_adapter = WeatherForecastPgDbAdapter(db_dsn)
 
-    # prepare CSV writer if requested
     csv_out = None
+    writer = None
     if export_to_csv:
         csv_out = open(WF_IMPORT_OUTPUT_CSV, "w", newline="", encoding="utf-8")
         writer = csv.writer(csv_out)
@@ -147,34 +152,29 @@ def import_wf_actuals_from_open_meteo(
             "precipitation_mm"
         ])
 
-    # buffer rows for DB bulk insert
     db_buffer = []
 
     pbar_ctx = tqdm(total=total_requests, desc="Fetching Open-Meteo data", unit="request") if tqdm else _NoopProgress()
     with pbar_ctx as pbar:
+        for batch in chunked(locations, OPEN_METEO_BATCH_SIZE):
+            first = batch[0]
+            if len(first) == 3:
+                lats = [x[1] for x in batch]
+                lons = [x[2] for x in batch]
+            else:
+                lats = [x[0] for x in batch]
+                lons = [x[1] for x in batch]
 
-            for batch in chunked(locations, OPEN_METEO_BATCH_SIZE):
-                # support two shapes:
-                # - CSV loader: (lat, lon)
-                # - DB loader: (id, latitude, longitude)
-                first = batch[0]
-                if isinstance(first, tuple) and len(first) == 3:
-                    lats = [x[1] for x in batch]
-                    lons = [x[2] for x in batch]
-                else:
-                    lats = [x[0] for x in batch]
-                    lons = [x[1] for x in batch]
-
-                for start, end in months:
-                    data = fetch_hourly(
-                        latitudes=lats,
-                        longitudes=lons,
-                        start_date=start,
-                        end_date=end,
-                        variables=OPEN_METEO_HOURLY_VARS,
-                        timezone=WF_IMPORT_TIMEZONE,
-                        max_retries=OPEN_METEO_MAX_RETRIES
-                    )
+            for start, end in months:
+                data = fetch_hourly(
+                    latitudes=lats,
+                    longitudes=lons,
+                    start_date=start,
+                    end_date=end,
+                    variables=OPEN_METEO_HOURLY_VARS,
+                    timezone=WF_IMPORT_TIMEZONE,
+                    max_retries=OPEN_METEO_MAX_RETRIES
+                )
 
                 for idx, location_data in enumerate(data):
                     hourly = location_data["hourly"]
@@ -186,23 +186,10 @@ def import_wf_actuals_from_open_meteo(
                         hourly["precipitation"]
                     ):
                         if export_to_csv:
-                            writer.writerow([
-                                lons[idx],
-                                lats[idx],
-                                t,
-                                temp,
-                                wind,
-                                rain
-                            ])
+                            writer.writerow([lons[idx], lats[idx], t, temp, wind, rain])
 
-                        if export_to_postgres and db_adapter is not None:
-                            # when DB adapter is present we expect locations to be tuples (city_id, lat, lon)
-                            cid = None
-                            try:
-                                cid = batch[idx][0]
-                            except Exception:
-                                cid = None
-
+                        if export_to_postgres and db_adapter:
+                            cid = batch[idx][0] if len(batch[idx]) == 3 else None
                             db_buffer.append({
                                 "city_id": cid,
                                 "timestamp_utc": t,
@@ -214,125 +201,64 @@ def import_wf_actuals_from_open_meteo(
                 pbar.update(1)
                 time.sleep(OPEN_METEO_THROTTLE_SECONDS)
 
-    if export_to_csv:
+    if csv_out:
         csv_out.close()
 
-    if export_to_postgres and db_adapter is not None and db_buffer:
-        # insert in one shot using optimized method
+    if export_to_postgres and db_adapter and db_buffer:
         db_adapter.insert_wfactuals(db_buffer)
 
-def load_locations(
-        db_dsn: Optional[str], 
-        cities_csv_input: Optional[str]):
 
-    if (cities_csv_input is None or cities_csv_input.strip()  == "") and (db_dsn is None or db_dsn.strip() == ""):
-        raise SystemExit("Cities CSV input or DB DSN must be provided")
-
-    if not db_dsn.strip() == "":
-        locations = load_cities_from_db(db_dsn)
-    else:
-        locations = load_cities_from_csv(cities_csv_input)
-    return locations
-
+# -----------------------------
+# CSV IMPORT TO POSTGRES
+# -----------------------------
 
 def import_wf_actuals_from_csv(
-        wf_actual_csv_input: str,
-        db_dsn: Optional[str] = None) -> None:
-    """Import weather forecast actuals from CSV file and insert into Postgres.
+    wf_actual_csv_input: str,
+    db_dsn: Optional[str] = None
+) -> None:
 
-    The input CSV is expected to contain columns similar to:
-      longitude, latitude, timestamp_utc, temperature_c, wind_speed_m_s, precipitation_mm
-
-    This function requires a valid db_dsn because we resolve city_id by matching
-    longitude/latitude against the cities table. Rows without a matching city_id
-    are skipped.
-    """
     if not wf_actual_csv_input or wf_actual_csv_input.strip() == "":
-        raise SystemExit("No weather CSV input provided.")
+        raise SystemExit("No weather CSV input provided")
+
+    if not os.path.exists(wf_actual_csv_input):
+        raise SystemExit(f"CSV file not found: {wf_actual_csv_input}")
 
     if not db_dsn or db_dsn.strip() == "":
-        raise SystemExit("Importing wf_actuals into Postgres requires a valid db_dsn.")
+        raise SystemExit("Postgres import requires a valid db_dsn")
 
     from adapters import WeatherForecastPgDbAdapter
-
     db_adapter = WeatherForecastPgDbAdapter(db_dsn)
 
-    # Build lookup from (rounded_lon, rounded_lat) -> city_id for exact/near-exact matching
     lookup_by_lonlat = {}
-    try:
-        rows = db_adapter.read_all_cities()
-        for r in rows:
-            try:
-                lon = float(r.get("longitude"))
-                lat = float(r.get("latitude"))
-                cid = r.get("id") or r.get("city_id")
-                lookup_by_lonlat[(round(lon, 6), round(lat, 6))] = cid
-            except Exception:
-                continue
-    except Exception:
-        raise SystemExit("Failed to read cities from database. Cannot resolve city ids.")
+    for r in db_adapter.read_all_cities():
+        lookup_by_lonlat[(round(float(r["longitude"]), 6), round(float(r["latitude"]), 6))] = r["id"]
+
+    with open(wf_actual_csv_input, newline="", encoding="utf-8") as f:
+        rows = list(csv.DictReader(f))
 
     data_buffer = []
+    pbar_ctx = tqdm(total=len(rows), desc="Importing wf_actuals from CSV", unit="row") if tqdm else _NoopProgress()
 
-    # Read CSV either from Azure Blob or local path
-    if wf_actual_csv_input.startswith("blob://"):
-        blob_name = wf_actual_csv_input[len("blob://"):] 
-        rows = _read_csv_from_blob(blob_name)
-    else:
-        with open(wf_actual_csv_input, newline="", encoding="utf-8") as f:
-            rows = list(csv.DictReader(f))
-
-    total_rows = len(rows)
-
-    pbar_ctx = tqdm(total=total_rows, desc="Importing wf_actuals from CSV", unit="row") if tqdm else _NoopProgress()
     with pbar_ctx as pbar:
         for row in rows:
-            lon_val = None
-            lat_val = None
-            for k in ("longitude", "Longitude", "lon", "Lon"):
-                if k in row and row[k] not in (None, ""):
-                    lon_val = row[k]; break
-            for k in ("latitude", "Latitude", "lat", "Lat"):
-                if k in row and row[k] not in (None, ""):
-                    lat_val = row[k]; break
-
-            if lon_val is None or lat_val is None:
-                pbar.update(1); continue
-
             try:
-                lon_f = float(lon_val); lat_f = float(lat_val)
+                lon = round(float(row["longitude"]), 6)
+                lat = round(float(row["latitude"]), 6)
             except Exception:
-                pbar.update(1); continue
+                pbar.update(1)
+                continue
 
-            key = (round(lon_f, 6), round(lat_f, 6))
-            cid = lookup_by_lonlat.get(key)
-            if cid is None:
-                pbar.update(1); continue
-
-            timestamp = row.get("timestamp_utc") or row.get("time") or row.get("timestamp")
-            temp_s = row.get("temperature_c") or row.get("temperature")
-            wind_s = row.get("wind_speed_m_s") or row.get("wind_speed")
-            precip_s = row.get("precipitation_mm") or row.get("precipitation")
-
-            try:
-                temperature_c = float(temp_s) if temp_s not in (None, "") else None
-            except Exception:
-                temperature_c = None
-            try:
-                wind_speed = float(wind_s) if wind_s not in (None, "") else None
-            except Exception:
-                wind_speed = None
-            try:
-                precipitation = float(precip_s) if precip_s not in (None, "") else None
-            except Exception:
-                precipitation = None
+            cid = lookup_by_lonlat.get((lon, lat))
+            if not cid:
+                pbar.update(1)
+                continue
 
             data_buffer.append({
                 "city_id": cid,
-                "timestamp_utc": timestamp,
-                "temperature_c": temperature_c,
-                "wind_speed": wind_speed,
-                "precipitation": precipitation
+                "timestamp_utc": row["timestamp_utc"],
+                "temperature_c": float(row["temperature_c"]),
+                "wind_speed": float(row["wind_speed_m_s"]),
+                "precipitation": float(row["precipitation_mm"])
             })
 
             if len(data_buffer) >= WF_IMPORT_CSV_INPUT_READ_BATCH_SIZE:
@@ -344,31 +270,29 @@ def import_wf_actuals_from_csv(
     if data_buffer:
         db_adapter.insert_wfactuals(data_buffer)
 
-    return
 
+# -----------------------------
+# CITIES IMPORT
+# -----------------------------
 
 def import_cities(input_path: str, dsn: str) -> int:
-
-    if dsn.strip() == "":
-        raise SystemExit("Invalid DSN")
-
+    if not os.path.exists(input_path):
+        raise SystemExit(f"Cities CSV file not found: {input_path}")
     """Import cities CSV into the `cities` table using the DB adapter.
 
     Returns the number of imported rows.
     """
-    # lazy imports so module import is cheap
+    # lazy imports so module import is cheap    from adapters import WeatherForecastPgDbAdapter
     from adapters import WeatherForecastPgDbAdapter
-
-    locations = load_cities_from_csv(input_path)  # list of (lon, lat, name)
     adapter = WeatherForecastPgDbAdapter(dsn)
 
-    items = []
-    for lon, lat, name in locations:
-        items.append({
-            "name": name,
-            "longitude": lon,
-            "latitude": lat
-        })
+    locations = load_cities_from_csv(input_path)
+
+    items = [{
+        "name": name,
+        "longitude": lon,
+        "latitude": lat
+    } for lon, lat, name in locations]
 
     adapter.insert_cities(items)
     return len(items)

@@ -37,6 +37,8 @@ spec:
           database: master_data
 
         primary:
+           podAnnotations:
+            sidecar.istio.io/inject: "false"
           persistence:
             enabled: true
             storageClass: managed-csi

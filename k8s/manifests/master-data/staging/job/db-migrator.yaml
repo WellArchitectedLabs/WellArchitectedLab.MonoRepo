@@ -1,18 +1,18 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: master-data-db-migration
+  name: master-data-db-migrator
   namespace: backend
   labels:
-    app: master-data-db-migration
+    app: master-data-db-migrator
   annotations:
     sidecar.istio.io/inject: "false"
 spec:
   template:
     metadata:
-      name: master-data-db-migration
+      name: master-data-db-migrator
       labels:
-        app: master-data-db-migration
+        app: master-data-db-migrator
     spec:
       restartPolicy: Never
       tolerations:

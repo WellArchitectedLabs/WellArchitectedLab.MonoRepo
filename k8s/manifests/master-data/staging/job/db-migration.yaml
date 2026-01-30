@@ -26,7 +26,7 @@ spec:
         kubernetes.azure.com/mode: user
       containers:
         - name: flyway
-          image: acrdevtshpwn.azurecr.io/master-data-flyway:1.0.0
+          image: acrdevtshpwn.azurecr.io/db-migrator:0.1.0-PullRequest0088.481-c4e10f8
           env:
             - name: FLYWAY_URL
               # no password is passed here. This is not a secret

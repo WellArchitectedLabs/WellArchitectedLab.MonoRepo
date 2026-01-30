@@ -32,12 +32,9 @@ spec:
               # no password is passed here. This is not a secret
               value: jdbc:postgresql://master-data-database-postgresql.backend.svc.cluster.local:5432/master_data
             - name: FLYWAY_USER
-              valueFrom:
-                secretKeyRef:
-                  name: master-data-db-secrets
-                  key: DB_OWNER_USER
+              value: postgres
             - name: FLYWAY_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: master-data-db-secrets
-                  key: DB_OWNER_PASSWORD
+                  key: POSTGRES_SUPERUSER_PASSWORD

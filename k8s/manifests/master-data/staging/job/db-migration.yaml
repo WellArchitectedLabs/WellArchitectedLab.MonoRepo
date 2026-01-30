@@ -1,0 +1,43 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: master-data-db-migration
+  namespace: backend
+  labels:
+    app: master-data-db-migration
+  annotations:
+    sidecar.istio.io/inject: "false"
+spec:
+  template:
+    metadata:
+      name: master-data-db-migration
+      labels:
+        app: master-data-db-migration
+    spec:
+      restartPolicy: Never
+      tolerations:
+      - key: workload
+        operator: 'Equal'
+        value: 'weather-forecast'
+        effect: 'NoSchedule'
+      # Where will my pods will run, and in what node label
+      # We should add a toleration because the user nodes are tainted and will be not schedule the pods if the taint is not provided
+      nodeSelector:
+        kubernetes.azure.com/mode: user
+      containers:
+        - name: flyway
+          image: acrdevtshpwn.azurecr.io/master-data-flyway:1.0.0
+          env:
+            - name: FLYWAY_URL
+              # no password is passed here. This is not a secret
+              value: jdbc:postgresql://master-data-database-postgresql.backend.svc.cluster.local:5432/master_data
+            - name: FLYWAY_USER
+              valueFrom:
+                secretKeyRef:
+                  name: master-data-db-secrets
+                  key: DB_OWNER_USER
+            - name: FLYWAY_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: master-data-db-secrets
+                  key: DB_OWNER_PASSWORD

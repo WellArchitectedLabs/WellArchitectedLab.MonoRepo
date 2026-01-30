@@ -14,8 +14,10 @@ spec:
       labels:
         app: cities-import
     spec:
+      # This is very important in order for csv resolving to work
+      # Container needs to be ran as root
       securityContext:
-        runAsUser: 0
+        runAsUser: 0 #root
         runAsGroup: 0
         fsGroup: 0
       tolerations:
@@ -43,5 +45,6 @@ spec:
       volumes:
       - name: imports-blob
         persistentVolumeClaim:
+          # reference created claim resource
           claimName: dev-pvc-az-blob-imports
       restartPolicy: Never

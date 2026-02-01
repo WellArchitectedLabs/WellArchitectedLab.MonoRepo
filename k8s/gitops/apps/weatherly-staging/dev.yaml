@@ -10,7 +10,7 @@ spec:
   source:
     repoURL: https://github.com/WellArchitectedLabs/WellArchitectedLab.MonoRepo.git
     targetRevision: feature/42-finalk8sintegration
-    path: k8s/overlays/weatherly/dev
+    path: k8s/overlays/weatherly-staging/dev
   destination:
     server: https://kubernetes.default.svc
     namespace: default

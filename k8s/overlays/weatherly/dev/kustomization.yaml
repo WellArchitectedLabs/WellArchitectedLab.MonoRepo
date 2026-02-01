@@ -3,14 +3,13 @@ kind: Kustomization
 
 # reference all manifests from base folder
 resources:
-  - ../../manifests/operations
-  - ../../manifests/insights/bff
-  - ../../manifests/insights/frontend
-  - ../../manifests/insights/bff/database
+  - ../../../manifests/operations
+  - ../../../manifests/insights/bff
+  - ../../../manifests/insights/frontend
+  - ../../../manifests/insights/bff/database
   - insights-bff_config-map.yaml
-  - ../../manifests/master-data/staging
-  - ../../manifests/shared
-  - ../../manifests/tools/htg
+  - ../../../manifests/shared
+  - ../../../manifests/tools/htg
 
 
 # define a dev prefix for all created environment in relation to this overlay

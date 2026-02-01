@@ -2,7 +2,7 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: cities-import
-  namespace: backend
+  namespace: backend2
   labels:
     app: cities-import
   annotations:

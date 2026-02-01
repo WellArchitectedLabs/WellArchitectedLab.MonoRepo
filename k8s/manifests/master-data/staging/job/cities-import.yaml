@@ -2,7 +2,7 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: cities-import
-  namespace: backend2
+  namespace: backend
   labels:
     app: cities-import
   annotations:
@@ -46,10 +46,7 @@ spec:
         args: ["--input", "/mnt/blob/capitals.csv"]
         env:
           - name: POSTGRES_DSN
-            valueFrom:
-              secretKeyRef:
-                name: master-data-db-secrets
-                key: DB_APP_DSN
+            value: postgresql://masterdata_app:appsecret@master-data-database:5432/master_data?sslmode=disable
         volumeMounts:
         - name: imports-blob
           mountPath: "/mnt/blob"

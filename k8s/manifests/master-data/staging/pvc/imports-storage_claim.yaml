@@ -2,7 +2,7 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: pvc-az-blob-imports
-  namespace: backend2
+  namespace: backend
   labels:
     app: pvc-az-blob-imports
 spec:

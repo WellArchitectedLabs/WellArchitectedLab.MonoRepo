@@ -2,11 +2,7 @@ FROM flyway/flyway:11.20.3
 
 # Install gettext for envsubst
 USER root
-# gettext package contains necessary envsubst package
-# Flyway is baed on Red Hat UBI Minimal so it must support microdnf (noy available for all images)
-RUN microdnf install -y gettext && \
-    # clean any older installation for image size optimization
-    microdnf clean all
+RUN apt-get update && apt-get install -y gettext-base && rm -rf /var/lib/apt/lists/*
 
 # Create directories
 RUN mkdir -p /flyway/sql /flyway/sql-templates
@@ -18,7 +14,7 @@ COPY data/migrations /flyway/sql-templates
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
-USER flyway
+# USER flyway
 
 ENTRYPOINT ["/entrypoint.sh"]
 CMD ["migrate"]

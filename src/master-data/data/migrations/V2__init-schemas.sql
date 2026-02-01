@@ -55,8 +55,6 @@ COMMENT ON TABLE public.wf_actuals
 -- Grant permissions to application user on newly created tables
 GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE public.wf_actuals TO ${DB_APP_USER};
 GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE public.cities TO ${DB_APP_USER};
-GRANT USAGE, SELECT, UPDATE ON SEQUENCE public.wf_actuals TO ${DB_APP_USER};
-GRANT USAGE, SELECT, UPDATE ON SEQUENCE public.cities TO ${DB_APP_USER};
 
 -- ============================================================================
 -- End of V2 Migration

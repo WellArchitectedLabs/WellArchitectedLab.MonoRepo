@@ -57,5 +57,5 @@ spec:
       - name: imports-blob
         persistentVolumeClaim:
           # reference created claim resource
-          claimName: pvc-az-blob-imports
+          claimName: dev-pvc-az-blob-imports
       restartPolicy: Never

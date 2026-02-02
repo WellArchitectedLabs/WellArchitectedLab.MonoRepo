@@ -1,89 +1,89 @@
-name: Status Check - Auto Label Pull Requests
+# name: Status Check - Auto Label Pull Requests
 
-on:
-  pull_request:
-    types: [opened, reopened, synchronize]
+# on:
+#   pull_request:
+#     types: [opened, reopened, synchronize]
 
-permissions:
-  issues: write
-  pull-requests: write
+# permissions:
+#   issues: write
+#   pull-requests: write
 
-jobs:
-  label:
-    name: Auto Label PR Check   # ✅ This is the check that will appear in GitHub
-    runs-on: ubuntu-latest
+# jobs:
+#   label:
+#     name: Auto Label PR Check   # ✅ This is the check that will appear in GitHub
+#     runs-on: ubuntu-latest
 
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
+#     steps:
+#       - name: Checkout repository
+#         uses: actions/checkout@v3
 
-      - name: Add labels
-        id: add_labels
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const branch = context.payload.pull_request.head.ref;
-            const labels = [];
+#       - name: Add labels
+#         id: add_labels
+#         uses: actions/github-script@v7
+#         with:
+#           script: |
+#             const branch = context.payload.pull_request.head.ref;
+#             const labels = [];
 
-            // ---------------------------
-            // I - Branch-based labels
-            // ---------------------------
-            if (branch.startsWith("feature/")) labels.push("feature");
-            if (branch.startsWith("fix/")) labels.push("fix");
-            if (branch.startsWith("hotfix/")) labels.push("hotfix");
+#             // ---------------------------
+#             // I - Branch-based labels
+#             // ---------------------------
+#             if (branch.startsWith("feature/")) labels.push("feature");
+#             if (branch.startsWith("fix/")) labels.push("fix");
+#             if (branch.startsWith("hotfix/")) labels.push("hotfix");
 
-            // ---------------------------
-            // II - Path-based labels
-            // ---------------------------
-            const files = await github.paginate(
-              github.rest.pulls.listFiles, {
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                pull_number: context.payload.pull_request.number,
-                per_page: 100
-              }
-            );
+#             // ---------------------------
+#             // II - Path-based labels
+#             // ---------------------------
+#             const files = await github.paginate(
+#               github.rest.pulls.listFiles, {
+#                 owner: context.repo.owner,
+#                 repo: context.repo.repo,
+#                 pull_number: context.payload.pull_request.number,
+#                 per_page: 100
+#               }
+#             );
 
-            // 1 - Insights Label
-            const insightsFilesTouched = files.some(file =>
-              file.filename.startsWith("src/insights/")
-            );
-            if (insightsFilesTouched) labels.push("insights");
+#             // 1 - Insights Label
+#             const insightsFilesTouched = files.some(file =>
+#               file.filename.startsWith("src/insights/")
+#             );
+#             if (insightsFilesTouched) labels.push("insights");
 
-            // 2 - Weather Master Data Label
-            const masterDataFilesTouched = files.some(file =>
-              file.filename.startsWith("src/master-data/")
-            );
-            if (masterDataFilesTouched) labels.push("master-data");
+#             // 2 - Weather Master Data Label
+#             const masterDataFilesTouched = files.some(file =>
+#               file.filename.startsWith("src/master-data/")
+#             );
+#             if (masterDataFilesTouched) labels.push("master-data");
 
-            // 3 - Weather Master Data Label
-            const calibrationFilesTouched = files.some(file =>
-              file.filename.startsWith("src/calibration/")
-            );
-            if (calibrationFilesTouched) labels.push("calibration");
+#             // 3 - Weather Master Data Label
+#             const calibrationFilesTouched = files.some(file =>
+#               file.filename.startsWith("src/calibration/")
+#             );
+#             if (calibrationFilesTouched) labels.push("calibration");
 
-            // 4 - DevOps team
-            const isDevOpsTouched = files.some(file =>
-              file.filename.startsWith("k8s") ||
-              file.filename.startsWith("iac") ||
-              file.filename.startsWith(".github") ||
-              file.filename.startsWith("src/docker-compose.yml")
-            );
-            if (isDevOpsTouched) labels.push("devops");
+#             // 4 - DevOps team
+#             const isDevOpsTouched = files.some(file =>
+#               file.filename.startsWith("k8s") ||
+#               file.filename.startsWith("iac") ||
+#               file.filename.startsWith(".github") ||
+#               file.filename.startsWith("src/docker-compose.yml")
+#             );
+#             if (isDevOpsTouched) labels.push("devops");
 
-            // ---------------------------
-            // Apply labels if any
-            // ---------------------------
-            if (labels.length > 0) {
-              await github.rest.issues.addLabels({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: context.payload.pull_request.number,
-                labels
-              });
-            }
+#             // ---------------------------
+#             // Apply labels if any
+#             // ---------------------------
+#             if (labels.length > 0) {
+#               await github.rest.issues.addLabels({
+#                 owner: context.repo.owner,
+#                 repo: context.repo.repo,
+#                 issue_number: context.payload.pull_request.number,
+#                 labels
+#               });
+#             }
 
-            console.log(`Labels applied: ${labels.join(", ") || "none"}`);
+#             console.log(`Labels applied: ${labels.join(", ") || "none"}`);
 
-      - name: Mark workflow as successful
-        run: echo "✅ Labeling complete"
+#       - name: Mark workflow as successful
+#         run: echo "✅ Labeling complete"

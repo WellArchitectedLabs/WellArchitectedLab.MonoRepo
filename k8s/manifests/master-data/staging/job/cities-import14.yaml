@@ -1,23 +1,21 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: cities-import14
+  name: cities-import15
   namespace: backend
   labels:
-    app: cities-import14
+    app: cities-import15
 spec:
   template:
     metadata:
-      name: cities-import14
+      name: cities-import15
       labels:
-        app: cities-import14
+        app: cities-import15
       annotations:
-        sidecar.istio.io/inject: "false" # prevent istio sidecar from intercepting traffic
+        sidecar.istio.io/inject: "false"
     spec:
-      # This is very important in order for csv resolving to work
-      # Container needs to be ran as root
       securityContext:
-        runAsUser: 0 #root
+        runAsUser: 0
         runAsGroup: 0
         fsGroup: 0
       tolerations:
@@ -25,54 +23,98 @@ spec:
         operator: 'Equal'
         value: 'weather-forecast'
         effect: 'NoSchedule'
-      # Where will my pods will run, and in what node label
-      # We should add a toleration because the user nodes are tainted and will be not schedule the pods if the taint is not provided
       nodeSelector:
         kubernetes.azure.com/mode: user
+      
       initContainers:
-      # Comprehensive Postgres health check
       - name: wait-for-postgres
         image: bitnamilegacy/postgresql:15.5.0-debian-11-r0
         env:
-          - name: PGPASSWORD
+          - name: POSTGRES_SUPERUSER_PASSWORD
             valueFrom:
               secretKeyRef:
                 name: master-data-db-secrets
                 key: POSTGRES_SUPERUSER_PASSWORD
+          - name: DB_APP_USER
+            valueFrom:
+              secretKeyRef:
+                name: master-data-db-secrets
+                key: DB_APP_USER
+          - name: DB_APP_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: master-data-db-secrets
+                key: DB_APP_PASSWORD
         command:
           - /bin/sh
           - -c
           - |
-            echo "Checking PostgreSQL availability..."
+            echo "=== PostgreSQL Diagnostic Check ==="
             
             # Step 1: Check if PostgreSQL is accepting connections
+            echo "Step 1: Checking if PostgreSQL is ready..."
             until pg_isready -h master-data-database-postgresql.backend.svc.cluster.local -p 5432; do
               echo "PostgreSQL not ready yet..."
               sleep 2
             done
             echo "✓ PostgreSQL is accepting connections"
             
-            # Step 2: Verify database exists
+            # Step 2: Verify database exists (using postgres superuser)
+            echo "Step 2: Verifying database exists..."
+            export PGPASSWORD=$POSTGRES_SUPERUSER_PASSWORD
+            
+            if psql -h master-data-database-postgresql.backend.svc.cluster.local \
+                    -U postgres \
+                    -d master_data \
+                    -c "SELECT 1" > /dev/null 2>&1; then
+              echo "✓ Database 'master_data' exists"
+            else
+              echo "✗ Database 'master_data' does NOT exist!"
+              exit 1
+            fi
+            
+            # Step 3: Check if user exists
+            echo "Step 3: Checking if user '$DB_APP_USER' exists..."
+            USER_EXISTS=$(psql -h master-data-database-postgresql.backend.svc.cluster.local \
+                              -U postgres \
+                              -d master_data \
+                              -tAc "SELECT 1 FROM pg_roles WHERE rolname='$DB_APP_USER'")
+            
+            if [ "$USER_EXISTS" = "1" ]; then
+              echo "✓ User '$DB_APP_USER' exists"
+            else
+              echo "✗ User '$DB_APP_USER' does NOT exist!"
+              exit 1
+            fi
+            
+            # Step 4: Test connection as app user
+            echo "Step 4: Testing connection as '$DB_APP_USER'..."
+            export PGPASSWORD=$DB_APP_PASSWORD
+            
             until psql -h master-data-database-postgresql.backend.svc.cluster.local \
-                       -U masterdata_app \
+                       -U $DB_APP_USER \
                        -d master_data \
                        -c "SELECT 1" > /dev/null 2>&1; do
-              echo "Database 'master_data' not ready or user 'masterdata_app' cannot connect..."
+              echo "Cannot connect as '$DB_APP_USER' - retrying..."
               sleep 3
             done
-            echo "✓ Database 'master_data' exists and is accessible"
+            echo "✓ Successfully connected as '$DB_APP_USER'"
             
-            # Step 3: Verify user has necessary permissions (check if can query tables)
-            echo "Checking user permissions..."
-            psql -h master-data-database-postgresql.backend.svc.cluster.local \
-                 -U masterdata_app \
-                 -d master_data \
-                 -c "\dt" > /dev/null 2>&1
-            echo "✓ User 'masterdata_app' has proper permissions"
+            # Step 5: Verify permissions
+            echo "Step 5: Verifying user permissions..."
+            if psql -h master-data-database-postgresql.backend.svc.cluster.local \
+                    -U $DB_APP_USER \
+                    -d master_data \
+                    -c "\dt" > /dev/null 2>&1; then
+              echo "✓ User can list tables"
+            else
+              echo "⚠ User cannot list tables (may be OK if no tables exist yet)"
+            fi
             
-            echo "All PostgreSQL checks passed! Starting main container..."
+            echo "=== All checks passed! ==="
+      
       containers:
-      - name: cities-import14
+      - name: cities-import15
         image: acrdevtshpwn.azurecr.io/cities-initializer:0.1.0-PullRequest0089.460-8063c85
         args: ["--input", "/mnt/blob/capitals.csv"]
         env:
@@ -80,13 +122,14 @@ spec:
             valueFrom:
               secretKeyRef:
                 name: master-data-db-secrets
-                key: DB_APP_USER
+                key: DB_APP_DSN
         volumeMounts:
         - name: imports-blob
           mountPath: "/mnt/blob"
+      
       volumes:
       - name: imports-blob
         persistentVolumeClaim:
-          # reference created claim resource
           claimName: dev-pvc-az-blob-imports2
+      
       restartPolicy: Never

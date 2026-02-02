@@ -1,16 +1,16 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: cities-import13
+  name: cities-import14
   namespace: backend
   labels:
-    app: cities-import13
+    app: cities-import14
 spec:
   template:
     metadata:
-      name: cities-import13
+      name: cities-import14
       labels:
-        app: cities-import13
+        app: cities-import14
       annotations:
         sidecar.istio.io/inject: "false" # prevent istio sidecar from intercepting traffic
     spec:
@@ -72,7 +72,7 @@ spec:
             
             echo "All PostgreSQL checks passed! Starting main container..."
       containers:
-      - name: cities-import13
+      - name: cities-import14
         image: acrdevtshpwn.azurecr.io/cities-initializer:0.1.0-PullRequest0089.460-8063c85
         args: ["--input", "/mnt/blob/capitals.csv"]
         env:

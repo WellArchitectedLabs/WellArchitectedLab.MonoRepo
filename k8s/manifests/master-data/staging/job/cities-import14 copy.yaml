@@ -1,16 +1,16 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: cities-import
+  name: cities-import15
   namespace: backend
   labels:
-    app: cities-import
+    app: cities-import15
 spec:
   template:
     metadata:
-      name: cities-import
+      name: cities-import15
       labels:
-        app: cities-import
+        app: cities-import15
       annotations:
         sidecar.istio.io/inject: "false"
     spec:
@@ -114,7 +114,7 @@ spec:
             echo "=== All checks passed! ==="
       
       containers:
-      - name: cities-import
+      - name: cities-import15
         image: acrdevtshpwn.azurecr.io/cities-initializer:0.1.0-PullRequest0089.460-8063c85
         args: ["--input", "/mnt/blob/capitals.csv"]
         env:

@@ -6,6 +6,9 @@ services:
       POSTGRES_DB: master_data
     volumes:
       - postgres-data:/var/lib/postgresql/data
+    ports:
+      # open postgres on port 5431 to avoid 5432 mismatches
+      - 5431:5432
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 5s
@@ -14,17 +17,26 @@ services:
   # We apply the latest migrations
   migrate:
     # using flyway migration docker image that we pull from dockerhub
-    image: flyway/flyway:11.20.3
+    build:
+      context: ../.
+      dockerfile: Dockerfile.db-migrator
     depends_on:
       masterdata-postgres:
         condition: service_healthy
-    volumes:
-      # we mount the local data/migrations folder to flyway/sql folder
-      - ../data/migrations:/flyway/sql
     # we point to the local postgres db
-    command: -url=jdbc:postgresql://masterdata-postgres:5432/master_data -user=postgres -password=postgres migrate
+    command: >
+      -url=jdbc:postgresql://masterdata-postgres:5432/master_data
+      -user=postgres
+      -password=postgres
+      -baselineOnMigrate=true
+      -validateOnMigrate=true
+      migrate
     # very important in order to execute migration only once
     restart: "no"
+    environment:
+      DB_APP_USER: app_user
+      DB_APP_PASSWORD: app_password
+      POSTGRES_DATABASE: master_data
 
   cities-import:
     tty: true
@@ -38,7 +50,7 @@ services:
       migrate:
         condition: service_completed_successfully
     environment:
-      - POSTGRES_DSN=postgresql://postgres:postgres@masterdata-postgres:5432/master_data?sslmode=disable
+      - POSTGRES_DSN=postgresql://app_user:app_password@masterdata-postgres:5432/master_data?sslmode=disable
     volumes:
       # mount the local file in the image and mark it as read only
       - ./data/imports:/data:ro
@@ -59,7 +71,7 @@ services:
       cities-import:
         condition: service_completed_successfully
     environment:
-      - POSTGRES_DSN=postgresql://postgres:postgres@masterdata-postgres:5432/master_data?sslmode=disable
+      - POSTGRES_DSN=postgresql://app_user:app_password@masterdata-postgres:5432/master_data?sslmode=disable
     volumes:
       - ./data/imports:/data:ro
     command: ["--input", "/data/weather_hourly-full.csv"]
@@ -80,7 +92,7 @@ services:
       cities-import:
         condition: service_completed_successfully
     environment:
-      - POSTGRES_DSN=postgresql://postgres:postgres@masterdata-postgres:5432/master_data?sslmode=disable
+      - POSTGRES_DSN=postgresql://app_user:app_password@masterdata-postgres:5432/master_data?sslmode=disable
     command:
       - "--from-date"
       - "${FROM_DATE:-2026-01-01}"

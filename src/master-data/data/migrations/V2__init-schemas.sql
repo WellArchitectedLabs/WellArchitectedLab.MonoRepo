@@ -1,3 +1,11 @@
+-- ============================================================================
+-- Flyway Migration: V2 - Create Database Schema
+-- ============================================================================
+-- Description: Creates initial database tables and structures
+-- Author: DevOps Team
+-- Date: 2026-02-01
+-- ============================================================================
+
 -- Table: public.cities
 
 CREATE TABLE IF NOT EXISTS public.cities
@@ -43,3 +51,11 @@ ALTER TABLE IF EXISTS public.wf_actuals
 
 COMMENT ON TABLE public.wf_actuals
     IS 'stores weather forecasts actuals';
+
+-- Grant permissions to application user on newly created tables
+GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE public.wf_actuals TO ${DB_APP_USER};
+GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE public.cities TO ${DB_APP_USER};
+
+-- ============================================================================
+-- End of V2 Migration
+-- ============================================================================

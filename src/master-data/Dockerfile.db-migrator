@@ -1,8 +1,20 @@
 FROM flyway/flyway:11.20.3
 
-# Copy migrations into the expected Flyway directory
-COPY data/migrations /flyway/sql
+# Install gettext for envsubst
+USER root
+RUN apt-get update && apt-get install -y gettext-base && rm -rf /var/lib/apt/lists/*
 
-# Default command (can be overridden by Job args)
-ENTRYPOINT ["flyway"]
+# Create directories
+RUN mkdir -p /flyway/sql /flyway/sql-templates
+
+# Copy migration templates
+COPY data/migrations /flyway/sql-templates
+
+# Create entrypoint script that processes templates
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+# USER flyway
+
+ENTRYPOINT ["/entrypoint.sh"]
 CMD ["migrate"]

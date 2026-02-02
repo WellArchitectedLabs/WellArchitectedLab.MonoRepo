@@ -37,7 +37,7 @@ spec:
           database: master_data
 
         primary:
-           podAnnotations:
+          podAnnotations:
             sidecar.istio.io/inject: "false"
           persistence:
             enabled: true
@@ -61,33 +61,9 @@ spec:
               cpu: 500m
               memory: 512Mi
 
-          # Correct initdb configuration for Bitnami chart 15.5.0
-          initdb:
-            scriptsConfigMap: master-data-initdb-configmap
-            user: postgres
-
-          # Pass app user credentials as environment variables for the init scripts
-          extraEnvVars:
-            - name: DB_APP_USER
-              valueFrom:
-                secretKeyRef:
-                  name: master-data-db-secrets
-                  key: DB_APP_USER
-            - name: PGPASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: master-data-db-secrets
-                  key: POSTGRES_SUPERUSER_PASSWORD
-            - name: DB_APP_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: master-data-db-secrets
-                  key: DB_APP_PASSWORD
-
   destination:
     namespace: backend
     server: https://kubernetes.default.svc
-
   syncPolicy:
     automated:
       prune: true

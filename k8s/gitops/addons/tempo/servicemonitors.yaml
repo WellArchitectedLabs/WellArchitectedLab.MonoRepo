@@ -13,7 +13,7 @@ spec:
   source:
     repoURL: https://github.com/WellArchitectedLabs/WellArchitectedLab.MonoRepo.git
     path: k8s/gitops/addons/tempo/prometheus-monitors
-    targetRevision: develop
+    targetRevision: feature/42-finalk8sintegration
   destination:
     server: https://kubernetes.default.svc
     namespace: monitoring

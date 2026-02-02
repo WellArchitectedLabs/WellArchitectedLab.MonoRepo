@@ -9,7 +9,7 @@ spec:
   project: default
   source:
     repoURL: https://github.com/WellArchitectedLabs/WellArchitectedLab.MonoRepo.git
-    targetRevision: develop
+    targetRevision: feature/42-finalk8sintegration
     path: k8s/gitops
   destination:
     server: https://kubernetes.default.svc

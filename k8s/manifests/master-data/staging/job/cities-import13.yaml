@@ -1,18 +1,16 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: cities-import12
+  name: cities-import13
   namespace: backend
   labels:
-    app: cities-import12
+    app: cities-import13
 spec:
   template:
     metadata:
-      name: cities-import12
+      name: cities-import13
       labels:
-        app: cities-import12
-      annotations:
-        sidecar.istio.io/inject: "false" # prevent istio sidecar from intercepting traffic
+        app: cities-import13
     spec:
       # This is very important in order for csv resolving to work
       # Container needs to be ran as root
@@ -86,7 +84,7 @@ spec:
             
             echo "All PostgreSQL checks passed! Starting main container..."
       containers:
-      - name: cities-import12
+      - name: cities-import13
         image: acrdevtshpwn.azurecr.io/cities-initializer:0.1.0-PullRequest0089.460-8063c85
         args: ["--input", "/mnt/blob/capitals.csv"]
         env:

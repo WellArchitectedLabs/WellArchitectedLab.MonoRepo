@@ -1,18 +1,18 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: cities-import7
+  name: cities-import8
   namespace: backend
   labels:
-    app: cities-import7
+    app: cities-import8
   annotations:
     sidecar.istio.io/inject: "false"
 spec:
   template:
     metadata:
-      name: cities-import7
+      name: cities-import8
       labels:
-        app: cities-import7
+        app: cities-import8
     spec:
       # This is very important in order for csv resolving to work
       # Container needs to be ran as root
@@ -41,7 +41,7 @@ spec:
               sleep 2
             done
       containers:
-      - name: cities-import7
+      - name: cities-import8
         image: acrdevtshpwn.azurecr.io/cities-initializer:0.1.0-PullRequest0089.460-8063c85
         args: ["--input", "/mnt/blob/capitals.csv"]
         env:

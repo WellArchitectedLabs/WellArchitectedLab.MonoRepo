@@ -57,7 +57,7 @@ spec:
       containers:
       - name: wf-actuals-import
         image: acrdevtshpwn.azurecr.io/wf-actuals-import:0.1.0-staging-scripts.1-0e40c53
-        args: ["--input", "/mnt/blob/weather_hourly-full.csv"]
+        args: ["--input", "/mnt/blob/weather_hourly-full.csv", "--export-to-postgres"]
         env:
           - name: POSTGRES_DSN
             valueFrom:

@@ -25,7 +25,7 @@ spec:
       
       containers:
       - name: flyway
-        image: acrdevtshpwn.azurecr.io/acrdevtshpwn.azurecr.io/db-migrator:0.1.0-PullRequest0089.457-47c7be8
+        image: acrdevtshpwn.azurecr.io/db-migrator:0.1.0-PullRequest0089.457-47c7be8
         imagePullPolicy: Always
         
         env:

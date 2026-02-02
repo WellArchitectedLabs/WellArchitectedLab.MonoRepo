@@ -4,7 +4,7 @@ metadata:
   namespace: backend
   name: master-data-staging-kustomization
 resources:
-  - job/cities-import6.yaml
+  - job/cities-import5.yaml
   - job/db-migrator.yaml
   - pv/imports-sa_pv2.yaml
   - pvc/imports-storage_claim2.yaml

@@ -27,7 +27,7 @@ spec:
         kubernetes.azure.com/mode: user
       initContainers:
       - name: postgres-sanity-guard
-        image: acrdevtshpwn.azurecr.io/postgres-sanity-guard:1.0.0
+        image: acrdevtshpwn.azurecr.io/postgres-sanity-guard:0.1.0-staging-scripts.1-276fa6a
         env:
           - name: DB_HOST
             value: master-data-database-postgresql.backend.svc.cluster.local
@@ -50,7 +50,6 @@ spec:
               secretKeyRef:
                 name: master-data-db-secrets
                 key: POSTGRES_SUPERUSER_PASSWORD
-          # Optional: customize retry behavior
           - name: MAX_RETRIES
             value: "30"
           - name: RETRY_INTERVAL

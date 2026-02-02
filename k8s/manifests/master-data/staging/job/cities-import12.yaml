@@ -1,16 +1,16 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: cities-import11
+  name: cities-import12
   namespace: backend
   labels:
-    app: cities-import11
+    app: cities-import12
 spec:
   template:
     metadata:
-      name: cities-import11
+      name: cities-import12
       labels:
-        app: cities-import11
+        app: cities-import12
       annotations:
         sidecar.istio.io/inject: "false" # prevent istio sidecar from intercepting traffic
     spec:
@@ -41,7 +41,7 @@ spec:
               sleep 2
             done
       containers:
-      - name: cities-import11
+      - name: cities-import12
         image: acrdevtshpwn.azurecr.io/cities-initializer:0.1.0-PullRequest0089.460-8063c85
         args: ["--input", "/mnt/blob/capitals.csv"]
         env:

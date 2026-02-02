@@ -1,0 +1,27 @@
+name: CI - Build & Push Postgres Sanity Guard - Operations
+
+on:
+    push:
+        branches:
+          - main
+          - develop
+          - 'release/**'
+        paths:
+          - src/operations/postgres-sanity-guard/**
+    pull_request:
+        paths:
+          - src/operations/postgres-sanity-guard/**
+    workflow_dispatch:
+
+jobs:
+    FlyWayDbMigrator-BuildAndPush:
+        uses: ./.github/workflows/template_ci.yml
+        with:
+            service_name: postgres-sanity-guard
+            service_path: src/operations/postgres-sanity-guard
+            gitversion_config_path: src/operations/postgres-sanity-guard/GitVersion.yml
+            dockerfile_name: Dockerfile.postgres-sanity-guard
+        secrets:
+            ACR_LOGIN_SERVER: ${{ secrets.ACR_LOGIN_SERVER }}
+            ACR_USERNAME: ${{ secrets.ACR_USERNAME }}
+            ACR_PASSWORD: ${{ secrets.ACR_PASSWORD }}

@@ -12,9 +12,9 @@ spec:
   storageClassName: ""
   csi:
     driver: blob.csi.azure.com
-    volumeHandle: stwfimportsdev_imports        # unique handle
+    volumeHandle: stwfimportsdev_imports
     volumeAttributes:
-      storageAccount: stwfimportsdev           # your storage account
-      containerName: imports                    # blob container
-      resourceGroup: rg-kubernetes-dev-001     # RG
-      protocol: fuse                            # must be fuse
+      storageAccount: stwfimportsdev
+      containerName: imports
+      resourceGroup: rg-kubernetes-dev-001
+      protocol: fuse

@@ -10,7 +10,7 @@ spec:
   source:
     repoURL: https://github.com/WellArchitectedLabs/WellArchitectedLab.MonoRepo.git
     targetRevision: feature/staging-scripts
-    path: k8s/gitops
+    path: k8s/overlays/bootstrap/dev
   destination:
     server: https://kubernetes.default.svc
     namespace: argocd

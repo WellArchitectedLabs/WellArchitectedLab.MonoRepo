@@ -6,6 +6,9 @@ metadata:
   labels:
     app: wf-actuals-import
 spec:
+  # This cron job is never executed and suspended by default
+  # This technique is used in order to simulate a manually applied job
+  # With having the argocd sync capabilities
   schedule: "0 0 31 2 *"  # Feb 31st (never runs automatically)
   suspend: true            # Suspended by default - only manual triggers
   jobTemplate:

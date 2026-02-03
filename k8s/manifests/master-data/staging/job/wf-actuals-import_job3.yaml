@@ -1,16 +1,16 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: wf-actuals-import2
+  name: wf-actuals-import3
   namespace: backend
   labels:
-    app: wf-actuals-import2
+    app: wf-actuals-import3
 spec:
   template:
     metadata:
-      name: wf-actuals-import2
+      name: wf-actuals-import3
       labels:
-        app: wf-actuals-import2
+        app: wf-actuals-import3
       annotations:
         sidecar.istio.io/inject: "false"
     spec:
@@ -55,7 +55,7 @@ spec:
           - name: RETRY_INTERVAL
             value: "2"
       containers:
-      - name: wf-actuals-import2
+      - name: wf-actuals-import3
         image: acrdevtshpwn.azurecr.io/wf-actuals-import:0.1.0-staging-scripts.1-cd835b2
         args: ["--input", "/mnt/blob/weather_hourly-full.csv", "--export-to-postgres"]
         env:

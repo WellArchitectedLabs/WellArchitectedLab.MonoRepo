@@ -4,6 +4,7 @@ kind: Kustomization
 # reference all manifests from base folder
 resources:
   - ../../../gitops/addons
+  - env-config.yaml
 
 
 # define a dev prefix for all created environment in relation to this overlay
@@ -15,3 +16,15 @@ nameSuffix: ""
 # this allows easy resource managemnt using -l filters
 commonLabels:
   environment: dev
+
+vars:
+  - name: ENV
+    objref:
+      kind: ConfigMap
+      name: env-config
+      apiVersion: v1
+    fieldref:
+      fieldpath: data.ENV
+  
+patchesStrategicMerge:
+  - grafana-db-host.patch.yaml

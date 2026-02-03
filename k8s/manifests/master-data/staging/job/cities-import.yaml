@@ -71,6 +71,6 @@ spec:
       volumes:
       - name: imports-blob
         persistentVolumeClaim:
-          claimName: dev-pvc-az-blob-imports2
+          claimName: dev-pvc-az-blob-imports
       
       restartPolicy: Never

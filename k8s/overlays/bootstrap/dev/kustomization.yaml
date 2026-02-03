@@ -27,4 +27,4 @@ vars:
       fieldpath: data.ENV
   
 patchesStrategicMerge:
-  - grafana-db-host.patch.yaml
+  - patches/grafana.yaml

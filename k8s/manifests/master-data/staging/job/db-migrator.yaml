@@ -36,7 +36,7 @@ spec:
             env:
               # Database connection settings
               - name: FLYWAY_URL
-                value: "jdbc:postgresql://master-data-database-postgresql:5432/master_data"
+                value: "jdbc:postgresql://dev-master-data-database-postgresql:5432/master_data"
               
               - name: FLYWAY_USER
                 value: "postgres"

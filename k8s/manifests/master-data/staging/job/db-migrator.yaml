@@ -44,20 +44,20 @@ spec:
               - name: FLYWAY_PASSWORD
                 valueFrom:
                   secretKeyRef:
-                    name: master-data-db-sealed-secrets
+                    name: dev-master-data-db-sealed-secrets
                     key: POSTGRES_SUPERUSER_PASSWORD
               
               # Application user credentials (for envsubst)
               - name: DB_APP_USER
                 valueFrom:
                   secretKeyRef:
-                    name: master-data-db-sealed-secrets
+                    name: dev-master-data-db-sealed-secrets
                     key: DB_APP_USER
               
               - name: DB_APP_PASSWORD
                 valueFrom:
                   secretKeyRef:
-                    name: master-data-db-sealed-secrets
+                    name: dev-master-data-db-sealed-secrets
                     key: DB_APP_PASSWORD
               
               - name: POSTGRES_DATABASE

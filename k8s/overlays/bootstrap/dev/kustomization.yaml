@@ -15,3 +15,6 @@ nameSuffix: ""
 # this allows easy resource managemnt using -l filters
 commonLabels:
   environment: dev
+
+patchesStrategicMerge:
+- grafana-params.yaml

@@ -6,6 +6,9 @@ metadata:
   labels:
     app: wf-actuals-import
 spec:
+  backoffLimit: 0     # Number of pods retried, here we set to this to zero in order to never retry (default is 6)
+  completions: 1      # Job completes after 1 successful pod
+  parallelism: 1      # Run 1 pod at a time
   template:
     metadata:
       name: wf-actuals-import

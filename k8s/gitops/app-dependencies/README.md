@@ -1,0 +1,1 @@
+Explain why this folder is called app dependencies

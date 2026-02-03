@@ -6,5 +6,5 @@ metadata:
 
 # reference all manifests from base folder
 resources:
-  - postgres.yaml
-  - sealed-secrets.yaml
+  - postgres/postgres.yaml
+  - postgres/sealed-secrets.yaml

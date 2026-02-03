@@ -4,7 +4,6 @@ metadata:
   name: master-data-database
   namespace: argocd
   labels:
-    workload: business
     stack: business
     workload-type: database
   annotations:

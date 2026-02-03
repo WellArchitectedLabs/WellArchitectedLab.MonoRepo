@@ -4,7 +4,8 @@ metadata:
   name: sandbox-weatherly-app
   namespace: argocd
   labels:
-    workload: applications
+    workload: root-applications
+    environment: sandbox
 spec:
   project: default
   source:

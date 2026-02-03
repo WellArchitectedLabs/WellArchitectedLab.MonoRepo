@@ -5,6 +5,7 @@ metadata:
   namespace: argocd
   labels:
     workload: root-applications
+    environment: sandbox
 spec:
   project: default
   source:

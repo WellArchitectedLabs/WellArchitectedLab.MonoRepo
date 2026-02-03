@@ -67,7 +67,7 @@ spec:
           containers:
           - name: wf-actuals-range-import
             image: acrdevtshpwn.azurecr.io/wf-actuals-db-importer:0.1.0-staging-scripts.1-6fc44eb
-            args: [--export-to-postgres", "--from-date", "2026-01-23", "--to-date", "2026-01-25"]
+            args: ["--export-to-postgres", "--from-date", "2026-01-23", "--to-date", "2026-01-25"]
             env:
               - name: POSTGRES_DSN
                 valueFrom:

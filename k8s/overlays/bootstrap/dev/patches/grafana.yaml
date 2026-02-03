@@ -7,4 +7,4 @@ spec:
     helm:
       values: |
         env:
-          GF_DATABASE_HOST: $(ENV)-grafana-database-postgresql.monitoring.svc.cluster.local:5432
+          GF_DATABASE_HOST: "$(ENV)-grafana-database-postgresql.monitoring.svc.cluster.local:5432"

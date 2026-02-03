@@ -5,6 +5,9 @@ metadata:
   namespace: argocd
   labels:
     workload: applications
+  annotations:
+    argocd.argoproj.io/sync-wave: "999"  # Run last
+    argocd.argoproj.io/sync-options: Prune=false
 spec:
   project: default
   source:

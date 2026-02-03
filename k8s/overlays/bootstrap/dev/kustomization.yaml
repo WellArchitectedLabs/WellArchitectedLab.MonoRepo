@@ -17,14 +17,19 @@ nameSuffix: ""
 commonLabels:
   environment: dev
 
-vars:
-  - name: ENV
-    objref:
+replacements:
+  - source:
       kind: ConfigMap
       name: env-config
-      apiVersion: v1
-    fieldref:
-      fieldpath: data.ENV
-  
-patchesStrategicMerge:
-  - patches/grafana.yaml
+      fieldPath: data.ENV
+    targets:
+      - select:
+          kind: Application
+          name: grafana
+        fieldPaths:
+          - spec.source.helm.values
+patches:
+  - target:
+      kind: Application
+      name: grafana
+    path: patches/grafana.yaml

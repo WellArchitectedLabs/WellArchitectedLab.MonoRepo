@@ -37,7 +37,7 @@ spec:
             image: acrdevtshpwn.azurecr.io/postgres-sanity-guard:0.1.0-staging-scripts.1-276fa6a
             env:
               - name: DB_HOST
-                value: master-data-database-postgresql.backend.svc.cluster.local
+                value: dev-master-data-database-postgresql.backend.svc.cluster.local
               - name: DB_PORT
                 value: "5432"
               - name: DB_NAME

@@ -6,6 +6,8 @@ metadata:
   labels:
     workload: applications
   annotations:
+    # bootstrap app is a pre-requisite
+    # so we'll run it before any other workload by specifying a negative sync wave index
     argocd.argoproj.io/sync-wave: "-1"
 spec:
   project: default

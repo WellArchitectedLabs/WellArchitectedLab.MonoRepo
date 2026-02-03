@@ -30,7 +30,7 @@ spec:
 
         auth:
           username: postgres
-          existingSecret: master-data-db-secrets
+          existingSecret: master-data-db-sealed-secrets
           secretKeys:
             adminPasswordKey: POSTGRES_SUPERUSER_PASSWORD
           # Database to create on initialization

@@ -16,5 +16,15 @@ nameSuffix: ""
 commonLabels:
   environment: dev
 
-patchesStrategicMerge:
-- grafana-params.yaml
+patches:
+- patch: |-
+    - op: add
+      path: /spec/source/helm/parameters
+      value:
+      - name: environmentPrefix
+        value: dev
+      - name: environment
+        value: dev
+  target:
+    kind: Application
+    name: grafana

@@ -3,13 +3,8 @@ kind: Kustomization
 metadata:
   namespace: argocd
   name: bootstrap-kustomization
+
+# reference all manifests from base folder
 resources:
-  - grafana
-  - istio
-  - kiali
-  - kube
-  - loki
-  - open-telemetry
-  - prometheus
-  - tempo
-  - namespace.yaml
+  - portgres.yaml
+  - sealed-secrets.yaml

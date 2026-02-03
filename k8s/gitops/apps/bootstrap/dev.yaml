@@ -1,10 +1,11 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: cluster-bootstrap
+  name: dev-cluster-bootstrap
   namespace: argocd
   labels:
-    workload: applications
+    workload: root-applications
+    environment: dev
   annotations:
     # bootstrap app is a pre-requisite
     # so we'll run it before any other workload by specifying a negative sync wave index

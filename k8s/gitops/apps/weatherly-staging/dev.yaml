@@ -4,7 +4,8 @@ metadata:
   name: dev-weatherly-app-datastaging
   namespace: argocd
   labels:
-    workload: applications
+    workload: root-applications
+    environment: dev
   annotations:
     argocd.argoproj.io/sync-wave: "999"  # Run last
     argocd.argoproj.io/sync-options: Prune=false

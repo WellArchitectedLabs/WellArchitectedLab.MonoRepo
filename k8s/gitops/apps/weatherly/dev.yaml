@@ -4,7 +4,8 @@ metadata:
   name: dev-weatherly-app
   namespace: argocd
   labels:
-    workload: applications
+    workload: root-applications
+    environment: dev
 spec:
   project: default
   source:

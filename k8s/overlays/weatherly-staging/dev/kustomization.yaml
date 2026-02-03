@@ -4,7 +4,7 @@ kind: Kustomization
 # reference all manifests from base folder
 resources:
   - ../../../manifests/master-data/staging
-  - ../../../gitops/business/staging
+  - ../../../gitops/app-dependencies/master-data
 
 
 # define a dev prefix for all created environment in relation to this overlay

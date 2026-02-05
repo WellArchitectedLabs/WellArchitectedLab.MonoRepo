@@ -1,0 +1,15 @@
+<Solution>
+  <Folder Name="/Core/">
+    <Project Path="Application/MasterData.Application.csproj" />
+    <Project Path="Domain/MasterData.Domain.csproj" />
+  </Folder>
+  <Folder Name="/Infrastructure/">
+    <Project Path="Infrastructure/MasterData.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/Presentation/">
+    <Project Path="Api/MasterData.Api.csproj" />
+  </Folder>
+  <Folder Name="/Solution Files/">
+    <File Path=".gitignore" />
+  </Folder>
+</Solution>

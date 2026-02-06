@@ -1,5 +1,5 @@
-using MasterData.Api.Dtos.City.GetAll;
 using MasterData.Application.Services.Interfaces;
+using MasterData.Client.Dtos.Responses.City.GetAll;
 using MasterData.Domain.AggregateModel.Cities;
 using Microsoft.AspNetCore.Mvc;
 
@@ -17,7 +17,7 @@ public class CitiesController(ICityService cityService)
     /// The list does not need to be paginated since they will not exceed the maximum allowed in parameter
     /// </summary>
     /// <returns>ReadOnlyCollection for <see cref="CityDto"/> object</returns>
-    [Route("api/v1/cities")]
+    [Route("api/v1/city")]
     [HttpGet]
     public async Task<IReadOnlyCollection<CityDto>> GetAllCities(CancellationToken cancellationToken)
     {

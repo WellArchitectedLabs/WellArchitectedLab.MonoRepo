@@ -1,6 +1,6 @@
 using MasterData.Domain.AggregateModel.Cities.ValueObjects;
 
-namespace MasterData.Api.Dtos.City.GetAll;
+namespace MasterData.Client.Dtos.Responses.City.GetAll;
 
 public record GpsCoordinatesDto(decimal Latitude, decimal Longitude);
 

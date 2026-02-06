@@ -1,10 +1,7 @@
-using MasterData.Api.Controllers;
-using MasterData.Domain.AggregateModel.Cities.ValueObjects;
-
-namespace MasterData.Api.Dtos.City.GetAll;
+namespace MasterData.Client.Dtos.Responses.City.GetAll;
 
 /// <summary>
-/// Root dto record for <see cref="CitiesController.GetAllCities"/> action method
+/// Root dto record for GetAllCities action method
 /// </summary>
 /// <param name="Id">City Id</param>
 /// <param name="Name">City Name</param>

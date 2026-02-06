@@ -12,6 +12,7 @@
 
    <ItemGroup>
      <ProjectReference Include="..\Application\MasterData.Application.csproj" />
+     <ProjectReference Include="..\Client\MasterData.Client.csproj" />
      <ProjectReference Include="..\Infrastructure\MasterData.Infrastructure.csproj" />
    </ItemGroup>
 

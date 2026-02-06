@@ -1,9 +1,7 @@
-using MasterData.Api.Dtos.City.GetAll;
 using MasterData.Api.Dtos.WfActual.Get.History;
 using MasterData.Application.Services.Interfaces;
 using MasterData.Domain.AggregateModel.Actuals;
 using MasterData.Domain.AggregateModel.Actuals.Enums;
-using MasterData.Domain.AggregateModel.Cities;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MasterData.Api.Controllers;
@@ -11,16 +9,20 @@ namespace MasterData.Api.Controllers;
 /// <summary>
 /// API Controller for <see cref="WfActual"/> entities
 /// </summary>
-/// <param name="actualsService"></param>
+/// <param name="actualService"></param>
 [ApiController]
-public class WfActualsController(IWfActualService actualsService)
+public class WfActualController(IWfActualService actualService)
 {
     /// <summary>
-    /// Returns all cities' list
-    /// The list does not need to be paginated since they will not exceed the maximum allowed in parameter
+    /// Returns weather forecast history based on the provided search parameters
     /// </summary>
-    /// <returns>ReadOnlyCollection for <see cref="CityDto"/> object</returns>
-    [Route("api/v1/actuals/{referenceDate}")]
+    /// <returns>ReadOnlyCollection for <see cref="WfActualDto"/> object</returns>
+    /// <param name="referenceDate">date subject of forecasting</param>
+    /// <param name="historicalDepthYears">number of past years of history returned for prediction analysis</param>
+    /// <param name="rollingWindowDays">odd number representing the number of days to pick in every historical year.</param>
+    /// <param name="leapDayResolutionStrategy">resolving strategy for leap years (29th of February)</param>
+    /// <param name="cancellationToken">provide cancellation token for stopping canceled processes down to downstream calls</param>
+    [Route("api/v1/actual/{referenceDate}")]
     [HttpGet]
     public async Task<IReadOnlyCollection<WfActualDto>> GetHistoricalSlices(
         [FromRoute] DateOnly referenceDate,
@@ -29,7 +31,7 @@ public class WfActualsController(IWfActualService actualsService)
         [FromQuery] LeapDayResolutionStrategy leapDayResolutionStrategy,
         CancellationToken cancellationToken)
     {
-        var historicalSlices = await actualsService.GetHistoricalSlice(
+        var historicalSlices = await actualService.GetHistoricalSlice(
             referenceDate,
             historicalDepthYears,
             rollingWindowDays,

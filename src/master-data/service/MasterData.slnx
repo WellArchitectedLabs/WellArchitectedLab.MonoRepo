@@ -1,4 +1,7 @@
 <Solution>
+  <Folder Name="/Client/">
+    <Project Path="Client/MasterData.Client.csproj" />
+  </Folder>
   <Folder Name="/Core/">
     <Project Path="Application/MasterData.Application.csproj" />
     <Project Path="Domain/MasterData.Domain.csproj" />

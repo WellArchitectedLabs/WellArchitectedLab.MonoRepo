@@ -1,4 +1,5 @@
-name: Template - Publish NuGet Package
+name: Publish NuGet Package (Template)
+
 on:
   workflow_call:
     inputs:
@@ -40,7 +41,7 @@ jobs:
 
       - uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: 8.0.x
+          dotnet-version: 10.0.x
 
       - name: Validate increment flags
         run: |
@@ -60,7 +61,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN || secrets.GITHUB_TOKEN }}
         run: |
           VERSION=$(gh api \
-            /users/MyOrg/packages/nuget/${{ inputs.package_id }}/versions \
+            /users/WellArchitectedLab/packages/nuget/${{ inputs.package_id }}/versions \
             --jq '.[0].name' || echo "0.0.0")
 
           echo "latest=$VERSION" >> $GITHUB_OUTPUT
@@ -91,16 +92,17 @@ jobs:
         run: dotnet build -c Release --no-restore
         working-directory: ${{ inputs.client_project_path }}
 
-      - name: Pack (nuspec)
+      - name: Pack
         run: |
-          nuget pack *.nuspec \
-            -Version ${{ steps.next.outputs.value }} \
-            -Properties Configuration=Release
+          dotnet pack \
+            -c Release \
+            --no-build \
+            /p:Version=${{ steps.next.outputs.value }}
         working-directory: ${{ inputs.client_project_path }}
 
       - name: Push to GitHub Packages
         run: |
-          dotnet nuget push "*.nupkg" \
+          dotnet nuget push "**/*.nupkg" \
             --source "$NUGET_SOURCE" \
             --api-key ${{ secrets.GH_PACKAGES_TOKEN || secrets.GITHUB_TOKEN }}
         working-directory: ${{ inputs.client_project_path }}

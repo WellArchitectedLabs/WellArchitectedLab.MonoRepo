@@ -55,29 +55,27 @@ jobs:
             exit 1
           fi
           
-      - name: Get latest published version
-        id: version
+      - name: Compute next version
+        id: next
         env:
           GH_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN || secrets.GITHUB_TOKEN }}
         run: |
-          # Try to get the latest version; suppress errors
+          # Fetch latest version from GitHub Packages
           LATEST=$(gh api \
             /users/WellArchitectedLab/packages/nuget/${{ inputs.package_id }}/versions \
             --jq '.[0].name' 2>/dev/null || echo "")
 
-          # If LATEST is empty or invalid, default to 0.0.0
+          # Fallback if no package exists yet
           if [[ -z "$LATEST" || ! "$LATEST" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
             LATEST="0.0.0"
           fi
 
-          echo "latest=$LATEST" >> $GITHUB_OUTPUT
+          echo "Latest version: $LATEST"
 
+          # Split into major, minor, patch
+          IFS='.' read -r MAJOR MINOR PATCH <<< "$LATEST"
 
-      - name: Compute next version
-        id: next
-        run: |
-          IFS='.' read -r MAJOR MINOR PATCH <<< "${{ steps.version.outputs.latest }}"
-
+          # Apply increment flags
           if [[ "${{ inputs.increment_major }}" == "true" ]]; then
             MAJOR=$((MAJOR+1))
             MINOR=0
@@ -89,8 +87,11 @@ jobs:
             PATCH=$((PATCH+1))
           fi
 
-          echo "value=$MAJOR.$MINOR.$PATCH" >> $GITHUB_OUTPUT
+          NEXT="$MAJOR.$MINOR.$PATCH"
+          echo "Next version: $NEXT"
 
+          # Output for subsequent steps
+          echo "value=$NEXT" >> $GITHUB_OUTPUT
 
       - name: Restore
         run: dotnet restore

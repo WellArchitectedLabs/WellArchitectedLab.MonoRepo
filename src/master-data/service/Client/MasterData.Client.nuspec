@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+    <metadata>
+        <id>Devpragmax.MasterData.Client</id>
+        <version>$version$</version>
+
+        <title>Master Data Client SDK</title>
+        <authors>Mohamed Baligh H.</authors>
+        <owners>devpragmax</owners>
+
+        <description>
+            Official .NET client SDK for Master Data API.
+            Provides strongly-typed APIs, client registration helpers,
+            and fluent first-class integration with Master Data services.
+        </description>
+
+        <summary>
+            .NET client library for Master Data APIs
+        </summary>
+
+        <tags>master-data sdk client api dotnet</tags>
+
+        <projectUrl>https://github.com/WellArchitectedLabs/WellArchitectedLab.MonoRepo</projectUrl>
+        <repository type="git" url="https://github.com/WellArchitectedLabs/WellArchitectedLab.MonoRepo" />
+        <license type="expression">MIT</license>
+
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+
+        <icon>icon.png</icon>
+        <readme>README.md</readme>
+
+        <releaseNotes>
+            See https://github.com/WellArchitectedLabs/WellArchitectedLab.MonoRepo/releases
+        </releaseNotes>
+    </metadata>
+
+    <files>
+        <!-- Compiled library -->
+        <file src="bin/Release/net8.0/*.dll" target="lib/net8.0" />
+
+        <!-- NuGet visuals -->
+        <file src="assets/icon.png" target="icon.png" />
+        <file src="README.md" target="README.md" />
+    </files>
+</package>

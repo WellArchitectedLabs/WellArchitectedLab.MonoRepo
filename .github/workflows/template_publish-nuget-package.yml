@@ -60,19 +60,17 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN || secrets.GITHUB_TOKEN }}
         run: |
-          # Attempt to get the latest version
-          RESPONSE=$(gh api \
+          # Try to get the latest version; suppress errors
+          LATEST=$(gh api \
             /users/WellArchitectedLab/packages/nuget/${{ inputs.package_id }}/versions \
-            --jq '.[0].name' 2>/dev/null || true)
+            --jq '.[0].name' 2>/dev/null || echo "")
 
-          # If gh returned empty or "null", set default version
-          if [ -z "$RESPONSE" ] || [ "$RESPONSE" = "null" ]; then
-            VERSION="0.0.0"
-          else
-            VERSION="$RESPONSE"
+          # If LATEST is empty or invalid, default to 0.0.0
+          if [[ -z "$LATEST" || ! "$LATEST" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            LATEST="0.0.0"
           fi
 
-          echo "latest=$VERSION" >> $GITHUB_OUTPUT
+          echo "latest=$LATEST" >> $GITHUB_OUTPUT
 
 
       - name: Compute next version

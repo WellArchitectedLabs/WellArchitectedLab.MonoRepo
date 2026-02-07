@@ -54,17 +54,24 @@ jobs:
             echo "Exactly one increment flag must be true."
             exit 1
           fi
-
+          
       - name: Get latest published version
         id: version
         env:
           GH_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN || secrets.GITHUB_TOKEN }}
         run: |
-          VERSION=$(gh api \
+          RESPONSE=$(gh api \
             /users/WellArchitectedLab/packages/nuget/${{ inputs.package_id }}/versions \
-            --jq '.[0].name' || echo "0.0.0")
+            --jq '.[0].name' 2>/dev/null || echo "")
+
+          if [ -z "$RESPONSE" ]; then
+            VERSION="0.0.0"
+          else
+            VERSION="$RESPONSE"
+          fi
 
           echo "latest=$VERSION" >> $GITHUB_OUTPUT
+
 
       - name: Compute next version
         id: next

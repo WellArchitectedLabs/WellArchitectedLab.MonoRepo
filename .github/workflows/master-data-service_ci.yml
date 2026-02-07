@@ -14,7 +14,7 @@ on:
     workflow_dispatch:
 
 jobs:
-    Frontend-BuildAndPush:
+    MasterDataService-BuildAndPush:
         uses: ./.github/workflows/template_ci.yml
         with:
             service_name: master-data-service

@@ -5,10 +5,14 @@ on:
         branches:
           - main
           - develop
+        paths:
+          - 'src/insights/bff/**'
     pull_request:
         branches:
           - main
           - develop
+        paths:
+          - 'src/insights/bff/**'
     workflow_dispatch:
 
 jobs:

@@ -60,11 +60,13 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN || secrets.GITHUB_TOKEN }}
         run: |
+          # Attempt to get the latest version
           RESPONSE=$(gh api \
             /users/WellArchitectedLab/packages/nuget/${{ inputs.package_id }}/versions \
-            --jq '.[0].name' 2>/dev/null || echo "")
+            --jq '.[0].name' 2>/dev/null || true)
 
-          if [ -z "$RESPONSE" ]; then
+          # If gh returned empty or "null", set default version
+          if [ -z "$RESPONSE" ] || [ "$RESPONSE" = "null" ]; then
             VERSION="0.0.0"
           else
             VERSION="$RESPONSE"
@@ -90,6 +92,7 @@ jobs:
           fi
 
           echo "value=$MAJOR.$MINOR.$PATCH" >> $GITHUB_OUTPUT
+
 
       - name: Restore
         run: dotnet restore

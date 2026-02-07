@@ -1,0 +1,108 @@
+name: Publish NuGet Package (Template)
+
+on:
+  workflow_call:
+    inputs:
+      client_project_path:
+        description: "Path to the client project"
+        required: true
+        type: string
+
+      package_id:
+        description: "NuGet package id"
+        required: true
+        type: string
+
+      increment_major:
+        required: true
+        type: boolean
+
+      increment_minor:
+        required: true
+        type: boolean
+
+      increment_patch:
+        required: true
+        type: boolean
+
+    secrets:
+      GH_PACKAGES_TOKEN:
+        required: false
+
+env:
+  NUGET_SOURCE: https://nuget.pkg.github.com/WellArchitectedLab/index.json
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Validate increment flags
+        run: |
+          COUNT=0
+          [[ "${{ inputs.increment_major }}" == "true" ]] && COUNT=$((COUNT+1))
+          [[ "${{ inputs.increment_minor }}" == "true" ]] && COUNT=$((COUNT+1))
+          [[ "${{ inputs.increment_patch }}" == "true" ]] && COUNT=$((COUNT+1))
+
+          if [ "$COUNT" -ne 1 ]; then
+            echo "Exactly one increment flag must be true."
+            exit 1
+          fi
+
+      - name: Get latest published version
+        id: version
+        env:
+          GH_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN || secrets.GITHUB_TOKEN }}
+        run: |
+          VERSION=$(gh api \
+            /users/WellArchitectedLab/packages/nuget/${{ inputs.package_id }}/versions \
+            --jq '.[0].name' || echo "0.0.0")
+
+          echo "latest=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Compute next version
+        id: next
+        run: |
+          IFS='.' read -r MAJOR MINOR PATCH <<< "${{ steps.version.outputs.latest }}"
+
+          if [[ "${{ inputs.increment_major }}" == "true" ]]; then
+            MAJOR=$((MAJOR+1))
+            MINOR=0
+            PATCH=0
+          elif [[ "${{ inputs.increment_minor }}" == "true" ]]; then
+            MINOR=$((MINOR+1))
+            PATCH=0
+          else
+            PATCH=$((PATCH+1))
+          fi
+
+          echo "value=$MAJOR.$MINOR.$PATCH" >> $GITHUB_OUTPUT
+
+      - name: Restore
+        run: dotnet restore
+        working-directory: ${{ inputs.client_project_path }}
+
+      - name: Build
+        run: dotnet build -c Release --no-restore
+        working-directory: ${{ inputs.client_project_path }}
+
+      - name: Pack
+        run: |
+          dotnet pack \
+            -c Release \
+            --no-build \
+            /p:Version=${{ steps.next.outputs.value }}
+        working-directory: ${{ inputs.client_project_path }}
+
+      - name: Push to GitHub Packages
+        run: |
+          dotnet nuget push "**/*.nupkg" \
+            --source "$NUGET_SOURCE" \
+            --api-key ${{ secrets.GH_PACKAGES_TOKEN || secrets.GITHUB_TOKEN }}
+        working-directory: ${{ inputs.client_project_path }}

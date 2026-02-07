@@ -1,0 +1,27 @@
+name: CI - Build & Master Data Service
+
+on:
+    push:
+       branches:
+            - main
+            - develop
+            - 'release/**'
+       paths:
+        - src/master-data/service/**
+    pull_request:
+        paths:
+          - src/master-data/service/**
+    workflow_dispatch:
+
+jobs:
+    MasterDataService-BuildAndPush:
+        uses: ./.github/workflows/template_ci.yml
+        with:
+            service_name: master-data-service
+            service_path: src/master-data/service
+            gitversion_config_path: src/master-data/service/GitVersion.yml
+            dockerfile_name: Dockerfile.master-data-service
+        secrets:
+            ACR_LOGIN_SERVER: ${{ secrets.ACR_LOGIN_SERVER }}
+            ACR_USERNAME: ${{ secrets.ACR_USERNAME }}
+            ACR_PASSWORD: ${{ secrets.ACR_PASSWORD }}

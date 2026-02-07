@@ -235,10 +235,14 @@ def import_wf_actuals_from_csv(
 
     with open(wf_actual_csv_input, newline="", encoding="utf-8") as f:
         rows = list(csv.DictReader(f))
+    
+    print(f'Preparing to import {len(rows)} weather forecast actuals into database')
+
+    unresolved_coordinates = [];
 
     data_buffer = []
-    pbar_ctx = tqdm(total=len(rows), desc="Importing wf_actuals from CSV", unit="row") if tqdm else _NoopProgress()
 
+    pbar_ctx = tqdm(total=len(rows), desc="Importing wf_actuals from CSV", unit="row") if tqdm else _NoopProgress()
     with pbar_ctx as pbar:
         for row in rows:
             try:
@@ -251,6 +255,7 @@ def import_wf_actuals_from_csv(
             cid = lookup_by_lonlat.get((lon, lat))
             if not cid:
                 pbar.update(1)
+                unresolved_coordinates.append({lon, lat})
                 continue
 
             data_buffer.append({
@@ -269,6 +274,8 @@ def import_wf_actuals_from_csv(
 
     if data_buffer:
         db_adapter.insert_wfactuals(data_buffer)
+    if unresolved_coordinates:
+        print(f"The following coordinates were not resolved from to a city from the cities table: {', '.join(unresolved_coordinates)}")
 
 
 # -----------------------------
@@ -290,9 +297,9 @@ def import_cities(input_path: str, dsn: str) -> int:
 
     items = [{
         "name": name,
-        "longitude": lon,
-        "latitude": lat
-    } for lon, lat, name in locations]
+        "latitude": lat,
+        "longitude": lon
+    } for lat, lon, name in locations]
 
     adapter.insert_cities(items)
     return len(items)

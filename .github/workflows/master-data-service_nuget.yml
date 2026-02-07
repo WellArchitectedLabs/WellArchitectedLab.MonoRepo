@@ -1,0 +1,37 @@
+name: Push Nuget Package - Master Data API
+
+on:
+  workflow_dispatch:
+    inputs:
+      increment_major:
+        description: "Increment MAJOR version for breaking changes"
+        type: boolean
+        default: false
+        required: true
+
+      increment_minor:
+        description: "Increment MINOR version for feature style non breaking changess"
+        type: boolean
+        default: false
+        required: true
+
+      increment_patch:
+        description: "Increment PATCH version for non service-contract breaking fixes / hotfixes"
+        type: boolean
+        default: true
+        required: true
+
+jobs:
+  publish:
+    uses: ./.github/workflows/template_publish-nuget-package.yml
+    with:
+      client_project_path: src/master-data/service/Client
+      package_id: MasterData.Client
+
+      increment_major: ${{ inputs.increment_major }}
+      increment_minor: ${{ inputs.increment_minor }}
+      increment_patch: ${{ inputs.increment_patch }}
+
+    secrets:
+      GH_PACKAGES_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+s

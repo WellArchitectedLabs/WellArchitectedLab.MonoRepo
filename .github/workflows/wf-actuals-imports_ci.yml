@@ -17,7 +17,7 @@ jobs:
     StagingScripts-BuildAndPush:
         uses: ./.github/workflows/template_ci.yml
         with:
-            service_name: wf-actuals-import-frontend
+            service_name: wf-actuals-import
             service_path: src/master-data/staging
             gitversion_config_path: src/master-data/staging/GitVersion.yml
             dockerfile_name: Dockerfile.wf-actuals-initializer

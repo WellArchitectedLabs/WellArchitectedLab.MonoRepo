@@ -26,7 +26,7 @@ class WeatherForecastPgDbAdapter:
         """Insert city records. Items are dicts with keys: name, longitude, latitude"""
         if not items:
             return
-        columns = ["name", "longitude", "latitude"]
+        columns = list(items[0].keys())
         values = [tuple(item[c] for c in columns) for item in items]
         query = f"INSERT INTO cities ({', '.join(columns)}) VALUES %s"
 
@@ -41,7 +41,7 @@ class WeatherForecastPgDbAdapter:
         
         columns = list(items[0].keys())
         column_list = ", ".join(columns)
-        values = (tuple(item[col] for col in columns) for item in items)
+        values = [tuple(item[col] for col in columns) for item in items]
         query = f"INSERT INTO wf_actuals ({column_list}) VALUES %s"
 
         with psycopg2.connect(self._dsn) as conn:

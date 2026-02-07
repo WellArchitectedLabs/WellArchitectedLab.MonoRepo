@@ -1,80 +1,85 @@
 apiVersion: batch/v1
-kind: Job
+kind: CronJob
 metadata:
   name: master-data-flyway-migration
   namespace: backend
 spec:
-  ttlSecondsAfterFinished: 3600  # Clean up after 1 hour
-  backoffLimit: 3
-  template:
-    metadata:
-      annotations:
-        sidecar.istio.io/inject: "false"
+  schedule: "0 0 31 2 *"  # Feb 31st (never runs automatically)
+  suspend: true            # Suspended by default - only manual triggers
+  jobTemplate:
     spec:
-      restartPolicy: OnFailure
-      
-      # Use the same tolerations and node selectors as your database
-      tolerations:
-        - key: "workload"
-          operator: "Equal"
-          value: "weather-forecast"
-          effect: "NoSchedule"
-      
-      nodeSelector:
-        kubernetes.azure.com/mode: user
-      
-      containers:
-      - name: flyway
-        image: acrdevtshpwn.azurecr.io/db-migrator:0.1.0-PullRequest0089.457-47c7be8
-        imagePullPolicy: Always
-        
-        env:
-          # Database connection settings
-          - name: FLYWAY_URL
-            value: "jdbc:postgresql://master-data-database-postgresql:5432/master_data"
+      backoffLimit: 0     # Number of pods retried, here we set to this to zero in order to never retry (default is 6)
+      completions: 1      # Job completes after 1 successful pod
+      parallelism: 1      # Run 1 pod at a time
+      template:
+        metadata:
+          annotations:
+            sidecar.istio.io/inject: "false"
+        spec:
+          restartPolicy: OnFailure
           
-          - name: FLYWAY_USER
-            value: "postgres"
+          # Use the same tolerations and node selectors as your database
+          tolerations:
+            - key: "workload"
+              operator: "Equal"
+              value: "weather-forecast"
+              effect: "NoSchedule"
           
-          - name: FLYWAY_PASSWORD
-            valueFrom:
-              secretKeyRef:
-                name: master-data-db-secrets
-                key: POSTGRES_SUPERUSER_PASSWORD
+          nodeSelector:
+            kubernetes.azure.com/mode: user
           
-          # Application user credentials (for envsubst)
-          - name: DB_APP_USER
-            valueFrom:
-              secretKeyRef:
-                name: master-data-db-secrets
-                key: DB_APP_USER
-          
-          - name: DB_APP_PASSWORD
-            valueFrom:
-              secretKeyRef:
-                name: master-data-db-secrets
-                key: DB_APP_PASSWORD
-          
-          - name: POSTGRES_DATABASE
-            value: "master_data"
-          
-          # Flyway configuration
-          - name: FLYWAY_BASELINE_ON_MIGRATE
-            value: "true"
-          
-          - name: FLYWAY_VALIDATE_ON_MIGRATE
-            value: "true"
-          
-          - name: FLYWAY_OUT_OF_ORDER
-            value: "false"
-          
-          - name: FLYWAY_LOCATIONS
-            value: "filesystem:/flyway/sql"
-        
-        resources:
-          requests:
-            cpu: 100m
-            memory: 128Mi
-          limits:
-            cpu: 500m
-            memory: 256Mi
+          containers:
+          - name: flyway
+            image: acrdevtshpwn.azurecr.io/db-migrator:0.1.0-PullRequest0089.457-47c7be8
+            imagePullPolicy: Always
+            
+            env:
+              # Database connection settings
+              - name: FLYWAY_URL
+                value: "jdbc:postgresql://dev-master-data-database-postgresql:5432/master_data"
+              
+              - name: FLYWAY_USER
+                value: "postgres"
+              
+              - name: FLYWAY_PASSWORD
+                valueFrom:
+                  secretKeyRef:
+                    name: dev-master-data-db-sealed-secrets
+                    key: POSTGRES_SUPERUSER_PASSWORD
+              
+              # Application user credentials (for envsubst)
+              - name: DB_APP_USER
+                valueFrom:
+                  secretKeyRef:
+                    name: dev-master-data-db-sealed-secrets
+                    key: DB_APP_USER
+              
+              - name: DB_APP_PASSWORD
+                valueFrom:
+                  secretKeyRef:
+                    name: dev-master-data-db-sealed-secrets
+                    key: DB_APP_PASSWORD
+              
+              - name: POSTGRES_DATABASE
+                value: "master_data"
+              
+              # Flyway configuration
+              - name: FLYWAY_BASELINE_ON_MIGRATE
+                value: "true"
+              
+              - name: FLYWAY_VALIDATE_ON_MIGRATE
+                value: "true"
+              
+              - name: FLYWAY_OUT_OF_ORDER
+                value: "false"
+              
+              - name: FLYWAY_LOCATIONS
+                value: "filesystem:/flyway/sql"
+            
+            resources:
+              requests:
+                cpu: 100m
+                memory: 128Mi
+              limits:
+                cpu: 500m
+                memory: 256Mi

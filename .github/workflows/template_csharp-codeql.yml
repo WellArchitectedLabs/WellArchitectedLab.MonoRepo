@@ -1,0 +1,37 @@
+# .github/workflows/codeql-analysis-template.yml
+name: CodeQL Analysis Template
+
+on:
+  workflow_call:
+    inputs:
+      solution:
+        description: "Path to the .sln file to build"
+        required: true
+        type: string
+
+jobs:
+  codeQLAnalysis:
+    name: CodeQL Analysis
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+    strategy:
+      matrix:
+        language: ['csharp']
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: ${{ matrix.language }}
+
+      - name: Build Solution
+        run: |
+          dotnet build ${{ inputs.solution }}
+
+      - name: Perform Code Analysis
+        uses: github/codeql-action/analyze@v3

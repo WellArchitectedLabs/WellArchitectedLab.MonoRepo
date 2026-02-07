@@ -30,7 +30,7 @@ on:
         required: false
 
 env:
-  NUGET_SOURCE: https://nuget.pkg.github.com/WellArchitectedLab/index.json
+  NUGET_SOURCE: https://nuget.pkg.github.com/WellArchitectedLabs/index.json
 
 jobs:
   publish:

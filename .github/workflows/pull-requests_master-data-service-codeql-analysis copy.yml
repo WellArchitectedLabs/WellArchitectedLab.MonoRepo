@@ -1,5 +1,5 @@
 # .github/workflows/codeql-insights-bff.yml
-name: CodeQL Analysis - Insights Bff
+name: CodeQL Analysis - Master Data Service
 
 on:
   push:
@@ -7,17 +7,17 @@ on:
       - main
       - develop
     paths:
-      - 'src/insights/bff/**'
+      - 'src/master-data/service/**'
   pull_request:
     branches:
       - main
       - develop
     paths:
-      - 'src/insights/bff/**'
+      - 'src/master-data/service/**'
   workflow_dispatch:
 
 jobs:
   call-codeql-template:
     uses: ./.github/workflows/template_csharp-codeql.yml
     with:
-      solution: 'src/insights/bff/WeatherForecast.sln'
+      solution: 'src/insights/service/MasterData.slnx'

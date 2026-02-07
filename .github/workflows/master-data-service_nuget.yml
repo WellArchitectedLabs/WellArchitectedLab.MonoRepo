@@ -34,4 +34,3 @@ jobs:
 
     secrets:
       GH_PACKAGES_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-s

@@ -20,4 +20,4 @@ jobs:
   call-codeql-template:
     uses: ./.github/workflows/template_csharp-codeql.yml
     with:
-      solution: 'src/insights/service/MasterData.slnx'
+      solution: 'src/master-data/service/MasterData.slnx'

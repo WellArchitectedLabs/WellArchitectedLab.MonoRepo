@@ -39,7 +39,7 @@
     <RequireLicenseAcceptance>false</RequireLicenseAcceptance>
 
     <!-- NuGet UI assets -->
-    <PackageReadmeFile>src/master-data/service/Client/README.md</PackageReadmeFile>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
 
     <!-- Release notes -->
     <PackageReleaseNotes>

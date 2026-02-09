@@ -1,7 +1,7 @@
-using MasterData.Api.Dtos.WfActual.Get.History;
 using MasterData.Client.Dtos;
 using MasterData.Client.Dtos.Parameters;
 using MasterData.Client.Dtos.Responses.City.GetAll;
+using MasterData.Client.Dtos.Responses.WfActual.Get.History;
 using Refit;
 
 namespace MasterData.Client;

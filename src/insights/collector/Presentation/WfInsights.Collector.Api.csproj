@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Swashbuckle.AspNetCore" Version="10.1.2" />
+        <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="10.1.2" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Application\WeatherInsights.Collector.Application.csproj" />
+      <ProjectReference Include="..\Domain\WeatherInsights.Collector.Domain.csproj" />
+      <ProjectReference Include="..\Infrastructure\WeatherInsights.Collector.Infrastructure.csproj" />
+    </ItemGroup>
+
+</Project>

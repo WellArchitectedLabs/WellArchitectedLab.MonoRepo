@@ -33,4 +33,4 @@ jobs:
       increment_patch: ${{ inputs.increment_patch }}
 
     secrets:
-      GH_PACKAGES_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      GH_PACKAGES_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}

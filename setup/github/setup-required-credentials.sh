@@ -17,7 +17,7 @@ command -v dotnet >/dev/null 2>&1 || {
 
 if ! gh auth status >/dev/null 2>&1; then
   echo "You are not logged in to GitHub CLI."
-  gh auth login --scopes read:packages
+  gh auth login
 fi
 
 GITHUB_USERNAME="$(gh api user --jq .login)"

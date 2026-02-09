@@ -60,9 +60,4 @@
     <PackageReference Include="Refit" Version="10.0.1" />
     <PackageReference Include="Refit.HttpClientFactory" Version="10.0.1" />
   </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\Domain\MasterData.Domain.csproj" />
-  </ItemGroup>
-
 </Project>

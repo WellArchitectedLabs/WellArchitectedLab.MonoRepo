@@ -1,5 +1,6 @@
-using MasterData.Api.Dtos.WfActual.Get.History;
+using MasterData.Api.Factories;
 using MasterData.Application.Services.Interfaces;
+using MasterData.Client.Dtos.Responses.WfActual.Get.History;
 using MasterData.Domain.AggregateModel.Actuals;
 using MasterData.Domain.AggregateModel.Actuals.Enums;
 using Microsoft.AspNetCore.Mvc;

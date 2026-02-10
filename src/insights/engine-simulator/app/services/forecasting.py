@@ -4,7 +4,7 @@ from prophet import Prophet
 from statsmodels.tsa.statespace.sarimax import SARIMAX
 
 
-def prophet_forecast(series: pd.Series, horizon: int) -> pd.Series:
+def prophet_forecast(series: pd.Series, horizon: int) -> list[float]:
     df = series.reset_index()
     df.columns = ["ds", "y"]
 
@@ -20,10 +20,10 @@ def prophet_forecast(series: pd.Series, horizon: int) -> pd.Series:
     )
     forecast = model.predict(future)
 
-    return forecast["yhat"].values
+    return forecast["yhat"].tolist()
 
 
-def sarimax_forecast(series: pd.Series, horizon: int) -> pd.Series:
+def sarimax_forecast(series: pd.Series, horizon: int) -> list[float]:
     model = SARIMAX(
         series,
         order=(1, 0, 1),
@@ -32,4 +32,6 @@ def sarimax_forecast(series: pd.Series, horizon: int) -> pd.Series:
         enforce_invertibility=False,
     )
     result = model.fit(disp=False)
-    return result.forecast(horizon)
+
+    # Convert to list explicitly
+    return result.forecast(horizon).tolist()

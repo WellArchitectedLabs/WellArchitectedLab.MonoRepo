@@ -26,12 +26,18 @@ class WeatherInsightsEngineSimulator:
 
         def forecast_column(col):
             try:
-                return prophet_forecast(df[col], horizon)
+                values = prophet_forecast(df[col], horizon)
             except Exception:
                 try:
-                    return sarimax_forecast(df[col], horizon)
+                    values = sarimax_forecast(df[col], horizon)
                 except Exception:
-                    return [df[col].mean()] * horizon
+                    values = [float(df[col].mean())] * horizon
+
+            # Final guardrail
+            if len(values) != horizon:
+                values = (values + [values[-1]])[:horizon]
+
+            return values
 
         temp_f = forecast_column("temperature")
         wind_f = forecast_column("wind")

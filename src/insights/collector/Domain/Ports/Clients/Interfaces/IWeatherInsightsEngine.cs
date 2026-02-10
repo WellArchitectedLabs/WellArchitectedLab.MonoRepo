@@ -16,5 +16,5 @@ public interface IWeatherInsightsEngine
     /// </summary>
     /// <param name="wfEngineInput"></param>
     /// <returns></returns>
-    Task<WfEngineOutput> Call(WfEngineInput wfEngineInput);
+    Task<WfEngineOutput> Call(WfEngineInput wfEngineInput, CancellationToken cancellationToken);
 }

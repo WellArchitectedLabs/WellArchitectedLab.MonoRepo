@@ -6,4 +6,8 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
+    <ItemGroup>
+      <PackageReference Include="MasterData.Client" Version="0.0.1" />
+    </ItemGroup>
+
 </Project>

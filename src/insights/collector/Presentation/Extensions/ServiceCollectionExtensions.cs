@@ -1,5 +1,7 @@
 using WeatherInsights.Collector.Application.Services;
 using WeatherInsights.Collector.Application.Services.Interfaces;
+using MasterData.Api.Extensions;
+using MasterData.Client.Extensions;
 
 namespace WfInsights.Collector.Api.Extensions;
 
@@ -34,6 +36,7 @@ internal static class ServiceCollectionExtensions
 
     private static IServiceCollection RegisterHttpClients(this IServiceCollection services)
     {
+        services.RegisterMasterDataClient("http://localhost:5000");
         return services;
     }
 }

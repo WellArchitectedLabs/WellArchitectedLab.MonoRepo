@@ -8,6 +8,11 @@
 
     <ItemGroup>
       <ProjectReference Include="..\Domain\WeatherInsights.Collector.Domain.csproj" />
+      <ProjectReference Include="..\Infrastructure\WeatherInsights.Collector.Infrastructure.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="MasterData.Client" Version="0.0.1" />
     </ItemGroup>
 
 </Project>

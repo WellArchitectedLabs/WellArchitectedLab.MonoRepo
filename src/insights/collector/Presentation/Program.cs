@@ -1,4 +1,3 @@
-using MasterData.Api.Extensions;
 using WfInsights.Collector.Api.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -18,11 +17,13 @@ builder.Services.AddCors(options =>
         .AllowAnyHeader());
 });
 
-// builder.Services.AddOpenApi();
+builder.Services.AddOpenApi();
+
+builder.Services.RegisterLayers();
 
 var app = builder.Build();
 
-// app.MapOpenApi();
+app.MapOpenApi();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

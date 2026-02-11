@@ -1,3 +1,7 @@
+using Microsoft.Extensions.Logging;
+using WeatherInsights.Collector.Domain.AggregateModel.Technical;
+using WeatherInsights.Collector.Domain.AggregateModel.Technical.Enums;
+
 namespace WeatherInsights.Collector.Domain.Ports.Clients.Models;
 
 /// <summary>
@@ -15,9 +19,93 @@ public record WfEngineOutput
     public required DateOnly ReferenceDate { get; init; }
     
     /// <summary>
+    /// Engine responded on this date time
+    /// </summary>
+    public DateTime ResponseTime = DateTime.UtcNow;
+    
+    /// <summary>
     /// A prediction indexed by hour of the reference date
     /// </summary>
-    public required IDictionary<DateTime, WfEngineOutput> PerHourPrediction { get; init; }
+    public required IDictionary<DateTime, WfEngineInsightOutput> PerHourPrediction { get; init; }
+    
+    
+    /// <summary>
+    /// Validates the wf engine output object and returns the unified validation object.
+    /// Accepts the reference date
+    /// </summary>
+    /// <param name="referenceDate"></param>
+    /// <returns></returns>
+    public IEnumerable<ValidationResult> Validate(DateOnly referenceDate)
+    {
+        var hours = Enumerable.Range(0, 23).ToList();
+        var calculationDateTimes = PerHourPrediction.Keys.ToHashSet();
+        var calculationHours = calculationDateTimes.Select(d => d.Hour).ToHashSet();
+        var nonReportedHours = new List<int>();
+        var nonRelatedDateTimesToReference = new List<DateTime>();
+        var validations = new List<ValidationResult>();
+        foreach (var hour in hours)
+        {
+            if(!calculationHours.Contains(hour))
+                nonReportedHours.Add(hour);
+        }
+
+        foreach (var calculationDateTime in calculationDateTimes)
+        {
+            if(DateOnly.FromDateTime(calculationDateTime) != referenceDate)
+                nonRelatedDateTimesToReference.Add(calculationDateTime);
+        }
+
+        if (nonReportedHours.Any())
+            validations.Add(new ValidationResult(
+                "MissingHours",
+                ValidationStatus.Warning,
+                $"Some reference date hours are not present into engine result. " +
+                $"Non reported hours list: {string.Join(',', nonReportedHours)}" +
+                $"Full DateTime List:  {string.Join(',', calculationHours)}." +
+                $"\r\nReferenceDate: {referenceDate}"));
+           
+        
+        if(nonRelatedDateTimesToReference.Any())
+            validations.Add(new ValidationResult(
+                "UnrelatedToReferenceDate",
+                ValidationStatus.Error,
+                $"Some reported hours by the prediction engine are unrelated to reference date. " +
+                $"Non related hours list: {string.Join(',', nonRelatedDateTimesToReference)}." +
+                $"Full DateTime List:  {string.Join(',', calculationHours)}." +
+                $"\r\nReferenceDate: {referenceDate}"));
+        
+        if (PerHourPrediction.Keys.Count != hours.Count())
+            validations.Add(new ValidationResult(
+                "UnmatchedHoursCount",
+                ValidationStatus.Error,
+                $"The reported number of hours for the reference date by the prediction engine is not equal to {hours.Count()} hours." +
+                $"Hours count:  {PerHourPrediction.Keys.Count}." +
+                $"Full DateTime List:  {string.Join(',', calculationHours)}." +
+                $"\r\nReferenceDate: {referenceDate}"));
+
+        return validations;
+    }
+    
+    /// <summary>
+    /// Validates data anc accepts a logger visitor object for reporting errors, warnings and infos
+    /// </summary>
+    /// <param name="referenceDate"></param>
+    /// <param name="cityId"></param>
+    /// <param name="loggerVisitor"></param>
+    public void ValidateAndLog(DateOnly referenceDate, int cityId, ILogger loggerVisitor)
+    {
+        var validationResults = Validate(referenceDate);
+        foreach (var validationResult in validationResults)
+        {
+            if (validationResult.IsSuccessful)
+                loggerVisitor.LogInformation("validation successful for reference date:  {ReferenceDate} and city Id {CityId}", referenceDate, cityId);
+            if(validationResult.HasWarnings)
+                loggerVisitor.LogWarning(validationResult.UnsuccessfulValidationMessage);
+            if(validationResult.HasErrors)
+                loggerVisitor.LogError(validationResult.UnsuccessfulValidationMessage);
+            
+        }
+    }
 }
 
 /// <summary>
@@ -28,13 +116,13 @@ public record WfEngineInsightOutput
     /// <summary>
     /// Predicted temperature in Celsius
     /// </summary>
-    public required double Temperature { get; init; }
+    public required decimal Temperature { get; init; }
     /// <summary>
     /// Predicted wind speed
     /// </summary>
-    public required double WindSpeed { get; init; }
+    public required decimal WindSpeed { get; init; }
     /// <summary>
     /// Predicted Precipitation
     /// </summary>
-    public required double Precipitation { get; init; }
+    public required decimal Precipitation { get; init; }
 }

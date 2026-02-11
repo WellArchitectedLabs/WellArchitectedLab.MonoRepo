@@ -16,5 +16,5 @@ public enum WeatherEngineExecutionStatus
     /// <summary>
     /// Weather engine returned results, but some warnings are reported.
     /// </summary>
-    Warning
+    Degraded
 }

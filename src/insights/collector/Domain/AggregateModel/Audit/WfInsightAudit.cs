@@ -7,28 +7,28 @@ namespace WeatherInsights.Collector.Domain.AggregateModel.Audit;
 /// This entity stored the input / output payloads for engine calls,
 /// stored by execution time
 /// </summary>
-public class WeatherInsightAudit
+public class WfInsightAudit
 {
     /// <summary>
-    /// The time calculation was executed in UTC
+    /// The time calculation was required from prediction engine in UTC
     /// </summary>
-    public DateTime ExecutionTimeUtc { get; init; }
+    public required DateTime RequestTimeUtc { get; init; }
+    
     /// <summary>
-    /// The concerned timestamp in UTC
+    /// The time calculation was received from prediction engine in UTC
     /// </summary>
-    public DateTime TimestampUtc { get; init; }
+    public required  DateTime ResponseTimeUtc { get; init; }
+    
     /// <summary>
     /// The input for weather forecasting engine for data repro.
     /// </summary>
     public required string WeatherEngineInput { get; init; }
+    
     /// <summary>
     /// The input from weather forecasting engine for data repro.
     /// </summary>
     public required string WeatherEngineOutput { get; init; }
-    /// <summary>
-    /// Execution status
-    /// </summary>
-    public required WeatherEngineExecutionStatus WeatherEngineExecutionStatus { get; init; }
+    
     /// <summary>
     /// The associated weather insight
     /// Is null in case the execution finished with and no insight is stored

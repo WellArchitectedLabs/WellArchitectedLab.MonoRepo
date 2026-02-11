@@ -27,9 +27,10 @@ public interface IMasterDataClient
     /// <param name="historySearchParams"><see cref="HistorySearchParams"/></param>
     /// <param name="cancellationToken">provide cancellation token for stopping canceled processes down to downstream calls</param>
     /// <returns></returns>
-    [Get("api/v1/actual/{referenceDate}")]
+    [Get("api/v1/actual/{referenceDate}/{cityId}")]
     public Task<IEnumerable<WfActualDto>> GetHistoricalSlices(
         DateOnly referenceDate,
+        int cityId,
         [Query] HistorySearchParams  historySearchParams,
         CancellationToken cancellationToken);
 }

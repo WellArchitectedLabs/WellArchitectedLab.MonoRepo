@@ -11,10 +11,9 @@ namespace WeatherInsights.Collector.Infrastructure.Clients;
 /// <summary>
 /// Connecting with prediction service, calls it, deserializes the response
 /// </summary>
-/// <param name="httpClientFactory"></param>
-/// <param name="logger"></param>
+/// <param name="httpClient">secure and injected http client from microsoft extensions</param>
 public class WfEngineClient(
-    HttpClient client) : IWeatherInsightsEngine
+    HttpClient httpClient) : IWeatherInsightsEngine
 {
 
     const string LaunchForecastUri="/forecast";
@@ -26,7 +25,7 @@ public class WfEngineClient(
         var stream = new MemoryStream();
 
         // Wrap it with GZip for compression
-        using (var gzip = new GZipStream(stream, CompressionLevel.Optimal, leaveOpen: true))
+        await using (var gzip = new GZipStream(stream, CompressionLevel.Optimal, leaveOpen: true))
         {
             // Serialize the payload directly to the compressed stream
             await JsonSerializer.SerializeAsync(gzip, wfEngineInput, new JsonSerializerOptions
@@ -45,7 +44,7 @@ public class WfEngineClient(
         content.Headers.ContentEncoding.Add("gzip"); // Important: tell server it's gzipped
 
         // Send request
-        var response = await client.PostAsync(LaunchForecastUri, content, cancellationToken);
+        var response = await httpClient.PostAsync(LaunchForecastUri, content, cancellationToken);
 
         // throws exception is status code is not successful
         response.EnsureSuccessStatusCode();

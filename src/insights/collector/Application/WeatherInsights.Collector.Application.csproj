@@ -15,8 +15,4 @@
       <PackageReference Include="MasterData.Client" Version="0.0.1" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Services\Models\" />
-    </ItemGroup>
-
 </Project>

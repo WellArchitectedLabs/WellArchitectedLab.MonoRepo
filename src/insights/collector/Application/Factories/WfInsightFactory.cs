@@ -1,26 +1,26 @@
 using MasterData.Client.Dtos.Responses.WfActual.Get.History;
 using WeatherInsights.Collector.Domain.AggregateModel.Insight;
+using WeatherInsights.Collector.Domain.Ports.Clients.Models;
 
 namespace WeatherInsights.Collector.Application.Factories;
 
 /// <summary>
-/// Factory methods around <see cref="WfInsightFactory"/>
+/// Factory methods around <see cref="WfInsight"/> entity
 /// </summary>
 public static class WfInsightFactory
 {
     /// <summary>
-    /// Creates a list of <see cref="WfInsight"/> objects from an IEnumerable of <see cref="WfActualDto"/>
+    /// Converts prediction responses to insights, that can be stored into database
     /// </summary>
-    /// <param name="wfActuals"></param>
+    /// <param name="perCityEngineOutput">prediction engine output for a single city</param>
     /// <returns></returns>
-    public static IEnumerable<WfInsight> CreateFromWfActuals(IEnumerable<WfActualDto> wfActuals)
-        => wfActuals.Select(wfActual => new WfInsight
-            {
-                CityId = wfActual.CityId,
-                Precipitation = wfActual.Precipitation,
-                Temperature = wfActual.Temperature,
-                WindSpeed = wfActual.WindSpeed,
-                TimestampUtc =  wfActual.TimestampUtc,
-            });
-    
+    public static IEnumerable<WfInsight> CreateFromEngineResponse(WfEngineOutput perCityEngineOutput)
+     => perCityEngineOutput.PerHourPrediction.Select(perHourPredictionKeyValue => new WfInsight
+        {
+            CityId = perCityEngineOutput.CityId,
+            TimestampUtc = perHourPredictionKeyValue.Key,
+            Temperature = perHourPredictionKeyValue.Value.Temperature,
+            WindSpeed = perHourPredictionKeyValue.Value.WindSpeed,
+            Precipitation = perHourPredictionKeyValue.Value.Precipitation
+        });
 }

@@ -1,7 +1,6 @@
 using System.IO.Compression;
 using System.Net.Http.Headers;
 using System.Text.Json;
-using Microsoft.Extensions.Logging;
 using WeatherInsights.Collector.Domain.Ports.Clients.Interfaces;
 using WeatherInsights.Collector.Domain.Ports.Clients.Models;
 using WeatherInsights.Collector.Infrastructure.Clients.JsonConverters;
@@ -13,10 +12,9 @@ namespace WeatherInsights.Collector.Infrastructure.Clients;
 /// </summary>
 /// <param name="httpClient">secure and injected http client from microsoft extensions</param>
 public class WfEngineClient(
-    HttpClient httpClient) : IWeatherInsightsEngine
+    HttpClient httpClient) : IWfEngineClient
 {
-
-    const string LaunchForecastUri="/forecast";
+    private const string LaunchForecastUri="/forecast";
     
     /// <inheritdoc/>
     public async Task<WfEngineOutput> Call(WfEngineInput wfEngineInput, CancellationToken cancellationToken)
@@ -32,7 +30,7 @@ public class WfEngineClient(
             {
                 DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull,
                 WriteIndented = false
-            });
+            }, cancellationToken);
         }
 
         // Reset stream position
@@ -49,7 +47,7 @@ public class WfEngineClient(
         // throws exception is status code is not successful
         response.EnsureSuccessStatusCode();
 
-        await using var responseStream = await response.Content.ReadAsStreamAsync();
+        await using var responseStream = await response.Content.ReadAsStreamAsync(cancellationToken);
 
         Stream jsonStream = responseStream;
 
@@ -64,9 +62,9 @@ public class WfEngineClient(
         };
 
         options.Converters.Add(new DateOnlyJsonConverter());
-        options.Converters.Add(new DateTimeKeyDictionaryConverter<WfEngineInsightOutput>());
+        options.Converters.Add(new DateTimeKeyDictionaryConverter<WfEngineInsightOutputItem>());
 
-        var result = await JsonSerializer.DeserializeAsync<WfEngineOutput>(jsonStream, options);
+        var result = await JsonSerializer.DeserializeAsync<WfEngineOutput>(jsonStream, options, cancellationToken);
 
         if (result is null)
             throw new InvalidOperationException("Failed to deserialize WfEngineOutput.");

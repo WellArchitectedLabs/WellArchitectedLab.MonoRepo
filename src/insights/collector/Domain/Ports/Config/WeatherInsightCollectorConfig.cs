@@ -8,6 +8,39 @@ namespace WeatherInsights.Collector.Domain.Ports.Config;
 public class WeatherInsightCollectorConfig
 {
     public required EngineCallConfig EngineCallConfig { get; set; }
+    public required MasterDataApiConfig  MasterDataApiConfig { get; set; }
+    public required WfEngineConfig  WfEngineConfig { get; set; }
+}
+
+/// <summary>
+/// Master data api config model
+/// </summary>
+public class MasterDataApiConfig
+{
+    public required string Url { get; set; }
+    public required MasterDataApiValidationThresholds ValidationThresholds { get; set; }
+}
+
+
+/// <summary>
+/// Master data api config model
+/// </summary>
+public class WfEngineConfig
+{
+    public required string Url { get; set; }
+    public required WfEngineConfigValidationThresholds ValidationThresholds { get; set; }
+}
+
+public class MasterDataApiValidationThresholds
+{
+    public int MaxMissingHoursPercentage { get; set; }
+    public int EnforceErrorOnUnrelatedTimeStamps { get; set; }
+}
+
+public class WfEngineConfigValidationThresholds
+{
+    public int MaxMissingHoursPercentage { get; set; }
+    public int EnforceErrorOnUnrelatedTimeStamps { get; set; }
 }
 
 /// <summary>

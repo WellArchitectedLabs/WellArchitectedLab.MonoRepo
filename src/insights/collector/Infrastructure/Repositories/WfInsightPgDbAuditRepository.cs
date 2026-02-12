@@ -1,6 +1,7 @@
 using WeatherInsights.Collector.Domain.AggregateModel.Audit;
 using WeatherInsights.Collector.Domain.AggregateModel.Insight;
 using WeatherInsights.Collector.Domain.Ports.Repositories;
+using WeatherInsights.Collector.Domain.Ports.Repositories.Interfaces;
 
 namespace WeatherInsights.Collector.Infrastructure.Repositories;
 

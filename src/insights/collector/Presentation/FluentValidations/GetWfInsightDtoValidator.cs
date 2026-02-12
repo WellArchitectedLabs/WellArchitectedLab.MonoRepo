@@ -12,9 +12,9 @@ namespace WfInsights.Collector.Api.FluentValidations;
 /// </summary>
 public class GetWfInsightDtoValidator : AbstractValidator<GetWeatherInsightParameters>
 {
-    public GetWfInsightDtoValidator(IOptionsSnapshot<WeatherInsightCollectorConfig> config)
+    public GetWfInsightDtoValidator(IOptionsSnapshot<EndpointsConfig> endpointsConfig)
     {
-        var maxGetEndpointRange = config.Value.Endpoints.GetInsightsV1.MaxRequestDateRangeInDays;
+        var maxGetEndpointRange = endpointsConfig.Value.GetInsightsV1.MaxRequestDateRangeInDays;
         RuleFor(dto => dto.FromDateTime).NotNull();
         RuleFor(dto => dto.ToDateTime).NotNull();
         RuleFor(dto => dto.FromDateTime).GreaterThan(dto => dto.ToDateTime);

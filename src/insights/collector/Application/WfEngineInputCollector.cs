@@ -1,9 +1,9 @@
 using MasterData.Client;
 using MasterData.Client.Dtos.Parameters;
 using Microsoft.Extensions.Options;
-using WeatherInsights.Collector.Application.Factories;
 using WeatherInsights.Collector.Application.Interfaces;
 using WeatherInsights.Collector.Domain.Ports.Clients.Models;
+using WeatherInsights.Collector.Domain.Ports.Clients.Models.Factories;
 using WeatherInsights.Collector.Domain.Ports.Config;
 
 namespace WeatherInsights.Collector.Application;
@@ -12,10 +12,10 @@ namespace WeatherInsights.Collector.Application;
 /// Implements <see cref="IWfEngineInputCollector"/>
 /// </summary>
 /// <param name="masterDataClient"><see cref="IMasterDataClient"/></param>
-/// <param name="configSnapshot">snapshot of <see cref="WeatherInsightCollectorConfig"/></param>
+/// <param name="masterDataServiceConfig">snapshot of <see cref="MasterDataServiceConfig"/></param>
 public class WfEngineInputCollector(
     IMasterDataClient masterDataClient,
-    IOptionsSnapshot<WeatherInsightCollectorConfig> configSnapshot,
+    IOptionsSnapshot<MasterDataServiceConfig> masterDataServiceConfig,
     WfInsightMonitor insightMonitor) : IWfEngineInputCollector
 {
     /// <inheritdoc/>
@@ -23,7 +23,7 @@ public class WfEngineInputCollector(
         DateOnly referenceDate, 
         CancellationToken cancellationToken)
     {
-        var engineCallConfig = configSnapshot.Value.MasterDataApi.Parameters;
+        var engineCallConfig = masterDataServiceConfig.Value.Parameters;
         var wfActuals =  (await masterDataClient.GetHistoricalSlices(
             referenceDate, 
             new HistorySearchParams(engineCallConfig.YearsHistoryDepth, engineCallConfig.RollingWindowDays, engineCallConfig.LeapDayStrategy), 

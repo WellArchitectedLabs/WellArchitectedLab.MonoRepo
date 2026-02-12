@@ -1,8 +1,6 @@
-using MasterData.Client.Dtos.Responses.WfActual.Get.History;
-using WeatherInsights.Collector.Domain.AggregateModel.Insight;
 using WeatherInsights.Collector.Domain.Ports.Clients.Models;
 
-namespace WeatherInsights.Collector.Application.Factories;
+namespace WeatherInsights.Collector.Domain.AggregateModel.Insight.Factories;
 
 /// <summary>
 /// Factory methods around <see cref="WfInsight"/> entity

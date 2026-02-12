@@ -1,7 +1,9 @@
-using WeatherInsights.Collector.Application.Factories;
 using WeatherInsights.Collector.Application.Interfaces;
+using WeatherInsights.Collector.Domain.AggregateModel.Audit.Factories;
+using WeatherInsights.Collector.Domain.AggregateModel.Insight.Factories;
 using WeatherInsights.Collector.Domain.Ports.Clients.Models;
 using WeatherInsights.Collector.Domain.Ports.Repositories;
+using WeatherInsights.Collector.Domain.Ports.Repositories.Interfaces;
 
 namespace WeatherInsights.Collector.Application;
 

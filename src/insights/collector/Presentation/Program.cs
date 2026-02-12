@@ -24,7 +24,7 @@ builder.Services.AddCors(options =>
 
 builder.Services.AddOpenApi();
 
-builder.Services.RegisterLayers();
+builder.Services.RegisterLayers(builder.Configuration);
 
 var app = builder.Build();
 

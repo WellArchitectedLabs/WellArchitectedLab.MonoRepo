@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using MasterData.Client.Dtos.Parameters;
 
 namespace WeatherInsights.Collector.Domain.Ports.Config;
@@ -7,19 +8,25 @@ namespace WeatherInsights.Collector.Domain.Ports.Config;
 /// </summary>
 public class WeatherInsightCollectorConfig
 {
-    public required MasterDataApiConfig  MasterDataApi { get; set; }
-    public required WfEngineConfig  WfEngine { get; set; }
-    public required EndpointsConfig Endpoints { get; set; }
+    [Required] 
+    public MasterDataServiceConfig MasterDataService { get; init; } = null!;
+    [Required]
+    public WfEngineConfig  WfEngine { get; init; } = null!;
+    [Required]
+    public EndpointsConfig Endpoints { get; init; } = null!;
 }
 
 /// <summary>
 /// Master data api config model
 /// </summary>
-public class MasterDataApiConfig
+public class MasterDataServiceConfig
 {
-    public required string Url { get; set; }
-    public required MasterDataApiValidationThresholds Thresholds { get; set; }
-    public required MasterDataApiParameters Parameters { get; set; }
+    [Required, MinLength(1)] 
+    public string Url { get; init; } = null!;
+    [Required] 
+    public TimeStampsThresholdsConfig Thresholds { get; init; } = null!;
+    [Required]
+    public MasterDataApiParameters Parameters { get; init; } = null!;
 }
 
 
@@ -28,20 +35,18 @@ public class MasterDataApiConfig
 /// </summary>
 public class WfEngineConfig
 {
-    public required string Url { get; set; }
-    public required WfEngineValidationThresholdsConfig Thresholds { get; set; }
+    [Required, MinLength(1)] 
+    public string Url { get; init; } = null!;
+    [Required]
+    public TimeStampsThresholdsConfig Thresholds { get; init; } = null!;
 }
 
-public class MasterDataApiValidationThresholds
+public class TimeStampsThresholdsConfig
 {
-    public int MaxToleratedMissingHoursPercentage { get; set; }
-    public int EnforceErrorOnUnrelatedTimeStamps { get; set; }
-}
-
-public class WfEngineValidationThresholdsConfig
-{
-    public int MaxToleratedMissingHoursPercentage { get; set; }
-    public bool EnforceErrorOnUnrelatedTimeStamps { get; set; }
+    [Required, Range(1, 100)]
+    public int MaxToleratedMissingHoursPercentage { get; init; }
+    [Required]
+    public bool EnforceErrorOnUnrelatedTimeStamps { get; init; }
 }
 
 /// <summary>
@@ -52,15 +57,18 @@ public class MasterDataApiParameters
     /// <summary>
     /// We query master data service for this amount of years back for prediction
     /// </summary>
-    public required int YearsHistoryDepth { get; set; }
+    [Required, Range(1, 2)]
+    public int YearsHistoryDepth { get; init; }
     /// <summary>
     /// We instruct master data service to roll actual data by this provided configuration
     /// </summary>
-    public required int RollingWindowDays { get; set; }
+    [Required, Range(1, 7)]
+    public int RollingWindowDays { get; init; }
     /// <summary>
     /// For leap days (29th of february, we apply the following strategy)
     /// </summary>
-    public required LeapDayResolutionStrategy LeapDayStrategy { get; set; }
+    [Required]
+    public LeapDayResolutionStrategy LeapDayStrategy { get; init; }
 }
 
 /// <summary>
@@ -71,7 +79,8 @@ public class EndpointsConfig
     /// <summary>
     /// GET api/v1/insight config
     /// </summary>
-    public required GetInsightsEndpoint GetInsightsV1 { get; set; }
+    [Required]
+    public GetInsightsEndpoint GetInsightsV1 { get; init; } = null!;
 }
 
 /// <summary>
@@ -82,5 +91,6 @@ public class GetInsightsEndpoint
     /// <summary>
     /// Maximum time span difference between from date time and to date time in request payload
     /// </summary>
-    public required int MaxRequestDateRangeInDays { get; set; }
+    [Required, Range(1, 60)]
+    public int MaxRequestDateRangeInDays { get; init; }
 }

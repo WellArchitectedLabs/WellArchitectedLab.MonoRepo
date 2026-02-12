@@ -1,9 +1,8 @@
 using MasterData.Client.Dtos.Responses.WfActual.Get.History;
-using WeatherInsights.Collector.Application.Extensions;
-using WeatherInsights.Collector.Domain.Ports.Clients.Models;
+using WeatherInsights.Collector.Domain.Extensions;
 using WeatherInsights.Collector.Domain.Ports.Config;
 
-namespace WeatherInsights.Collector.Application.Factories;
+namespace WeatherInsights.Collector.Domain.Ports.Clients.Models.Factories;
 
 /// <summary>
 /// Factory methods around <see cref="WfEngineInputFactory"/>

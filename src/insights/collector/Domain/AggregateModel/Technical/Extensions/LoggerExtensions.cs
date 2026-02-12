@@ -1,11 +1,11 @@
 using Microsoft.Extensions.Logging;
 
-namespace WeatherInsights.Collector.Domain.AggregateModel.Technical.Visitors;
+namespace WeatherInsights.Collector.Domain.AggregateModel.Technical.Extensions;
 
 /// <summary>
 /// Extensions around <see cref="ILogger"/>
 /// </summary>
-public static class loggerExtensions
+public static class LoggerExtensions
 {
     /// <summary>
     /// Logs a validation result list via the provided logger object

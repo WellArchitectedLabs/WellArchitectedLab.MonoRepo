@@ -1,4 +1,7 @@
 <Solution>
+  <Folder Name="/Client/">
+    <Project Path="Client/WeatherInsights.Collector.Client.csproj" />
+  </Folder>
   <Folder Name="/Core/">
     <Project Path="Application/WeatherInsights.Collector.Application.csproj" />
     <Project Path="Domain/WeatherInsights.Collector.Domain.csproj" />

@@ -2,11 +2,11 @@ using MasterData.Client;
 using MasterData.Client.Dtos.Parameters;
 using Microsoft.Extensions.Options;
 using WeatherInsights.Collector.Application.Factories;
-using WeatherInsights.Collector.Application.Services.Interfaces;
+using WeatherInsights.Collector.Application.Interfaces;
 using WeatherInsights.Collector.Domain.Ports.Clients.Models;
 using WeatherInsights.Collector.Domain.Ports.Config;
 
-namespace WeatherInsights.Collector.Application.Services;
+namespace WeatherInsights.Collector.Application;
 
 /// <summary>
 /// Implements <see cref="IWfEngineInputCollector"/>
@@ -23,7 +23,7 @@ public class WfEngineInputCollector(
         DateOnly referenceDate, 
         CancellationToken cancellationToken)
     {
-        var engineCallConfig = configSnapshot.Value.EngineCallConfig;
+        var engineCallConfig = configSnapshot.Value.MasterDataApi.Parameters;
         var wfActuals =  (await masterDataClient.GetHistoricalSlices(
             referenceDate, 
             new HistorySearchParams(engineCallConfig.YearsHistoryDepth, engineCallConfig.RollingWindowDays, engineCallConfig.LeapDayStrategy), 

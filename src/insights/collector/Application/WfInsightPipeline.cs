@@ -1,6 +1,8 @@
-using WeatherInsights.Collector.Application.Services.Interfaces;
+using WeatherInsights.Collector.Application.Interfaces;
+using WeatherInsights.Collector.Domain.AggregateModel.Insight;
+using WeatherInsights.Collector.Domain.Ports.Repositories;
 
-namespace WeatherInsights.Collector.Application.Services;
+namespace WeatherInsights.Collector.Application;
 
 /// <summary>
 /// Implements an insights pipelines.
@@ -13,10 +15,11 @@ public class WfInsightPipeline(
     IWfEngineCaller wfEngineCaller,
     IWfEngineInputCollector engineInputCollector,
     IWfInsightModelPersister insightModelPersister,
-    IWfInsightMonitor insightMonitor) : IWfInsightPipeline
+    IWfInsightMonitor insightMonitor,
+    IWfInsightRepository wfInsightRepository) : IWfInsightPipeline
 {
     /// <inheritdoc/>
-    public async Task OrchestratePipeline(DateOnly referenceDate, CancellationToken cancellationToken)
+    public async Task LaunchPrediction(DateOnly referenceDate, CancellationToken cancellationToken)
     {
         var perCityEngineInputs = await engineInputCollector.CollectPredictionInput(referenceDate, cancellationToken);
         var perCityEngineOutputs = await wfEngineCaller.CallEngine(perCityEngineInputs, cancellationToken);
@@ -26,4 +29,9 @@ public class WfInsightPipeline(
             throw new ApplicationException("An internal system inconsistencies prevented server from relaying the calculation. Please refer to logs for more details.");
         await insightModelPersister.PersistModel(perCityEngineInputs, perCityEngineOutputs, cancellationToken);
     }
+    
+    /// <inheritdoc/>
+    public Task<List<WfInsight>> GetInsights(int cityId, DateTime fromDateTime, DateTime toDateTime, CancellationToken cancellationToken) =>
+            wfInsightRepository.GetInsights(cityId, fromDateTime, toDateTime, cancellationToken);
+    
 }

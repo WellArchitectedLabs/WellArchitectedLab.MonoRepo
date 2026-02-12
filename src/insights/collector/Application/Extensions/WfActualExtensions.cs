@@ -23,12 +23,12 @@ public static class WfActualExtensions
     /// </summary>
     /// <param name="wfActuals">list of wf actuals to validate</param>
     /// <param name="referenceDate">reference date</param>
-    /// <param name="engineCallConfig"><see cref="EngineCallConfig"/>: necessary to validate timestamp near / yearly partitioning.</param>
+    /// <param name="masterDataApiParameters"><see cref="PredictionEngineConfig"/>: necessary to validate timestamp near / yearly partitioning.</param>
     /// <returns></returns>
     public static List<ValidationResult> Validate(
         this IEnumerable<WfActualDto> wfActuals,
         DateOnly referenceDate,
-        EngineCallConfig engineCallConfig)
+        MasterDataApiParameters masterDataApiParameters)
     {   
         var actualTimestamps = wfActuals
             .Select(x => x.TimestampUtc)
@@ -42,17 +42,17 @@ public static class WfActualExtensions
         var validationResults = ValidateWindow(
             windowName: "Near history rolling window",
             referenceEndUtc,
-            engineCallConfig.RollingWindowDays,
+            masterDataApiParameters.RollingWindowDays,
             actualTimestamps);
 
-        for (int yearOffset = 1; yearOffset <= engineCallConfig.YearsHistoryDepth; yearOffset++)
+        for (int yearOffset = 1; yearOffset <= masterDataApiParameters.YearsHistoryDepth; yearOffset++)
         {
             var yearlyReferenceEndUtc = referenceEndUtc.AddYears(-yearOffset);
 
             validationResults.AddRange(ValidateWindow(
                 windowName: $"Year -{yearOffset} rolling window history",
                 yearlyReferenceEndUtc,
-                engineCallConfig.RollingWindowDays,
+                masterDataApiParameters.RollingWindowDays,
                 actualTimestamps));
         }
 

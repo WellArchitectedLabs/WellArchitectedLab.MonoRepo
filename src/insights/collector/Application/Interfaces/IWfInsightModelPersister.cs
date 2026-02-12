@@ -1,6 +1,6 @@
 using WeatherInsights.Collector.Domain.Ports.Clients.Models;
 
-namespace WeatherInsights.Collector.Application.Services.Interfaces;
+namespace WeatherInsights.Collector.Application.Interfaces;
 
 /// <summary>
 /// Transforms engine outputs to valida entities

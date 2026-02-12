@@ -1,14 +1,13 @@
 using MasterData.Client.Dtos.Responses.WfActual.Get.History;
 using Microsoft.Extensions.Logging;
 using WeatherInsights.Collector.Application.Extensions;
-using WeatherInsights.Collector.Application.Services.Interfaces;
+using WeatherInsights.Collector.Application.Interfaces;
 using WeatherInsights.Collector.Domain.AggregateModel.Technical;
-using WeatherInsights.Collector.Domain.AggregateModel.Technical.Enums;
 using WeatherInsights.Collector.Domain.AggregateModel.Technical.Visitors;
 using WeatherInsights.Collector.Domain.Ports.Clients.Models;
 using WeatherInsights.Collector.Domain.Ports.Config;
 
-namespace WeatherInsights.Collector.Application.Services;
+namespace WeatherInsights.Collector.Application;
 
 /// <summary>
 /// Validates external data and logs errors when needed
@@ -22,14 +21,14 @@ public class WfInsightMonitor(ILogger<WfInsightMonitor> logger) : IWfInsightMoni
     /// <inheritdoc/>
     public Task<List<ValidationResult>> ApplyValidationAndLogs(
         DateOnly referenceDate,
-        EngineCallConfig engineCallConfig,
+        MasterDataApiParameters masterDataApiParameters,
         List<WfActualDto>? wfActuals,
         CancellationToken cancellationToken)
     {
         if (wfActuals is null || !wfActuals.Any())
             throw new ApplicationException($"{InternalServerErrorMessage}.  Weather Forecast actuals are empty.");
         
-        var validationResults = wfActuals.Validate(referenceDate, engineCallConfig);
+        var validationResults = wfActuals.Validate(referenceDate, masterDataApiParameters);
         logger.LogValidationResults(validationResults);
 
         if (validationResults.Any(validation => validation.HasErrors))

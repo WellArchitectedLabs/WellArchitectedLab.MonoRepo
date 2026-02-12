@@ -1,6 +1,6 @@
 using WeatherInsights.Collector.Domain.Ports.Clients.Models;
 
-namespace WeatherInsights.Collector.Application.Services.Interfaces;
+namespace WeatherInsights.Collector.Application.Interfaces;
 
 /// <summary>
 /// Calls engine given an input

@@ -7,6 +7,8 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="FluentValidation" Version="12.1.1" />
+        <PackageReference Include="FluentValidation.AspNetCore" Version="11.3.1" />
         <PackageReference Include="MasterData.Client" Version="0.0.1" />
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.2" />
         <PackageReference Include="Swashbuckle.AspNetCore" Version="10.1.2" />
@@ -15,6 +17,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\Application\WeatherInsights.Collector.Application.csproj" />
+      <ProjectReference Include="..\Client\WeatherInsights.Collector.Client.csproj" />
       <ProjectReference Include="..\Domain\WeatherInsights.Collector.Domain.csproj" />
       <ProjectReference Include="..\Infrastructure\WeatherInsights.Collector.Infrastructure.csproj" />
     </ItemGroup>

@@ -3,7 +3,7 @@ using WeatherInsights.Collector.Domain.AggregateModel.Technical;
 using WeatherInsights.Collector.Domain.Ports.Clients.Models;
 using WeatherInsights.Collector.Domain.Ports.Config;
 
-namespace WeatherInsights.Collector.Application.Services.Interfaces;
+namespace WeatherInsights.Collector.Application.Interfaces;
 
 /// <summary>
 /// Applies validation on external services models.
@@ -18,13 +18,13 @@ public interface IWfInsightMonitor
     /// And transforms them to structured logs
     /// </summary>
     /// <param name="referenceDate">requested engine calculation date</param>
-    /// <param name="engineCallConfig">necessary for wf actuals cardinality validation</param>
+    /// <param name="masterDataApiParameters">necessary for wf actuals cardinality validation</param>
     /// <param name="wfActuals">wf actuals, as a result to master data service call</param>
     /// <param name="cancellationToken"><see cref="CancellationToken"/></param>
     /// <returns></returns>
     Task<List<ValidationResult>> ApplyValidationAndLogs(
         DateOnly referenceDate,
-        EngineCallConfig engineCallConfig,
+        MasterDataApiParameters masterDataApiParameters,
         List<WfActualDto>? wfActuals,
         CancellationToken cancellationToken);
     

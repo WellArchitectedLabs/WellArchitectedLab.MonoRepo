@@ -1,8 +1,6 @@
 using WeatherInsights.Collector.Domain.Ports.Clients.Models;
 
-namespace WeatherInsights.Collector.Application.Services.Interfaces;
-
-using Domain.AggregateModel.Insight;
+namespace WeatherInsights.Collector.Application.Interfaces;
 
 /// <summary>
 /// Data science engine needs the set of data that is stored in other services

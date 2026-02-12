@@ -4,7 +4,7 @@ using WeatherInsights.Collector.Domain.Ports.Repositories;
 
 namespace WeatherInsights.Collector.Infrastructure.Repositories;
 
-public class WfInsightAuditRepository : IWfInsightAuditRepository
+public class WfInsightPgDbAuditRepository : IWfInsightAuditRepository
 {
     public Task Save(IEnumerable<WfInsightAudit> wfInsights, CancellationToken cancellationToken)
     {

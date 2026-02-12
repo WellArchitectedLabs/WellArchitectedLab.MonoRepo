@@ -1,6 +1,5 @@
 using MasterData.Client.Dtos.Responses.WfActual.Get.History;
 using WeatherInsights.Collector.Application.Extensions;
-using WeatherInsights.Collector.Domain.AggregateModel.Insight;
 using WeatherInsights.Collector.Domain.Ports.Clients.Models;
 using WeatherInsights.Collector.Domain.Ports.Config;
 
@@ -17,26 +16,32 @@ public static class WfEngineInputFactory
     /// <param name="wfActuals"></param>
     /// <param name="referenceDate">date subject of calculation</param>
     /// <param name="cityIds">list of city ids, provided as reference data to prediction engine</param>
-    /// <param name="engineCallConfig">injected from application configs. USed for near / fear years resolution</param>
+    /// <param name="masterDataApiParameters">injected from application configs. USed for near / fear years resolution</param>
     /// <returns></returns>
     public static IEnumerable<WfEngineInput> CreateFromWfActuals(
         DateOnly referenceDate,
         IEnumerable<int> cityIds,
-        EngineCallConfig engineCallConfig,
+        MasterDataApiParameters masterDataApiParameters,
         IEnumerable<WfActualDto> wfActuals)
     {
         var wfActualDtos = wfActuals?.ToList() ?? [];
         var citiesList = cityIds?.ToList() ?? [];
         if (!wfActualDtos.Any())
             throw new ArgumentException("Please provide a non empty wf actuals' list");
-        if(engineCallConfig == null)
+        if(masterDataApiParameters == null)
             throw new ArgumentException("Please provide a non null engine config");
         if(!citiesList.Any())
             throw new ArgumentException("Please provide a non empty cities' list");
-        var perCityNearActuals = wfActualDtos.Where(wfa => wfa.GetDateOnlyTimeStamp() > referenceDate.AddDays(engineCallConfig.RollingWindowDays)).ToLookup(wfa => wfa.CityId);
+        var perCityNearActuals = wfActualDtos
+            .Where(wfa => wfa.GetDateOnlyTimeStamp() > referenceDate.AddDays(masterDataApiParameters.RollingWindowDays))
+            .ToLookup(wfa => wfa.CityId);
         // needed for far actuals calculation
-        var nearTimeStamps = perCityNearActuals.SelectMany(kv => kv.Select(wfa => wfa.GetDateOnlyTimeStamp())).ToHashSet();
-        var perCityFarActuals = wfActualDtos.Where(wfa => nearTimeStamps.Contains(wfa.GetDateOnlyTimeStamp())).ToLookup(wfa => wfa.CityId);
+        var nearTimeStamps = perCityNearActuals.SelectMany(kv => 
+            kv.Select(wfa => wfa.GetDateOnlyTimeStamp()))
+            .ToHashSet();
+        var perCityFarActuals = wfActualDtos
+            .Where(wfa => nearTimeStamps.Contains(wfa.GetDateOnlyTimeStamp()))
+            .ToLookup(wfa => wfa.CityId);
         return citiesList.Select(cityId => new WfEngineInput
         (
             cityId, 

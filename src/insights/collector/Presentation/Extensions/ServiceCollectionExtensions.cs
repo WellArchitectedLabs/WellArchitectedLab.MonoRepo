@@ -1,7 +1,6 @@
-using WeatherInsights.Collector.Application.Services;
-using WeatherInsights.Collector.Application.Services.Interfaces;
-using MasterData.Api.Extensions;
 using MasterData.Client.Extensions;
+using WeatherInsights.Collector.Application;
+using WeatherInsights.Collector.Application.Interfaces;
 using WeatherInsights.Collector.Domain.Ports.Clients.Interfaces;
 using WeatherInsights.Collector.Domain.Ports.Repositories;
 using WeatherInsights.Collector.Infrastructure.Clients;
@@ -39,8 +38,8 @@ internal static class ServiceCollectionExtensions
 
     private static IServiceCollection ResgiterRepositories(this IServiceCollection services)
     {
-        services.AddScoped<IWfInsightDbRepository, WfInsightRepository>();
-        services.AddScoped<IWfInsightAuditRepository, WfInsightAuditRepository>();
+        services.AddScoped<IWfInsightRepository, WfInsightPgDbRepository>();
+        services.AddScoped<IWfInsightAuditRepository, WfInsightPgDbAuditRepository>();
         return services;
     }
 

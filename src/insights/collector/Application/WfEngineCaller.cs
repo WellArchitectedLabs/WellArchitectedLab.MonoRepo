@@ -1,9 +1,9 @@
 using Microsoft.Extensions.Logging;
-using WeatherInsights.Collector.Application.Services.Interfaces;
+using WeatherInsights.Collector.Application.Interfaces;
 using WeatherInsights.Collector.Domain.Ports.Clients.Interfaces;
 using WeatherInsights.Collector.Domain.Ports.Clients.Models;
 
-namespace WeatherInsights.Collector.Application.Services;
+namespace WeatherInsights.Collector.Application;
 
 /// <summary>
 /// Mediator class communicating with the weather insights forecasting engine

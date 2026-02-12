@@ -7,7 +7,7 @@ namespace WeatherInsights.Collector.Domain.Ports.Repositories;
 /// Repository pattern
 /// Managing sb access for <see cref="WfInsight"/> entity
 /// </summary>
-public interface IWfInsightAuditDbRepository
+public interface IWfInsightAuditRepository
 {
     /// <summary>
     /// Saves the provided list of wf insights

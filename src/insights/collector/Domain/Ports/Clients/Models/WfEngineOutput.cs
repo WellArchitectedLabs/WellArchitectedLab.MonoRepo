@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Logging;
 using WeatherInsights.Collector.Domain.AggregateModel.Technical;
 using WeatherInsights.Collector.Domain.AggregateModel.Technical.Enums;
+using WeatherInsights.Collector.Domain.AggregateModel.Technical.Visitors;
 
 namespace WeatherInsights.Collector.Domain.Ports.Clients.Models;
 
@@ -26,7 +27,7 @@ public record WfEngineOutput
     /// <summary>
     /// A prediction indexed by hour of the reference date
     /// </summary>
-    public required IDictionary<DateTime, WfEngineInsightOutput> PerHourPrediction { get; init; }
+    public required IDictionary<DateTime, WfEngineInsightOutputItem> PerHourPrediction { get; init; }
     
     
     /// <summary>
@@ -85,33 +86,12 @@ public record WfEngineOutput
 
         return validations;
     }
-    
-    /// <summary>
-    /// Validates data anc accepts a logger visitor object for reporting errors, warnings and infos
-    /// </summary>
-    /// <param name="referenceDate"></param>
-    /// <param name="cityId"></param>
-    /// <param name="loggerVisitor"></param>
-    public void ValidateAndLog(DateOnly referenceDate, int cityId, ILogger loggerVisitor)
-    {
-        var validationResults = Validate(referenceDate);
-        foreach (var validationResult in validationResults)
-        {
-            if (validationResult.IsSuccessful)
-                loggerVisitor.LogInformation("validation successful for reference date:  {ReferenceDate} and city Id {CityId}", referenceDate, cityId);
-            if(validationResult.HasWarnings)
-                loggerVisitor.LogWarning(validationResult.UnsuccessfulValidationMessage);
-            if(validationResult.HasErrors)
-                loggerVisitor.LogError(validationResult.UnsuccessfulValidationMessage);
-            
-        }
-    }
 }
 
 /// <summary>
 /// Output for a single timeStamp (date + exact hour)
 /// </summary>
-public record WfEngineInsightOutput
+public record WfEngineInsightOutputItem
 {
     /// <summary>
     /// Predicted temperature in Celsius

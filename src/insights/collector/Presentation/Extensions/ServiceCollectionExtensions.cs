@@ -6,6 +6,7 @@ using WeatherInsights.Collector.Domain.Ports.Config;
 using WeatherInsights.Collector.Domain.Ports.Repositories;
 using WeatherInsights.Collector.Domain.Ports.Repositories.Interfaces;
 using WeatherInsights.Collector.Infrastructure.Clients;
+using WeatherInsights.Collector.Infrastructure.Connectors;
 using WeatherInsights.Collector.Infrastructure.Repositories;
 
 namespace WfInsights.Collector.Api.Extensions;
@@ -57,6 +58,7 @@ internal static class ServiceCollectionExtensions
     {
         services.AddScoped<IWfInsightRepository, WfInsightPgDbRepository>();
         services.AddScoped<IWfInsightAuditRepository, WfInsightPgDbAuditRepository>();
+        services.AddScoped<IPostgresDbConnectionFactory, PostgresDbConnectionFactory>();
         return services;
     }
 

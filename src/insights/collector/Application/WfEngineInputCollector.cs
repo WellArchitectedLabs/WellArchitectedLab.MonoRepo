@@ -16,7 +16,7 @@ namespace WeatherInsights.Collector.Application;
 public class WfEngineInputCollector(
     IMasterDataClient masterDataClient,
     IOptionsSnapshot<MasterDataServiceConfig> masterDataServiceConfig,
-    WfInsightMonitor insightMonitor) : IWfEngineInputCollector
+    IWfInsightMonitor insightMonitor) : IWfEngineInputCollector
 {
     /// <inheritdoc/>
     public async Task<IDictionary<int, WfEngineInput>> CollectPredictionInput(

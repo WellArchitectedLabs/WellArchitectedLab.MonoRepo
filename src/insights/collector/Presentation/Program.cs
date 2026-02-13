@@ -1,5 +1,6 @@
 using FluentValidation.AspNetCore;
 using WfInsights.Collector.Api.Extensions;
+using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -28,13 +29,11 @@ builder.Services.RegisterLayers(builder.Configuration);
 
 var app = builder.Build();
 
-app.MapOpenApi();
-
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    app.MapOpenApi();
+    app.MapScalarApiReference();
 }
 
 app.UseHttpsRedirection();

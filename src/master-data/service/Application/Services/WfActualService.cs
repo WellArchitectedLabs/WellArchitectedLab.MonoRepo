@@ -35,6 +35,11 @@ public class WfActualService(IWfActualRepository wfActualRepository, ILogger<WfA
     }
     
     
+    /// <summary>
+    /// Logs missing timestamps
+    /// </summary>
+    /// <param name="requested"></param>
+    /// <param name="actuals"></param>
     private void LogMissingTimestamps(
         IReadOnlyCollection<DateTime> requested,
         IReadOnlyCollection<DateTime> actuals)

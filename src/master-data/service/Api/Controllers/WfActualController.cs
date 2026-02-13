@@ -19,16 +19,14 @@ public class WfActualController(IWfActualService actualService)
     /// </summary>
     /// <returns>ReadOnlyCollection for <see cref="WfActualDto"/> object</returns>
     /// <param name="referenceDate">date subject of forecasting</param>
-    /// <param name="cityId">city, subject of prediction</param>
     /// <param name="historicalDepthYears">number of past years of history returned for prediction analysis</param>
     /// <param name="rollingWindowDays">odd number representing the number of days to pick in every historical year.</param>
     /// <param name="leapDayResolutionStrategy">resolving strategy for leap years (29th of February)</param>
     /// <param name="cancellationToken">provide cancellation token for stopping canceled processes down to downstream calls</param>
-    [Route("api/v1/actual/{referenceDate}/{cityId}")]
+    [Route("api/v1/actual/{referenceDate}")]
     [HttpGet]
     public async Task<IReadOnlyCollection<WfActualDto>> GetHistoricalSlices(
         [FromRoute] DateOnly referenceDate,
-        [FromRoute] int cityId,
         [FromQuery] int historicalDepthYears,
         [FromQuery] int rollingWindowDays,
         [FromQuery] LeapDayResolutionStrategy leapDayResolutionStrategy,

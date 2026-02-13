@@ -25,8 +25,7 @@ public class WfEngineInputCollector(
     {
         var engineCallConfig = masterDataServiceConfig.Value.Parameters;
         var wfActuals =  (await masterDataClient.GetHistoricalSlices(
-            referenceDate, 
-            1,
+            referenceDate,
             new HistorySearchParams(engineCallConfig.YearsHistoryDepth, engineCallConfig.RollingWindowDays, engineCallConfig.LeapDayStrategy), cancellationToken)).ToList();
         await insightMonitor.ApplyValidationAndLogs(referenceDate, engineCallConfig, wfActuals, cancellationToken);
         var cityIds = (await masterDataClient.GetAllCities()).Select(c => c.Id).ToHashSet();

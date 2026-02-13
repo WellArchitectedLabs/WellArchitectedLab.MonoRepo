@@ -3,7 +3,6 @@ using WeatherInsights.Collector.Application;
 using WeatherInsights.Collector.Application.Interfaces;
 using WeatherInsights.Collector.Domain.Ports.Clients.Interfaces;
 using WeatherInsights.Collector.Domain.Ports.Config;
-using WeatherInsights.Collector.Domain.Ports.Repositories;
 using WeatherInsights.Collector.Domain.Ports.Repositories.Interfaces;
 using WeatherInsights.Collector.Infrastructure.Clients;
 using WeatherInsights.Collector.Infrastructure.Connectors;

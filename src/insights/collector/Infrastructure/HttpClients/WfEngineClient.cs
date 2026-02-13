@@ -3,9 +3,9 @@ using System.Net.Http.Headers;
 using System.Text.Json;
 using WeatherInsights.Collector.Domain.Ports.HttpClients.Interfaces;
 using WeatherInsights.Collector.Domain.Ports.HttpClients.Models;
-using WeatherInsights.Collector.Infrastructure.Clients.JsonConverters;
+using WeatherInsights.Collector.Infrastructure.HttpClients.JsonConverters;
 
-namespace WeatherInsights.Collector.Infrastructure.Clients;
+namespace WeatherInsights.Collector.Infrastructure.HttpClients;
 
 /// <summary>
 /// Connecting with prediction service, calls it, deserializes the response

@@ -1,7 +1,7 @@
 using Microsoft.Extensions.Configuration;
 using Npgsql;
 
-namespace WeatherInsights.Collector.Infrastructure.Connectors;
+namespace WeatherInsights.Collector.Infrastructure.DataAccess.Postgres.Connectors;
 
 /// <summary>
 /// A generic db factory for a postgres database

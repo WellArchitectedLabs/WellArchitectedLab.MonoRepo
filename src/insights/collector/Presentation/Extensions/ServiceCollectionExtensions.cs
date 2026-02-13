@@ -1,12 +1,16 @@
+using FluentValidation;
 using MasterData.Client.Extensions;
 using WeatherInsights.Collector.Application;
 using WeatherInsights.Collector.Application.Interfaces;
 using WeatherInsights.Collector.Domain.Ports.Config;
 using WeatherInsights.Collector.Domain.Ports.Database.Repositories.Interfaces;
 using WeatherInsights.Collector.Domain.Ports.HttpClients.Interfaces;
-using WeatherInsights.Collector.Infrastructure.Clients;
-using WeatherInsights.Collector.Infrastructure.Connectors;
-using WeatherInsights.Collector.Infrastructure.Repositories;
+using WeatherInsights.Collector.Domain.Ports.UnitOfWork;
+using WeatherInsights.Collector.Infrastructure.DataAccess.Postgres.Connectors;
+using WeatherInsights.Collector.Infrastructure.DataAccess.Postgres.Repositories;
+using WeatherInsights.Collector.Infrastructure.DataAccess.Postgres.UnitOfWork;
+using WeatherInsights.Collector.Infrastructure.HttpClients;
+using WfInsights.Collector.Api.FluentValidations;
 
 namespace WfInsights.Collector.Api.Extensions;
 
@@ -24,8 +28,14 @@ internal static class ServiceCollectionExtensions
     internal static IServiceCollection RegisterLayers(this IServiceCollection services, IConfiguration configuration)
     {
         return services
+            .RegisterPresentationLayer()
             .ResgiterInfrastructure()
             .RegisterApplicationLayer(configuration);
+    }
+
+    private static IServiceCollection RegisterPresentationLayer(this IServiceCollection services)
+    {
+        return services.AddValidatorsFromAssemblyContaining<GetWeatherInsightParametersValidator>();
     }
     
     /// <summary>
@@ -55,6 +65,8 @@ internal static class ServiceCollectionExtensions
     /// <returns></returns>
     private static IServiceCollection ResgiterInfrastructure(this IServiceCollection services)
     {
+        services.AddScoped<PostgresUnitOfWork>();
+        services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<PostgresUnitOfWork>());
         services.AddScoped<IWfInsightRepository, WfInsightPgDbRepository>();
         services.AddScoped<IWfInsightAuditRepository, WfInsightPgDbAuditRepository>();
         services.AddScoped<IPostgresDbConnectionFactory, PostgresDbConnectionFactory>();

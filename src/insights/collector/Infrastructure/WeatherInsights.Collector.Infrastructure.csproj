@@ -16,4 +16,8 @@
       <ProjectReference Include="..\Domain\WeatherInsights.Collector.Domain.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="DataAccess\Postgres\" />
+    </ItemGroup>
+
 </Project>

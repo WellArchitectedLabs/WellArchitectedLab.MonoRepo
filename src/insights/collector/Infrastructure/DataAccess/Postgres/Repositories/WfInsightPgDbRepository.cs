@@ -1,14 +1,17 @@
 using Dapper;
 using WeatherInsights.Collector.Domain.AggregateModel.Insight;
 using WeatherInsights.Collector.Domain.Ports.Database.Repositories.Interfaces;
-using WeatherInsights.Collector.Infrastructure.UnitOfWork;
+using WeatherInsights.Collector.Infrastructure.DataAccess.Postgres.Connectors;
+using WeatherInsights.Collector.Infrastructure.DataAccess.Postgres.UnitOfWork;
 
-namespace WeatherInsights.Collector.Infrastructure.Repositories;
+namespace WeatherInsights.Collector.Infrastructure.DataAccess.Postgres.Repositories;
 
 /// <summary>
 /// Postgres implementation of <see cref="WfInsight"/> entity data access
 /// </summary>
-public sealed class WfInsightPgDbRepository(PostgresUnitOfWork unitOfWork) : IWfInsightRepository
+public sealed class WfInsightPgDbRepository(
+    PostgresUnitOfWork unitOfWork,
+    IPostgresDbConnectionFactory connectionFactory) : IWfInsightRepository
 {
     /// <inheritdoc/>
     public async Task<ILookup<int, int>> Save(IEnumerable<WfInsight> wfInsights, CancellationToken cancellationToken)
@@ -90,7 +93,7 @@ public sealed class WfInsightPgDbRepository(PostgresUnitOfWork unitOfWork) : IWf
             ORDER BY timestamp_utc;
             """;
 
-        var records = await unitOfWork.Connection.QueryAsync<WfInsight>(
+        var records = await connectionFactory.CreateConnection().QueryAsync<WfInsight>(
             new CommandDefinition(
                 sql,
                 new
@@ -99,7 +102,7 @@ public sealed class WfInsightPgDbRepository(PostgresUnitOfWork unitOfWork) : IWf
                     FromUtc = fromUtc,
                     ToUtc = toUtc
                 },
-                transaction: unitOfWork.Transaction,
+                null,
                 cancellationToken: cancellationToken));
 
         return records.AsList();

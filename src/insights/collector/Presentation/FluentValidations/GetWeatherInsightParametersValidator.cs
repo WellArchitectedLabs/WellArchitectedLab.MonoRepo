@@ -10,14 +10,14 @@ namespace WfInsights.Collector.Api.FluentValidations;
 /// Fluent validation docs: https://docs.fluentvalidation.net/en/latest/custom-validators.html
 /// <see cref="AbstractValidator{T}"/> Installed from nuget package: FluentValidation
 /// </summary>
-public class GetWfInsightDtoValidator : AbstractValidator<GetWeatherInsightParameters>
+public class GetWeatherInsightParametersValidator : AbstractValidator<GetWeatherInsightParameters>
 {
-    public GetWfInsightDtoValidator(IOptionsSnapshot<EndpointsConfig> endpointsConfig)
+    public GetWeatherInsightParametersValidator(IOptionsSnapshot<EndpointsConfig> endpointsConfig)
     {
         var maxGetEndpointRange = endpointsConfig.Value.GetInsightsV1.MaxRequestDateRangeInDays;
         RuleFor(dto => dto.FromDateTime).NotNull();
         RuleFor(dto => dto.ToDateTime).NotNull();
-        RuleFor(dto => dto.FromDateTime).GreaterThan(dto => dto.ToDateTime);
+        RuleFor(dto => dto.ToDateTime).GreaterThan(dto => dto.FromDateTime);
         RuleFor(x => x)
             .Must(o => HaveValidDateRange(o, 30))
             .WithMessage("The date range must not exceed 30 days.");

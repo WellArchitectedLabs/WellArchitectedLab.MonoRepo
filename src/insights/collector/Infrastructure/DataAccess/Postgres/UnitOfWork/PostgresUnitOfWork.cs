@@ -1,8 +1,8 @@
 using Npgsql;
 using WeatherInsights.Collector.Domain.Ports.UnitOfWork;
-using WeatherInsights.Collector.Infrastructure.Connectors;
+using WeatherInsights.Collector.Infrastructure.DataAccess.Postgres.Connectors;
 
-namespace WeatherInsights.Collector.Infrastructure.UnitOfWork;
+namespace WeatherInsights.Collector.Infrastructure.DataAccess.Postgres.UnitOfWork;
 
 /// <summary>
 /// We need to apply the unit of work pattern to our postgres persistence code
@@ -19,6 +19,7 @@ public sealed class PostgresUnitOfWork(IPostgresDbConnectionFactory connectionFa
     public async Task BeginAsync(CancellationToken cancellationToken)
     {
         _connection =  connectionFactory.CreateConnection();
+        await _connection.OpenAsync(cancellationToken);
         _transaction = await _connection.BeginTransactionAsync(cancellationToken);
     }
 

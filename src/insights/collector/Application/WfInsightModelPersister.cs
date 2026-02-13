@@ -31,15 +31,17 @@ public class WfInsightModelPersister(
         {
             var perCityInsights = perCityEngineOutputs.ToDictionary(kv => kv.Key,
                 kv => WfInsightFactory.CreateFromEngineResponse(kv.Value));
-            await wfInsightRepository.Save(perCityInsights.Values.SelectMany(wIns => wIns), cancellationToken);
-            var cityIds = perCityInsights.Keys.Select(k => k).ToHashSet();
-            // since the unit of work instance is scoped, both insights and insight audits
-            // repositories will use the same instance created above
-            var wfInsightAudits = cityIds.SelectMany(cityId =>
-                // we project audit by concerned insights
-                perCityInsights[cityId].Select(wfIns =>
-                    WfInsightAuditFactory.CreateFromWfInsight(perCityEngineInputs[cityId], perCityEngineOutputs[cityId],
-                        wfIns.Id)));
+            
+            var insightIdsByCityId = await wfInsightRepository.Save(
+                perCityInsights.Values.SelectMany(wIns => wIns), cancellationToken);
+
+            var wfInsightAudits = insightIdsByCityId
+                .SelectMany(grp => grp.Select(insightId =>
+                    WfInsightAuditFactory.CreateFromWfInsight(
+                        perCityEngineInputs[grp.Key],
+                        perCityEngineOutputs[grp.Key],
+                        insightId)));
+            
             await wfInsightAuditRepository.Save(wfInsightAudits, cancellationToken);
             
             await unitOfWork.CommitAsync(cancellationToken);

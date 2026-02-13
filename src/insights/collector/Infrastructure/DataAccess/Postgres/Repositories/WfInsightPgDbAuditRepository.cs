@@ -1,9 +1,9 @@
 using Dapper;
 using WeatherInsights.Collector.Domain.AggregateModel.Audit;
 using WeatherInsights.Collector.Domain.Ports.Database.Repositories.Interfaces;
-using WeatherInsights.Collector.Infrastructure.UnitOfWork;
+using WeatherInsights.Collector.Infrastructure.DataAccess.Postgres.UnitOfWork;
 
-namespace WeatherInsights.Collector.Infrastructure.Repositories;
+namespace WeatherInsights.Collector.Infrastructure.DataAccess.Postgres.Repositories;
 
 public sealed class WfInsightPgDbAuditRepository(PostgresUnitOfWork unitOfWork)
     : IWfInsightAuditRepository

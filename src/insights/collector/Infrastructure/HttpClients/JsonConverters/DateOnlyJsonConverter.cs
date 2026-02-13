@@ -1,7 +1,7 @@
-namespace WeatherInsights.Collector.Infrastructure.Clients.JsonConverters;
-
 using System.Text.Json;
 using System.Text.Json.Serialization;
+
+namespace WeatherInsights.Collector.Infrastructure.HttpClients.JsonConverters;
 
 public sealed class DateOnlyJsonConverter : JsonConverter<DateOnly>
 {

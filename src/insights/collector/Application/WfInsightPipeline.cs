@@ -31,7 +31,7 @@ public class WfInsightPipeline(
     }
     
     /// <inheritdoc/>
-    public Task<List<WfInsight>> GetInsights(int cityId, DateTime fromDateTime, DateTime toDateTime, CancellationToken cancellationToken) =>
-            wfInsightRepository.GetInsights(cityId, fromDateTime, toDateTime, cancellationToken);
+    public Task<List<WfInsight>> GetInsights(int cityId, DateTime fromDateTime, DateTime toDateTime, CancellationToken cancellationToken) 
+        => wfInsightRepository.GetInsights(cityId, fromDateTime, toDateTime, cancellationToken);
     
 }

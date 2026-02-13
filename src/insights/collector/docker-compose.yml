@@ -1,5 +1,6 @@
 include:
   - ../data/docker-compose.yml
+  - ../engine-simulator/docker.compose.yml
 
 services:
   insights-collector:
@@ -13,5 +14,7 @@ services:
     ports: 
       - 80:80
     environment:
-      ConnectionStrings__Postgres: "Host=masterdata-postgres;Port=5432;Database=master_data;Username=postgres;Password=postgres;Ssl Mode=Disable;"
+      ConnectionStrings__Postgres: "Host=insights-postgres;Port=5432;Database=master_data;Username=postgres;Password=postgres;Ssl Mode=Disable;"
+      WeEngine__URL: "http://engine-proxy:80"
+      MasterDataService__Url: "http://master-data-service:80"
       ASPNETCORE_ENVIRONMENT: Development

@@ -2,9 +2,9 @@ using MasterData.Client;
 using MasterData.Client.Dtos.Parameters;
 using Microsoft.Extensions.Options;
 using WeatherInsights.Collector.Application.Interfaces;
-using WeatherInsights.Collector.Domain.Ports.Clients.Models;
-using WeatherInsights.Collector.Domain.Ports.Clients.Models.Factories;
 using WeatherInsights.Collector.Domain.Ports.Config;
+using WeatherInsights.Collector.Domain.Ports.HttpClients.Models;
+using WeatherInsights.Collector.Domain.Ports.HttpClients.Models.Factories;
 
 namespace WeatherInsights.Collector.Application;
 

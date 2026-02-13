@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from datetime import datetime
+from datetime import date, datetime
 from typing import Dict
 
 
@@ -11,5 +11,5 @@ class WfEngineInsightOutput(BaseModel):
 
 class WfEngineOutput(BaseModel):
     city_id: int
-    reference_date: datetime
+    reference_date: date
     per_hour_prediction: Dict[datetime, WfEngineInsightOutput]

@@ -1,5 +1,5 @@
 using System.Text.Json;
-using WeatherInsights.Collector.Domain.Ports.Clients.Models;
+using WeatherInsights.Collector.Domain.Ports.HttpClients.Models;
 
 namespace WeatherInsights.Collector.Domain.AggregateModel.Audit.Factories;
 

@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from datetime import datetime
+from datetime import date, datetime
 from typing import Dict
 
 
@@ -11,6 +11,6 @@ class WfEngineInputActualItem(BaseModel):
 
 class WfEngineInput(BaseModel):
     city_id: int
-    reference_date: datetime
+    reference_date: date
     far_history: Dict[datetime, WfEngineInputActualItem]
     near_history: Dict[datetime, WfEngineInputActualItem]

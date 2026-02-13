@@ -1,8 +1,4 @@
-using Microsoft.Extensions.Logging;
-using WeatherInsights.Collector.Domain.AggregateModel.Technical;
-using WeatherInsights.Collector.Domain.AggregateModel.Technical.Enums;
-
-namespace WeatherInsights.Collector.Domain.Ports.Clients.Models;
+namespace WeatherInsights.Collector.Domain.Ports.HttpClients.Models;
 
 /// <summary>
 /// The output returned from prediction engine
@@ -17,7 +13,7 @@ public record WfEngineOutput
     /// <summary>
     /// Reference date concerned by calculation
     /// </summary>
-    public required DateOnly ReferenceDate { get; init; }
+    public required DateTime ReferenceDate { get; init; }
     
     /// <summary>
     /// Engine responded on this date time

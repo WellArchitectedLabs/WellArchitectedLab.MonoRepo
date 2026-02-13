@@ -1,8 +1,8 @@
 using System.IO.Compression;
 using System.Net.Http.Headers;
 using System.Text.Json;
-using WeatherInsights.Collector.Domain.Ports.Clients.Interfaces;
-using WeatherInsights.Collector.Domain.Ports.Clients.Models;
+using WeatherInsights.Collector.Domain.Ports.HttpClients.Interfaces;
+using WeatherInsights.Collector.Domain.Ports.HttpClients.Models;
 using WeatherInsights.Collector.Infrastructure.Clients.JsonConverters;
 
 namespace WeatherInsights.Collector.Infrastructure.Clients;
@@ -29,7 +29,9 @@ public class WfEngineClient(
             await JsonSerializer.SerializeAsync(gzip, wfEngineInput, new JsonSerializerOptions
             {
                 DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull,
-                WriteIndented = false
+                WriteIndented = false,
+                PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower,
+                DictionaryKeyPolicy = JsonNamingPolicy.SnakeCaseLower
             }, cancellationToken);
         }
 
@@ -58,7 +60,9 @@ public class WfEngineClient(
 
         var options = new JsonSerializerOptions
         {
-            PropertyNameCaseInsensitive = true
+            PropertyNameCaseInsensitive = true,
+            PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower,
+            DictionaryKeyPolicy = JsonNamingPolicy.SnakeCaseLower
         };
 
         options.Converters.Add(new DateOnlyJsonConverter());

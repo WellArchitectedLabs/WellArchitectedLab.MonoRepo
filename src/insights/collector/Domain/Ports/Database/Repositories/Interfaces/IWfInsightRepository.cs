@@ -1,6 +1,6 @@
 using WeatherInsights.Collector.Domain.AggregateModel.Insight;
 
-namespace WeatherInsights.Collector.Domain.Ports.Repositories.Interfaces;
+namespace WeatherInsights.Collector.Domain.Ports.Database.Repositories.Interfaces;
 
 /// <summary>
 /// Repository pattern
@@ -13,8 +13,8 @@ public interface IWfInsightRepository
     /// </summary>
     /// <param name="wfInsights">list of wf insights to insert</param>
     /// <param name="cancellationToken"><see cref="CancellationToken"/></param>
-    /// <returns></returns>
-    Task Save(IEnumerable<WfInsight> wfInsights, CancellationToken cancellationToken);
+    /// <returns>A list of insights by city id (24 hours insights by reference date)</returns>
+    Task<ILookup<int, int>> Save(IEnumerable<WfInsight> wfInsights, CancellationToken cancellationToken);
     
     /// <summary>
     /// Queries database and get insights between the provided date times.

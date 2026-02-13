@@ -5,9 +5,9 @@ using WeatherInsights.Collector.Application.Interfaces;
 using WeatherInsights.Collector.Domain.AggregateModel.Technical;
 using WeatherInsights.Collector.Domain.AggregateModel.Technical.Extensions;
 using WeatherInsights.Collector.Domain.Extensions;
-using WeatherInsights.Collector.Domain.Ports.Clients.Models;
-using WeatherInsights.Collector.Domain.Ports.Clients.Models.Validators;
 using WeatherInsights.Collector.Domain.Ports.Config;
+using WeatherInsights.Collector.Domain.Ports.HttpClients.Models;
+using WeatherInsights.Collector.Domain.Ports.HttpClients.Models.Validators;
 
 namespace WeatherInsights.Collector.Application;
 

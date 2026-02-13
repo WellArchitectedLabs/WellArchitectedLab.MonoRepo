@@ -1,5 +1,5 @@
 import pandas as pd
-from datetime import timedelta
+from datetime import datetime, time, timedelta
 from app.models.input import WfEngineInput
 from app.models.output import (
     WfEngineOutput,
@@ -44,7 +44,7 @@ class WeatherInsightsEngineSimulator:
         precip_f = forecast_column("precip")
 
         predictions = {}
-        start = wf_input.reference_date.replace(hour=0, minute=0, second=0)
+        start = datetime.combine(wf_input.reference_date, time.min)
 
         for i in range(24):
             ts = start + timedelta(hours=i)

@@ -2,7 +2,7 @@ using MasterData.Client.Dtos.Responses.WfActual.Get.History;
 using WeatherInsights.Collector.Domain.Extensions;
 using WeatherInsights.Collector.Domain.Ports.Config;
 
-namespace WeatherInsights.Collector.Domain.Ports.Clients.Models.Factories;
+namespace WeatherInsights.Collector.Domain.Ports.HttpClients.Models.Factories;
 
 /// <summary>
 /// Factory methods around <see cref="WfEngineInputFactory"/>
@@ -32,7 +32,7 @@ public static class WfEngineInputFactory
         if(!citiesList.Any())
             throw new ArgumentException("Please provide a non empty cities' list");
         var perCityNearActuals = wfActualDtos
-            .Where(wfa => wfa.GetDateOnlyTimeStamp() > referenceDate.AddDays(masterDataApiParameters.RollingWindowDays))
+            .Where(wfa => wfa.GetDateOnlyTimeStamp() >= referenceDate.AddDays(- masterDataApiParameters.RollingWindowDays))
             .ToLookup(wfa => wfa.CityId);
         // needed for far actuals calculation
         var nearTimeStamps = perCityNearActuals.SelectMany(kv => 

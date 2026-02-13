@@ -1,7 +1,7 @@
 using Microsoft.Extensions.Logging;
 using WeatherInsights.Collector.Application.Interfaces;
-using WeatherInsights.Collector.Domain.Ports.Clients.Interfaces;
-using WeatherInsights.Collector.Domain.Ports.Clients.Models;
+using WeatherInsights.Collector.Domain.Ports.HttpClients.Interfaces;
+using WeatherInsights.Collector.Domain.Ports.HttpClients.Models;
 
 namespace WeatherInsights.Collector.Application;
 

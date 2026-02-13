@@ -1,7 +1,7 @@
 using MasterData.Client.Dtos.Responses.WfActual.Get.History;
 using WeatherInsights.Collector.Domain.AggregateModel.Technical;
-using WeatherInsights.Collector.Domain.Ports.Clients.Models;
 using WeatherInsights.Collector.Domain.Ports.Config;
+using WeatherInsights.Collector.Domain.Ports.HttpClients.Models;
 
 namespace WeatherInsights.Collector.Application.Interfaces;
 

@@ -1,11 +1,11 @@
 using Dapper;
 using WeatherInsights.Collector.Domain.AggregateModel.Audit;
-using WeatherInsights.Collector.Domain.Ports.Repositories.Interfaces;
-using WeatherInsights.Collector.Infrastructure.Connectors;
+using WeatherInsights.Collector.Domain.Ports.Database.Repositories.Interfaces;
+using WeatherInsights.Collector.Infrastructure.UnitOfWork;
 
 namespace WeatherInsights.Collector.Infrastructure.Repositories;
 
-public sealed class WfInsightPgDbAuditRepository(IPostgresDbConnectionFactory connectionFactory)
+public sealed class WfInsightPgDbAuditRepository(PostgresUnitOfWork unitOfWork)
     : IWfInsightAuditRepository
 {
     public async Task Save(IEnumerable<WfInsightAudit> wfInsights, CancellationToken cancellationToken)
@@ -44,8 +44,7 @@ public sealed class WfInsightPgDbAuditRepository(IPostgresDbConnectionFactory co
             );
             """;
 
-        await using var connection = connectionFactory.CreateConnection();
-        await connection.ExecuteAsync(
+        await unitOfWork.Connection.ExecuteAsync(
             new CommandDefinition(
                 sql,
                 new
@@ -56,6 +55,7 @@ public sealed class WfInsightPgDbAuditRepository(IPostgresDbConnectionFactory co
                     Outputs = outputs,
                     InsightIds = insightIds
                 },
+                transaction: unitOfWork.Transaction,
                 cancellationToken: cancellationToken));
     }
 }

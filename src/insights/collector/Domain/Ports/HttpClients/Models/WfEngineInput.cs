@@ -1,6 +1,6 @@
 using MasterData.Client.Dtos.Responses.WfActual.Get.History;
 
-namespace WeatherInsights.Collector.Domain.Ports.Clients.Models;
+namespace WeatherInsights.Collector.Domain.Ports.HttpClients.Models;
 
 /// <summary>
 /// WF engine expects the following object for a single calculation request

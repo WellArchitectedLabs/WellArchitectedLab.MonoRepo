@@ -1,6 +1,6 @@
-using WeatherInsights.Collector.Domain.Ports.Clients.Models;
+using WeatherInsights.Collector.Domain.Ports.HttpClients.Models;
 
-namespace WeatherInsights.Collector.Domain.Ports.Clients.Interfaces;
+namespace WeatherInsights.Collector.Domain.Ports.HttpClients.Interfaces;
 
 /// <summary>
 /// Client interface for interacting with the weather insights engine

@@ -1,22 +1,21 @@
 using Dapper;
-using Npgsql;
 using WeatherInsights.Collector.Domain.AggregateModel.Insight;
-using WeatherInsights.Collector.Domain.Ports.Repositories.Interfaces;
-using WeatherInsights.Collector.Infrastructure.Connectors;
+using WeatherInsights.Collector.Domain.Ports.Database.Repositories.Interfaces;
+using WeatherInsights.Collector.Infrastructure.UnitOfWork;
 
 namespace WeatherInsights.Collector.Infrastructure.Repositories;
 
 /// <summary>
 /// Postgres implementation of <see cref="WfInsight"/> entity data access
 /// </summary>
-public sealed class WfInsightPgDbRepository(IPostgresDbConnectionFactory connectionFactory) : IWfInsightRepository
+public sealed class WfInsightPgDbRepository(PostgresUnitOfWork unitOfWork) : IWfInsightRepository
 {
     /// <inheritdoc/>
-    public async Task Save(IEnumerable<WfInsight> wfInsights, CancellationToken cancellationToken)
+    public async Task<ILookup<int, int>> Save(IEnumerable<WfInsight> wfInsights, CancellationToken cancellationToken)
     {
         var insights = wfInsights as WfInsight[] ?? wfInsights.ToArray();
         if (insights.Length == 0)
-            return;
+            return Enumerable.Empty<(int CityId, int Id)>().ToLookup(x => x.CityId, x => x.Id);
 
         var timestamps = insights.Select(i => DateTime.SpecifyKind(i.TimestampUtc, DateTimeKind.Utc)).ToArray();
         var temperatures = insights.Select(i => i.Temperature).ToArray();
@@ -45,11 +44,11 @@ public sealed class WfInsightPgDbRepository(IPostgresDbConnectionFactory connect
                 wind_speed,
                 precipitation,
                 city_id
-            );
+            )
+            RETURNING id, city_id;
             """;
 
-        await using var connection = connectionFactory.CreateConnection();
-        await connection.ExecuteAsync(
+        var returned = await unitOfWork.Connection.QueryAsync<(int Id, int CityId)>(
             new CommandDefinition(
                 sql,
                 new
@@ -60,7 +59,10 @@ public sealed class WfInsightPgDbRepository(IPostgresDbConnectionFactory connect
                     Precipitations = precipitations,
                     CityIds = cityIds
                 },
+                transaction: unitOfWork.Transaction,
                 cancellationToken: cancellationToken));
+
+        return returned.ToLookup(r => r.CityId, r => r.Id);
     }
 
     /// <inheritdoc/>
@@ -88,9 +90,7 @@ public sealed class WfInsightPgDbRepository(IPostgresDbConnectionFactory connect
             ORDER BY timestamp_utc;
             """;
 
-        await using var connection = connectionFactory.CreateConnection();
-
-        var records = await connection.QueryAsync<WfInsight>(
+        var records = await unitOfWork.Connection.QueryAsync<WfInsight>(
             new CommandDefinition(
                 sql,
                 new
@@ -99,6 +99,7 @@ public sealed class WfInsightPgDbRepository(IPostgresDbConnectionFactory connect
                     FromUtc = fromUtc,
                     ToUtc = toUtc
                 },
+                transaction: unitOfWork.Transaction,
                 cancellationToken: cancellationToken));
 
         return records.AsList();

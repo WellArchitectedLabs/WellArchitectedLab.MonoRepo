@@ -2,7 +2,7 @@ using WeatherInsights.Collector.Domain.AggregateModel.Technical;
 using WeatherInsights.Collector.Domain.AggregateModel.Technical.Enums;
 using WeatherInsights.Collector.Domain.Ports.Config;
 
-namespace WeatherInsights.Collector.Domain.Ports.Clients.Models.Validators;
+namespace WeatherInsights.Collector.Domain.Ports.HttpClients.Models.Validators;
 
 public static class WfEngineOutputValidator
 {

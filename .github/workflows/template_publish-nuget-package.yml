@@ -62,7 +62,7 @@ jobs:
         run: |
           # Fetch latest version from GitHub Packages
           LATEST=$(gh api \
-            /users/WellArchitectedLab/packages/nuget/${{ inputs.package_id }}/versions \
+            /orgs/WellArchitectedLabs/packages/nuget/${{ inputs.package_id }}/versions \
             --jq '.[0].name' 2>/dev/null || echo "")
 
           # Fallback if no package exists yet

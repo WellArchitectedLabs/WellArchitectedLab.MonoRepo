@@ -1,0 +1,17 @@
+include:
+  - ../data/docker-compose.yml
+
+services:
+  insights-collector:
+    # using flyway migration docker image that we pull from dockerhub
+    build:
+      context: ./
+      dockerfile: Dockerfile.insights-collector
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    ports: 
+      - 80:80
+    environment:
+      ConnectionStrings__Postgres: "Host=masterdata-postgres;Port=5432;Database=master_data;Username=postgres;Password=postgres;Ssl Mode=Disable;"
+      ASPNETCORE_ENVIRONMENT: Development

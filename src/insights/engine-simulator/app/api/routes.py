@@ -9,13 +9,9 @@ engine = WeatherInsightsEngineSimulator()
 
 
 @router.post("/forecast", response_model=WfEngineOutput)
-async def forecast(request: Request):
-    content_encoding = request.headers.get("Content-Encoding", "")
-    
-    body = await request.body()
-    
-    if "gzip" in content_encoding:
-        body = gzip.decompress(body)
-    
-    input = WfEngineInput.model_validate_json(body)
+async def forecast(input: WfEngineInput):
     return engine.call(input)
+
+@router.get("/health")
+async def health_check():
+    return {"status": "healthy"}

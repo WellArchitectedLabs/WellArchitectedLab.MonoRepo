@@ -1,6 +1,6 @@
 include:
   - ../data/docker-compose.yml
-  - ../engine-simulator/docker.compose.yml
+  - ../engine-simulator/docker-compose.yml
 
 services:
   insights-collector:
@@ -8,13 +8,22 @@ services:
     build:
       context: ./
       dockerfile: Dockerfile.insights-collector
+      secrets:
+        - dev_secrets
     depends_on:
-      migrate:
+      ## Arrange insights own dependencies
+      insights-postgres-migrate:
         condition: service_completed_successfully
+      engine-proxy:
+        condition: service_healthy
     ports: 
       - 80:80
     environment:
-      ConnectionStrings__Postgres: "Host=insights-postgres;Port=5432;Database=master_data;Username=postgres;Password=postgres;Ssl Mode=Disable;"
-      WeEngine__URL: "http://engine-proxy:80"
+      ConnectionStrings__Postgres: "Host=insights-postgres;Port=5432;Database=insights_database;Username=app_user;Password=app_password;Ssl Mode=Disable;"
+      WfEngine__Url: "http://engine-proxy:80"
       MasterDataService__Url: "http://master-data-service:80"
       ASPNETCORE_ENVIRONMENT: Development
+
+secrets:
+  dev_secrets:
+    file: ~/.wellarchitectedlabs/secrets.json

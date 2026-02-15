@@ -1,18 +1,44 @@
-# Stage 1: Build
+# syntax=docker/dockerfile:1.6
+
+############################
+# Stage 1 — Build
+############################
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /src
 
-# Copy source code
+# Install jq (only in build stage)
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends jq \
+    && rm -rf /var/lib/apt/lists/*
+
 COPY . .
 
-# Go to API project folder
 WORKDIR /src/Presentation
 
-# Restore, build, and publish API project
-RUN dotnet restore
+# Restore using BuildKit secret
+RUN --mount=type=secret,id=dev_secrets \
+    set -e; \
+    SECRET_FILE="/run/secrets/dev_secrets"; \
+    \
+    GITHUB_USERNAME=$(jq -r '.github.username' "$SECRET_FILE"); \
+    GITHUB_TOKEN=$(jq -r '.github.token' "$SECRET_FILE"); \
+    \
+    dotnet nuget add source \
+        --username "$GITHUB_USERNAME" \
+        --password "$GITHUB_TOKEN" \
+        --store-password-in-clear-text \
+        --name github \
+        "https://nuget.pkg.github.com/WellArchitectedLabs/index.json"; \
+    \
+    dotnet restore; \
+    \
+    dotnet nuget remove source github
+
 RUN dotnet publish -c Release -o /app --no-restore
 
-# Stage 2: Runtime
+############################
+# Stage 2 — Runtime
+############################
 FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS runtime
 WORKDIR /app
 
@@ -21,4 +47,4 @@ COPY --from=build /app .
 EXPOSE 80
 ENV ASPNETCORE_URLS=http://+:80
 
-ENTRYPOINT ["dotnet", "MasterData.Api.dll"]
+ENTRYPOINT ["dotnet", "WfInsights.Collector.Api.dll"]

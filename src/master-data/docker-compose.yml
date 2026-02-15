@@ -5,7 +5,7 @@ services:
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: master_data
     volumes:
-      - postgres-data:/var/lib/postgresql/data
+      - master-data-postgres-data:/var/lib/postgresql/data
     ports:
       # necessary for exposing the database instance
       # database instance is exposed on 5431 port to avoid port conflicts with any local postgres instance
@@ -16,7 +16,7 @@ services:
       retries: 10
 
   # We apply the latest migrations
-  migrate:
+  masterdata-postgres-migrate:
     # using flyway migration docker image that we pull from dockerhub
     build:
       context: ./
@@ -40,4 +40,4 @@ services:
       POSTGRES_DATABASE: master_data
 
 volumes:
-  postgres-data:
+  master-data-postgres-data:

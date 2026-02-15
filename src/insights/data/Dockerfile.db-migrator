@@ -7,7 +7,7 @@ RUN apt-get update && apt-get install -y gettext-base && rm -rf /var/lib/apt/lis
 # Create directories
 RUN mkdir -p /flyway/sql /flyway/sql-templates
 
-# Copy migration templates
+# Copy migration into templates
 COPY migrations /flyway/sql-templates
 
 # Create entrypoint script that processes templates

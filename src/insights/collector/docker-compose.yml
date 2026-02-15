@@ -1,7 +1,3 @@
-include:
-  - ../data/docker-compose.yml
-  - ../engine-simulator/docker-compose.yml
-
 services:
   insights-collector:
     # using flyway migration docker image that we pull from dockerhub
@@ -10,12 +6,6 @@ services:
       dockerfile: Dockerfile.insights-collector
       secrets:
         - dev_secrets
-    depends_on:
-      ## Arrange insights own dependencies
-      insights-postgres-migrate:
-        condition: service_completed_successfully
-      engine-proxy:
-        condition: service_healthy
     ports: 
       - 80:80
     environment:

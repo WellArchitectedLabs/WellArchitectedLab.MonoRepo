@@ -1,6 +1,3 @@
-include:
-  - ../docker-compose.yml
-
 services:  
   cities-import:
     tty: true
@@ -8,11 +5,6 @@ services:
     build:
       context: ./
       dockerfile: Dockerfile.cities-initializer
-    depends_on:
-      masterdata-postgres:
-        condition: service_healthy
-      masterdata-postgres-migrate:
-        condition: service_completed_successfully
     environment:
       - POSTGRES_DSN=postgresql://app_user:app_password@masterdata-postgres:5432/master_data?sslmode=disable
     volumes:
@@ -27,11 +19,6 @@ services:
     build:
       context: ./
       dockerfile: Dockerfile.wf-actuals-initializer
-    depends_on:
-      masterdata-postgres:
-        condition: service_healthy
-      masterdata-postgres-migrate:
-        condition: service_completed_successfully
     environment:
       - POSTGRES_DSN=postgresql://app_user:app_password@masterdata-postgres:5432/master_data?sslmode=disable
     volumes:
@@ -46,11 +33,6 @@ services:
     build:
       context: ./
       dockerfile: Dockerfile.wf-actuals-range
-    depends_on:
-      masterdata-postgres:
-        condition: service_healthy
-      masterdata-postgres-migrate:
-        condition: service_completed_successfully
     environment:
       - POSTGRES_DSN=postgresql://app_user:app_password@masterdata-postgres:5432/master_data?sslmode=disable
     command:

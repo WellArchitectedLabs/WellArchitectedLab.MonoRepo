@@ -9,6 +9,7 @@ COMPOSE := docker compose
 
 STAMP_DIR := .make-stamps
 MASTER_DATA_MIGRATE_STAMP := $(STAMP_DIR)/master_data_migrated
+INSIGHTS_DATA_MIGRATE_STAMP := $(STAMP_DIR)/insights_data_migrated
 CITIES_STAMP := $(STAMP_DIR)/cities_imported
 WEATHER_STAMP := $(STAMP_DIR)/weather_imported
 
@@ -36,12 +37,20 @@ $(STAMP_DIR):
 
 $(MASTER_DATA_MIGRATE_STAMP): | $(STAMP_DIR)
 	@printf "$(BLUE)Running migration...$(RESET)\n"
-	cd $(MASTER) && $(COMPOSE) -p $(APP_NAME) up --build masterdata-postgres-migrate
-	cd $(MASTER) && $(COMPOSE) down
+	cd $(MASTER)/data && $(COMPOSE) -p $(APP_NAME) up --build masterdata-postgres-migrate
+	cd $(MASTER)/data && $(COMPOSE) down
 	@touch $(MASTER_DATA_MIGRATE_STAMP)
 	@printf "$(GREEN)Migration completed.$(RESET)\n"
 
+$(INSIGHTS_DATA_MIGRATE_STAMP): | $(STAMP_DIR)
+	@printf "$(BLUE)Running migration...$(RESET)\n"
+	cd $(INSIGHTS)/data && $(COMPOSE) -p $(APP_NAME) up --build insights-postgres-migrate
+	cd $(INSIGHTS)/data && $(COMPOSE) down
+	@touch $(INSIGHTS_DATA_MIGRATE_STAMP)
+	@printf "$(GREEN)Migration completed.$(RESET)\n"
+
 master-data-postgres-migrate: $(MASTER_DATA_MIGRATE_STAMP)
+insights-data-postgres-migrate: $(INSIGHTS_DATA_MIGRATE_STAMP)
 
 ############################################
 # Cities Import (idempotent)
@@ -78,15 +87,16 @@ master-data-service: wf-actuals-import
 	cd $(MASTER)/service && $(COMPOSE) -p $(APP_NAME) up --build -d master-data-service
 	@printf "$(GREEN)Master data service started.$(RESET)\n"
 
-insights-collector: master-data-service
-	@printf "$(BLUE)Starting insights collector...$(RESET)\n"
-	cd $(INSIGHTS)/collector && $(COMPOSE) -p $(APP_NAME) up --build -d insights-collector
-	@printf "$(GREEN)Insights collector started.$(RESET)\n"
-
 insights-engine-simulator:
 	@printf "$(BLUE)Starting engine simulator...$(RESET)\n"
 	cd $(INSIGHTS)/engine-simulator && $(COMPOSE) -p $(APP_NAME) up -d engine-proxy
 	@printf "$(GREEN)Engine simulator running.$(RESET)\n"
+
+insights-collector: master-data-service insights-data-postgres-migrate insights-engine-simulator
+	@printf "$(BLUE)Starting insights collector...$(RESET)\n"
+	cd $(INSIGHTS)/collector && $(COMPOSE) -p $(APP_NAME) up --build -d insights-collector
+	@printf "$(GREEN)Insights collector started.$(RESET)\n"
+
 
 ############################################
 # Utilities

@@ -1,0 +1,23 @@
+# .github/workflows/codeql-insights-bff.yml
+name: CodeQL Analysis -Insights Collector
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+    paths:
+      - 'src/insights/collector/**'
+  pull_request:
+    branches:
+      - main
+      - develop
+    paths:
+      - 'src/insights/collector/**'
+  workflow_dispatch:
+
+jobs:
+  call-codeql-template:
+    uses: ./.github/workflows/template_csharp-codeql.yml
+    with:
+      solution: 'src/insights/collector/WeatherInsights.Collector.slnx'

@@ -56,7 +56,7 @@ jobs:
             );
             if (masterDataFilesTouched) labels.push("master-data");
 
-            // 3 - Weather Master Data Label
+            // 3 - Weather Calibration Label
             const calibrationFilesTouched = files.some(file =>
               file.filename.startsWith("src/calibration/")
             );

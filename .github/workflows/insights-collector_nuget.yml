@@ -1,4 +1,4 @@
-name: Push Nuget Package - Master Data API
+name: Push Nuget Package - Insights Collector
 
 on:
   workflow_dispatch:
@@ -25,8 +25,8 @@ jobs:
   publish:
     uses: ./.github/workflows/template_publish-nuget-package.yml
     with:
-      client_project_path: src/master-data/service/Client
-      package_id: MasterData.Client
+      client_project_path: src/insights/collector/Client
+      package_id: InsightsCollector.Client
 
       increment_major: ${{ inputs.increment_major }}
       increment_minor: ${{ inputs.increment_minor }}

@@ -8,7 +8,7 @@
 
   
   <ItemGroup>
-    <ProjectReference Include="..\Domain\WeatherForecast.Domain.csproj" />
+    <ProjectReference Include="..\Domain\WeatherInsights.Bff.Domain.csproj" />
   </ItemGroup>
 
   

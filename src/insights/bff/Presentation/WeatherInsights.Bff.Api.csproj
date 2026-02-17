@@ -12,9 +12,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Domain\WeatherForecast.Domain.csproj" />
-    <ProjectReference Include="..\Application\WeatherForecast.Application.csproj" />
-    <ProjectReference Include="..\Infrastructure\WeatherForecast.Infrastructure.csproj" />
+    <ProjectReference Include="..\Domain\WeatherInsights.Bff.Domain.csproj" />
+    <ProjectReference Include="..\Application\WeatherInsights.Bff.Application.csproj" />
+    <ProjectReference Include="..\Infrastructure\WeatherInsights.Bff.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

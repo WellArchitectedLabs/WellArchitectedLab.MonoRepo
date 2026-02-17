@@ -1,0 +1,6 @@
+@WeatherInsights.Bff.Api_HostAddress = http://localhost:5238
+
+GET {{WeatherInsights.Bff.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

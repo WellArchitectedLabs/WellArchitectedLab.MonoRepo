@@ -18,7 +18,7 @@ public static class ServiceCollectionExtensions
     /// <param name="services"><see cref="IServiceCollection"/> to extend</param>
     /// <param name="apiAddress">Discovered weather insights api address</param>
     /// <returns></returns>
-    public static IServiceCollection ResgiterInsightsCollectorClient(this IServiceCollection services, string apiAddress)
+    public static IServiceCollection RegisterInsightsCollectorClient(this IServiceCollection services, string apiAddress)
     {
         // nothing special for the moment
         var settings = new RefitSettings();

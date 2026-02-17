@@ -1,7 +1,4 @@
-using MasterData.Client.Dtos.Parameters;
-using MasterData.Client.Dtos.Responses.City.GetAll;
 using Refit;
-using WeatherInsights.Collector.Client.Dtos;
 using WeatherInsights.Collector.Client.Dtos.Parameters.Get;
 using WeatherInsights.Collector.Client.Dtos.Responses.Get;
 

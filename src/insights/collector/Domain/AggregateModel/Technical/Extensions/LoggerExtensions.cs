@@ -8,22 +8,6 @@ namespace WeatherInsights.Collector.Domain.AggregateModel.Technical.Extensions;
 public static class LoggerExtensions
 {
     /// <summary>
-    /// Sanitizes a message before it is written to logs, to prevent log forging.
-    /// Currently removes carriage return and newline characters.
-    /// </summary>
-    private static string SanitizeForLogging(string? message)
-    {
-        if (string.IsNullOrEmpty(message))
-        {
-            return string.Empty;
-        }
-
-        return message
-            .Replace("\r", string.Empty)
-            .Replace("\n", string.Empty);
-    }
-
-    /// <summary>
     /// Logs a validation result list via the provided logger object
     /// </summary>
     /// <param name="logger"><see cref="ILogger"/>to extend</param>
@@ -49,5 +33,22 @@ public static class LoggerExtensions
                     break;
             }
         }
+    }
+    
+    /// <summary>
+    /// Sanitizes a message before it is written to logs, to prevent log forging.
+    /// Currently, removes carriage return and newline characters.
+    /// Sanitization is necessary for security reasons
+    /// </summary>
+    private static string SanitizeForLogging(string? message)
+    {
+        if (string.IsNullOrEmpty(message))
+        {
+            return string.Empty;
+        }
+
+        return message
+            .Replace("\r", string.Empty)
+            .Replace("\n", string.Empty);
     }
 }

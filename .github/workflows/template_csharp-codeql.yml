@@ -32,16 +32,7 @@ jobs:
         uses: github/codeql-action/init@v3
         with:
           languages: ${{ matrix.language }}
-      
-      - name: Add GitHub Packages NuGet source
-        run: |
-          dotnet nuget add source \
-            --username ${{ github.actor }} \
-            --password ${{ secrets.GITHUB_TOKEN }} \
-            --store-password-in-clear-text \
-            --name github \
-            "https://nuget.pkg.github.com/WellArchitectedLabs/index.json"
-            
+
       - name: Debug NuGet
         run: |
           echo "Actor: $GITHUB_ACTOR"

@@ -1,5 +1,7 @@
+using FluentValidation.AspNetCore;
 using Scalar.AspNetCore;
 using WeatherForecast.Api.Extensions;
+using WeatherInsights.Bff.Api.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,18 +10,18 @@ var builder = WebApplication.CreateBuilder(args);
 builder.SetupConfiguration();
 
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddOpenApi();
+
+builder.Services.AddFluentValidationAutoValidation();
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAllPolicy", builder => builder.AllowAnyOrigin()
+    options.AddPolicy("AllowAllPolicy", corsPolicyBuilder => corsPolicyBuilder.AllowAnyOrigin()
     .AllowAnyMethod()
     .AllowAnyHeader());
 });
 
-builder.Services.RegisterLayers();
+builder.Services.RegisterLayers(builder.Configuration);
 
 var app = builder.Build();
 

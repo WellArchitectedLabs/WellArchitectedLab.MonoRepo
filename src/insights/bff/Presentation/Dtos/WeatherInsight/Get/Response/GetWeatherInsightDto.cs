@@ -1,17 +1,10 @@
-namespace WeatherInsights.Collector.Domain.AggregateModel.Insight;
+namespace WeatherInsights.Bff.Api.Dtos.WeatherInsight.Get.Response;
 
 /// <summary>
-/// A Wf insight is a weather calculation that is returned by the weather forecasting engine
-/// Weather Collector arranges the needed input data for the weather forecasting engine to run.
-/// Collector also stores the input payload for reproducible forecasts.
+/// Dto related to Get insights API method
 /// </summary>
-public class WfInsight
+public record GetWeatherInsightDto
 {
-    /// <summary>
-    /// Auto-incremented Id
-    /// </summary>
-    public int Id { get; init; }
-    
     /// <summary>
     /// Timestamp associated to the actual value
     /// Insights are calculated on hourly basis for every day and every city
@@ -34,9 +27,22 @@ public class WfInsight
     /// wiki: https://en.wikipedia.org/wiki/Precipitation
     /// </summary>
     public required decimal Precipitation { get; init; }
-    
-    /// <summary>
-    /// Got from master data Db
-    /// </summary>
-    public required int CityId  { get; init; }
+}
+
+/// <summary>
+/// Factory for creating <see cref="GetWeatherInsightDto"/> objects
+/// </summary>
+public static class GetWeatherInsightDtoFactory
+{
+    public static IEnumerable<GetWeatherInsightDto> CreateFromDomain(
+        IEnumerable<Domain.AggregateModel.Insights.WeatherInsight> weatherInsights)
+    {
+        return weatherInsights.Select(domainInsights => new GetWeatherInsightDto
+        {
+            TimestampUtc = domainInsights.TimestampUtc,
+            Temperature = domainInsights.Temperature,
+            WindSpeed = domainInsights.WindSpeed,
+            Precipitation = domainInsights.Precipitation
+        });
+    }
 }

@@ -1,17 +1,12 @@
-namespace WeatherInsights.Collector.Domain.AggregateModel.Insight;
+namespace WeatherInsights.Bff.Domain.AggregateModel.Insights;
 
 /// <summary>
-/// A Wf insight is a weather calculation that is returned by the weather forecasting engine
-/// Weather Collector arranges the needed input data for the weather forecasting engine to run.
-/// Collector also stores the input payload for reproducible forecasts.
+/// Domain model for a weather insight
+/// Mostly identical to the insights collector model
+/// This is basically the insights collector model, adapter for the Bff business rules.
 /// </summary>
-public class WfInsight
-{
-    /// <summary>
-    /// Auto-incremented Id
-    /// </summary>
-    public int Id { get; init; }
-    
+public class WeatherInsight
+{   
     /// <summary>
     /// Timestamp associated to the actual value
     /// Insights are calculated on hourly basis for every day and every city

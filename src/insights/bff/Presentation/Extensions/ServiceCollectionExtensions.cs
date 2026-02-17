@@ -1,26 +1,47 @@
-using WeatherForecast.Api.Domain.Ports;
-using WeatherForecast.Application;
-using WeatherForecast.Application.Services.Interfaces;
-using WeatherForecast.Domain.Ports.Adapters.Database;
-using WeatherForecast.Infrastructure.Adapters.Database;
-using WeatherForecast.Infrastructure.Redis;
+using FluentValidation;
+using WeatherInsights.Bff.Api.FluentValidations;
+using WeatherInsights.Bff.Application.Services;
+using WeatherInsights.Bff.Application.Services.Interfaces;
+using WeatherInsights.Bff.Domain.Ports.Adapters;
+using WeatherInsights.Bff.Domain.Ports.Configuration;
+using WeatherInsights.Bff.Infrastructure.Adapters;
+using WeatherInsights.Collector.Client.Extensions;
 
-public static class IServiceCollectionExtensions
+namespace WeatherInsights.Bff.Api.Extensions;
+
+/// <summary>
+/// Extensions around <see cref="IServiceCollection"/>
+/// </summary>
+public static class ServiceCollectionExtensions
 {
-    public static IServiceCollection RegisterLayers(this IServiceCollection services)
+    public static IServiceCollection RegisterLayers(
+        this IServiceCollection services,
+        IConfiguration configuration)
     {
-        services.RegisterInfrastructureLayer();
-        return services.RegisterApplicationLayer();
+        return services.RegisterInfrastructureLayer(configuration)
+            .RegisterApplicationLayer()
+            .RegisterPresentationLayer();
     }
 
-    public static IServiceCollection RegisterInfrastructureLayer(this IServiceCollection services)
+    private static IServiceCollection RegisterInfrastructureLayer(
+        this IServiceCollection services, 
+        IConfiguration configuration)
     {
-        services.AddSingleton<IRedisConnector, RedisConnector>();
-        return services.AddScoped<IWeatherForecastDbAdapter, WeatherForecastRedisDbAdapter>();
+        var insightsCollectorUrl = configuration.GetSection(
+            StaticConfigurationPaths.InsightsUrlPath).Value;
+        ArgumentException.ThrowIfNullOrWhiteSpace(insightsCollectorUrl);
+        services.RegisterInsightsCollectorClient(insightsCollectorUrl);
+        services.AddScoped<IWeatherInsightsCollectorAdapter, HttpWeatherInsightsCollectorAdapter>();
+        return services;
     }
     
-    public static IServiceCollection RegisterApplicationLayer(this IServiceCollection services)
+    private static IServiceCollection RegisterApplicationLayer(this IServiceCollection services)
     {
-        return services.AddScoped<IWeatherForecastService, WeatherForecastService>();
+        return services.AddScoped<IWeatherInsightsService, WeatherInsightService>();
+    }
+    
+    private static IServiceCollection RegisterPresentationLayer(this IServiceCollection services)
+    {
+        return services.AddValidatorsFromAssemblyContaining<GetWeatherInsightParameterValidation>();
     }
 }

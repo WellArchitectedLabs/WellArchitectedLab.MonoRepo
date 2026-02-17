@@ -13,6 +13,7 @@
 
   
   <ItemGroup>
+    <PackageReference Include="insightscollector.client" Version="1.0.0" />
     <PackageReference Include="Microsoft.Extensions.Options" Version="10.0.0" />
   </ItemGroup>
 

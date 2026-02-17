@@ -1,4 +1,4 @@
-namespace MasterData.Api.Dtos.WfActual.Get.History;
+namespace MasterData.Client.Dtos.Responses.WfActual.Get.History;
 
 public record WfActualDto
 {
@@ -29,21 +29,4 @@ public record WfActualDto
     /// Foreign key to city table
     /// </summary>
     public required int CityId  { get; init; }
-}
-
-/// <summary>
-/// Factory of <see cref="WfActual"/> type
-/// </summary>
-public static class WfActualDtoFactory
-{
-    public static IEnumerable<WfActualDto> CreateFromDomain(
-        IEnumerable<Domain.AggregateModel.Actuals.WfActual> domainActuals)
-        => domainActuals.Select(domainActual => new WfActualDto
-        {
-            TimestampUtc = domainActual.TimestampUtc,
-            Temperature = domainActual.Temperature,
-            WindSpeed = domainActual.WindSpeed,
-            Precipitation = domainActual.Precipitation,
-            CityId = domainActual.CityId
-        });
 }

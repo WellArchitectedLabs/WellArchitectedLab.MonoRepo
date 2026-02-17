@@ -1,3 +1,5 @@
+using Refit;
+
 namespace MasterData.Client.Dtos.Parameters;
 
 /// <summary>
@@ -9,9 +11,9 @@ namespace MasterData.Client.Dtos.Parameters;
 /// <param name="RollingWindowDays">odd number representing the number of days to pick in every historical year.</param>
 /// <param name="LeapDayResolutionStrategy">resolving strategy for leap years (29th of February)</param>
 public record HistorySearchParams(
-    int HistoricalDepthYears, 
-    int RollingWindowDays, 
-    LeapDayResolutionStrategy LeapDayResolutionStrategy);
+    [property: AliasAs("historicalDepthYears")] int HistoricalDepthYears,
+    [property: AliasAs("rollingWindowDays")] int RollingWindowDays,
+    [property: AliasAs("leapDayResolutionStrategy")] LeapDayResolutionStrategy LeapDayResolutionStrategy);
 
 
 /// <summary>

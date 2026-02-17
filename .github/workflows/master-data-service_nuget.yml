@@ -10,7 +10,7 @@ on:
         required: true
 
       increment_minor:
-        description: "Increment MINOR version for feature style non breaking changess"
+        description: "Increment MINOR version for feature style non breaking changes"
         type: boolean
         default: false
         required: true
@@ -33,4 +33,4 @@ jobs:
       increment_patch: ${{ inputs.increment_patch }}
 
     secrets:
-      GH_PACKAGES_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      GH_PACKAGES_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}

@@ -1,7 +1,7 @@
-using MasterData.Api.Dtos.WfActual.Get.History;
 using MasterData.Client.Dtos;
 using MasterData.Client.Dtos.Parameters;
 using MasterData.Client.Dtos.Responses.City.GetAll;
+using MasterData.Client.Dtos.Responses.WfActual.Get.History;
 using Refit;
 
 namespace MasterData.Client;
@@ -17,7 +17,7 @@ public interface IMasterDataClient
     /// Returns all cities stored in master data database
     /// </summary>
     /// <returns></returns>
-    [Get("api/v1/city")]
+    [Get("/api/v1/city")]
     Task<IEnumerable<CityDto>> GetAllCities();
     
     /// <summary>
@@ -27,7 +27,7 @@ public interface IMasterDataClient
     /// <param name="historySearchParams"><see cref="HistorySearchParams"/></param>
     /// <param name="cancellationToken">provide cancellation token for stopping canceled processes down to downstream calls</param>
     /// <returns></returns>
-    [Get("api/v1/actual/{referenceDate}")]
+    [Get("/api/v1/actual/{referenceDate}")]
     public Task<IEnumerable<WfActualDto>> GetHistoricalSlices(
         DateOnly referenceDate,
         [Query] HistorySearchParams  historySearchParams,

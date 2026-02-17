@@ -62,7 +62,7 @@ jobs:
         run: |
           # Fetch latest version from GitHub Packages
           LATEST=$(gh api \
-            /users/WellArchitectedLab/packages/nuget/${{ inputs.package_id }}/versions \
+            /orgs/WellArchitectedLabs/packages/nuget/${{ inputs.package_id }}/versions \
             --jq '.[0].name' 2>/dev/null || echo "")
 
           # Fallback if no package exists yet
@@ -76,6 +76,8 @@ jobs:
           IFS='.' read -r MAJOR MINOR PATCH <<< "$LATEST"
 
           # Apply increment flags
+          echo "Latest version: $LATEST"
+
           if [[ "${{ inputs.increment_major }}" == "true" ]]; then
             MAJOR=$((MAJOR+1))
             MINOR=0
@@ -91,6 +93,8 @@ jobs:
           echo "Next version: $NEXT"
 
           # Output for subsequent steps
+          NEXT="$MAJOR.$MINOR.$PATCH"
+          echo "Next version: $NEXT"
           echo "value=$NEXT" >> $GITHUB_OUTPUT
 
       - name: Restore

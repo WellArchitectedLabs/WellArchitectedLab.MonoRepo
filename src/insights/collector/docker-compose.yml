@@ -1,0 +1,19 @@
+services:
+  insights-collector:
+    # using flyway migration docker image that we pull from dockerhub
+    build:
+      context: ./
+      dockerfile: Dockerfile.insights-collector
+      secrets:
+        - dev_secrets
+    ports: 
+      - 80:80
+    environment:
+      ConnectionStrings__Postgres: "Host=insights-postgres;Port=5432;Database=insights_database;Username=app_user;Password=app_password;Ssl Mode=Disable;"
+      WfEngine__Url: "http://engine-proxy:80"
+      MasterDataService__Url: "http://master-data-service:80"
+      ASPNETCORE_ENVIRONMENT: Development
+
+secrets:
+  dev_secrets:
+    file: ~/.wellarchitectedlabs/secrets.json

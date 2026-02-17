@@ -1,21 +1,11 @@
-include:
-  - ../staging/docker-compose.yml
-
 services:
   master-data-service:
     # using flyway migration docker image that we pull from dockerhub
     build:
       context: ./
       dockerfile: Dockerfile.master-data-service
-    depends_on:
-      migrate:
-        condition: service_completed_successfully
-      cities-import:
-        condition: service_completed_successfully
-      wf-actuals-import:
-        condition: service_completed_successfully
     ports: 
-      - 80:80
+      - 82:80
     environment:
       ConnectionStrings__Postgres: "Host=masterdata-postgres;Port=5432;Database=master_data;Username=postgres;Password=postgres;Ssl Mode=Disable;"
       ASPNETCORE_ENVIRONMENT: Development

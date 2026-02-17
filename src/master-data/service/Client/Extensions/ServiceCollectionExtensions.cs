@@ -1,3 +1,4 @@
+using MasterData.Client.Formatters;
 using Microsoft.Extensions.DependencyInjection;
 using Refit;
 
@@ -20,8 +21,12 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection RegisterMasterDataClient(this IServiceCollection services, string apiAddress)
     {
         // nothing special for the moment
-        var settings = new RefitSettings();
-        services.AddRefitClient<IMasterDataClient>(settings)
+        var refitSettings = new RefitSettings
+        {
+            UrlParameterFormatter = new DateOnlyUrlParameterFormatter(),
+        };
+        
+        services.AddRefitClient<IMasterDataClient>(refitSettings)
             .ConfigureHttpClient(c => c.BaseAddress = new Uri(apiAddress));
         
         return services;

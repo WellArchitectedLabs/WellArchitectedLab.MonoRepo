@@ -9,6 +9,10 @@ on:
         required: true
         type: string
 
+permissions:
+  contents: read
+  packages: read
+
 jobs:
   codeQLAnalysis:
     name: CodeQL Analysis
@@ -17,6 +21,7 @@ jobs:
       actions: read
       contents: read
       security-events: write
+      packages: read 
     strategy:
       matrix:
         language: ['csharp']
@@ -28,6 +33,22 @@ jobs:
         uses: github/codeql-action/init@v3
         with:
           languages: ${{ matrix.language }}
+
+      - name: Debug NuGet
+        run: |
+          echo "Actor: $GITHUB_ACTOR"
+          echo "Token length: ${#NUGET_AUTH_TOKEN}"
+          dotnet nuget list source
+        env:
+          GITHUB_ACTOR: ${{ github.actor }}
+          NUGET_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Restore dependencies
+        run: dotnet restore ${{ inputs.solution }}
+        env:
+          # Inject env variables for GitHub Packages in Nuget.config level
+          GITHUB_ACTOR: ${{ github.actor }}
+          NUGET_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build Solution
         run: |

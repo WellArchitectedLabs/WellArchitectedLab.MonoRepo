@@ -1,4 +1,4 @@
-name: CI - Build & Master Data Service
+name: CI - Build Master Data Service
 
 on:
     push:

@@ -33,22 +33,17 @@ jobs:
         uses: github/codeql-action/init@v3
         with:
           languages: ${{ matrix.language }}
-
-      - name: Debug NuGet
+      
+      - name: Configure NuGet for GitHub Packages
         run: |
-          echo "Actor: $GITHUB_ACTOR"
-          echo "Token length: ${#NUGET_AUTH_TOKEN}"
-          dotnet nuget list source
-        env:
-          GITHUB_ACTOR: ${{ github.actor }}
-          NUGET_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          dotnet nuget update source GitHub \
+            --username "${{ github.actor }}" \
+            --password "${{ secrets.GITHUB_TOKEN }}" \
+            --store-password-in-clear-text \
+            --configfile ./nuget.config
 
       - name: Restore dependencies
         run: dotnet restore ${{ inputs.solution }}
-        env:
-          # Inject env variables for GitHub Packages in Nuget.config level
-          GITHUB_ACTOR: ${{ github.actor }}
-          NUGET_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build Solution
         run: |

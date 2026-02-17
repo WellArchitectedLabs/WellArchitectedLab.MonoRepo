@@ -42,6 +42,13 @@ jobs:
             --name github \
             "https://nuget.pkg.github.com/WellArchitectedLabs/index.json"
 
+      - name: Restore dependencies
+        run: dotnet restore ${{ inputs.solution }}
+        env:
+          # Inject env variables for GitHub Packages in Nuget.config level
+          GITHUB_ACTOR: ${{ github.actor }}
+          NUGET_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Build Solution
         run: |
           dotnet build ${{ inputs.solution }}

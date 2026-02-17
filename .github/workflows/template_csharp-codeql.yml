@@ -41,6 +41,15 @@ jobs:
             --store-password-in-clear-text \
             --name github \
             "https://nuget.pkg.github.com/WellArchitectedLabs/index.json"
+            
+      - name: Debug NuGet
+        run: |
+          echo "Actor: $GITHUB_ACTOR"
+          echo "Token length: ${#NUGET_AUTH_TOKEN}"
+          dotnet nuget list source
+        env:
+          GITHUB_ACTOR: ${{ github.actor }}
+          NUGET_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Restore dependencies
         run: dotnet restore ${{ inputs.solution }}

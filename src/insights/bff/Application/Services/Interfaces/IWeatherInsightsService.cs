@@ -15,5 +15,9 @@ public interface IWeatherInsightsService
     /// <param name="to">to date in a date time format</param>
     /// <param name="cancellationToken">propagate frontend cancellations to all called APIs.</param>
     /// <returns></returns>
-    Task<List<WeatherInsight>> Get(int cityId, DateTime from, DateTime to, CancellationToken cancellationToken);
+    Task<IReadOnlyCollection<WeatherInsight>> Get(
+        int cityId, 
+        DateTime from, 
+        DateTime to, 
+        CancellationToken cancellationToken);
 }

@@ -15,5 +15,5 @@ public interface IWeatherInsightsCollectorAdapter
     /// <param name="to">a date time to timestamp</param>
     /// <param name="ct">propagate errors to called APIs</param>
     /// <returns>the list of weather insights in the given date range and for the given city id</returns>
-    Task<IEnumerable<WeatherInsight>> Get(int cityId, DateTime from, DateTime to, CancellationToken ct);
+    Task<List<WeatherInsight>> Get(int cityId, DateTime from, DateTime to, CancellationToken ct);
 }

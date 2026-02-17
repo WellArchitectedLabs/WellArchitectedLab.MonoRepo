@@ -12,7 +12,7 @@ public class HttpWeatherInsightsCollectorAdapter
     (IWeatherInsightsClient weatherInsightsHttpClient): IWeatherInsightsCollectorAdapter
 {
     /// <inheritdoc/>
-    public async Task<IEnumerable<WeatherInsight>> Get(int cityId, DateTime from, DateTime to, CancellationToken ct)
+    public async Task<List<WeatherInsight>> Get(int cityId, DateTime from, DateTime to, CancellationToken ct)
     {
         var getWfInsightDto = await weatherInsightsHttpClient.Get(cityId,
             new GetWeatherInsightParameters
@@ -29,6 +29,6 @@ public class HttpWeatherInsightsCollectorAdapter
             WindSpeed = wfDto.WindSpeed,
             TimestampUtc = wfDto.TimestampUtc,
             Precipitation =  wfDto.Precipitation
-        });
+        }).ToList();
     }
 }

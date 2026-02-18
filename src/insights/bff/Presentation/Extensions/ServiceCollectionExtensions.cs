@@ -1,4 +1,5 @@
 using FluentValidation;
+using MasterData.Client.Extensions;
 using WeatherInsights.Bff.Api.FluentValidations;
 using WeatherInsights.Bff.Application.Services;
 using WeatherInsights.Bff.Application.Services.Interfaces;
@@ -30,7 +31,14 @@ public static class ServiceCollectionExtensions
         var insightsCollectorUrl = configuration.GetSection(
             StaticConfigurationPaths.InsightsUrlPath).Value;
         ArgumentException.ThrowIfNullOrWhiteSpace(insightsCollectorUrl);
+        
+        var masterDataClientUrl = configuration.GetSection(
+            StaticConfigurationPaths.MasterDataUrlPath).Value;
+        ArgumentException.ThrowIfNullOrWhiteSpace(masterDataClientUrl);
+        
         services.RegisterInsightsCollectorClient(insightsCollectorUrl);
+        services.RegisterMasterDataClient(masterDataClientUrl);
+        
         services.AddScoped<IWeatherInsightsCollectorAdapter, HttpWeatherInsightsCollectorAdapter>();
         return services;
     }

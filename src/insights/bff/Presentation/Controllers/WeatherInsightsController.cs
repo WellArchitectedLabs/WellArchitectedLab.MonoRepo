@@ -6,7 +6,7 @@ using WeatherInsights.Bff.Application.Services.Interfaces;
 namespace WeatherInsights.Bff.Api.Controllers;
 
 [ApiController]
-[Route("insights")]
+[Route("insight")]
 public class WeatherInsightsController(IWeatherInsightsService weatherInsightsService) : ControllerBase
 {
     [HttpGet]

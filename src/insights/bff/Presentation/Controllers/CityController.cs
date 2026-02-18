@@ -6,12 +6,11 @@ using WeatherInsights.Bff.Application.Services.Interfaces;
 namespace WeatherInsights.Bff.Api.Controllers;
 
 [ApiController]
-[Route("city")]
+[Route("[controller]")]
 public class CityController(ICityService cityService) : ControllerBase
 {
     [HttpGet]
     public async Task<ActionResult> Get(
-        [FromRoute] GetWeatherInsightParameter  parameter,
         CancellationToken cancellationToken)
     {
         var allCities = await cityService.GetAll(cancellationToken);

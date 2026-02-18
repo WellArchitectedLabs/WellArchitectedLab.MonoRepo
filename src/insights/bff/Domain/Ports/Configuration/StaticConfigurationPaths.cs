@@ -7,7 +7,20 @@ namespace WeatherInsights.Bff.Domain.Ports.Configuration;
 /// </summary>
 public static class StaticConfigurationPaths
 {
-    public const string InsightsUrlPath = "InsightsCollector:Url";
-    public const string MasterDataUrlPath = "MasterData:Url";
+    #region private constants
+
+    private const string UrlSuffix = "Url";
+
+    #endregion
+
+    #region public constants
+    
+    
+    public const string InsightsCollector = "InsightsCollector";
+    public const string MasterData = "MasterData";
+    public const string InsightsCollectorUrlPath = $"{InsightsCollector}:{UrlSuffix}";
+    public const string MasterDataUrlPath = $"{MasterData}:{UrlSuffix}";
     public const string EndpointsConfig = "Endpoints";
+
+    #endregion
 }

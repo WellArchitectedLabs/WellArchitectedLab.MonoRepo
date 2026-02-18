@@ -12,14 +12,14 @@ public static class WebApplicationBuilderExtensions
         // validate insight service config and make it accessible via options pattern
         webApplicationBuilder.Services
             .AddOptions<WeatherInsightsCollectorConfig>()
-            .Bind(webApplicationBuilder.Configuration.GetSection(StaticConfigurationPaths.InsightsUrlPath))
+            .Bind(webApplicationBuilder.Configuration.GetSection(StaticConfigurationPaths.InsightsCollector))
             .ValidateDataAnnotations()
             .ValidateOnStart();
         
         // validate master data service config and make it accessible via options pattern
         webApplicationBuilder.Services
             .AddOptions<MasterDataConfig>()
-            .Bind(webApplicationBuilder.Configuration.GetSection(StaticConfigurationPaths.MasterDataUrlPath))
+            .Bind(webApplicationBuilder.Configuration.GetSection(StaticConfigurationPaths.MasterData))
             .ValidateDataAnnotations()
             .ValidateOnStart();
         

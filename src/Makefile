@@ -97,6 +97,11 @@ insights-collector: master-data-service insights-data-postgres-migrate insights-
 	cd $(INSIGHTS)/collector && $(COMPOSE) -p $(APP_NAME) up --build -d insights-collector
 	@printf "$(GREEN)Insights collector started.$(RESET)\n"
 
+insights-bff: insights-collector
+	@printf "$(BLUE)Starting insights BFF...$(RESET)\n"
+	cd $(INSIGHTS)/bff && $(COMPOSE) -p $(APP_NAME) up --build -d insights-bff
+	@printf "$(GREEN)Insights BFF started.$(RESET)\n"
+
 
 ############################################
 # Utilities
@@ -111,6 +116,7 @@ down:
 	cd $(MASTER)/service && $(COMPOSE) -p $(APP_NAME) down || true
 	cd $(INSIGHTS)/collector && $(COMPOSE) -p $(APP_NAME) down || true
 	cd $(INSIGHTS)/engine-simulator && $(COMPOSE) -p $(APP_NAME) down || true
+	cd $(INSIGHTS)/bff && $(COMPOSE) -p $(APP_NAME) down || true
 
 clean: down
 	cd $(MASTER)/data && $(COMPOSE) -p $(APP_NAME) down -v || true
@@ -118,4 +124,5 @@ clean: down
 	cd $(MASTER)/service && $(COMPOSE) -p $(APP_NAME) down -v || true
 	cd $(INSIGHTS)/collector && $(COMPOSE) -p $(APP_NAME) down -v || true
 	cd $(INSIGHTS)/engine-simulator && $(COMPOSE) -p $(APP_NAME) down -v || true
+	cd $(INSIGHTS)/bff && $(COMPOSE) -p $(APP_NAME) down -v || true
 	@rm -rf $(STAMP_DIR)

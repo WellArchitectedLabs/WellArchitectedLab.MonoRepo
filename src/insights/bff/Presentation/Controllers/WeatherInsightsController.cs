@@ -9,7 +9,7 @@ namespace WeatherInsights.Bff.Api.Controllers;
 [Route("insight")]
 public class WeatherInsightsController(IWeatherInsightsService weatherInsightsService) : ControllerBase
 {
-    [HttpGet]
+    [HttpGet("{cityId}/{fromDate}/{toDate}")]
     public async Task<ActionResult> Get(
         [FromRoute] GetWeatherInsightParameter  parameter,
         CancellationToken cancellationToken)

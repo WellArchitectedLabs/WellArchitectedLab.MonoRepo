@@ -29,7 +29,7 @@ public static class ServiceCollectionExtensions
         IConfiguration configuration)
     {
         var insightsCollectorUrl = configuration.GetSection(
-            StaticConfigurationPaths.InsightsUrlPath).Value;
+            StaticConfigurationPaths.InsightsCollectorUrlPath).Value;
         ArgumentException.ThrowIfNullOrWhiteSpace(insightsCollectorUrl);
         
         var masterDataClientUrl = configuration.GetSection(
@@ -39,13 +39,17 @@ public static class ServiceCollectionExtensions
         services.RegisterInsightsCollectorClient(insightsCollectorUrl);
         services.RegisterMasterDataClient(masterDataClientUrl);
         
-        services.AddScoped<IWeatherInsightsCollectorAdapter, HttpWeatherInsightsCollectorAdapter>();
+        services
+            .AddScoped<IWeatherInsightsCollectorAdapter, HttpWeatherInsightsCollectorAdapter>()
+            .AddScoped<IMasterDataAdapter, HttpMasterDataAdapter>();
         return services;
     }
     
     private static IServiceCollection RegisterApplicationLayer(this IServiceCollection services)
     {
-        return services.AddScoped<IWeatherInsightsService, WeatherInsightService>();
+        return services
+            .AddScoped<IWeatherInsightsService, WeatherInsightService>()
+            .AddScoped<ICityService, CityService>();
     }
     
     private static IServiceCollection RegisterPresentationLayer(this IServiceCollection services)

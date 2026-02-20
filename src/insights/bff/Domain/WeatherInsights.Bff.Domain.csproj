@@ -7,6 +7,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="InsightsCollector.Client" Version="1.0.0" />
+    <PackageReference Include="MasterData.Client" Version="2.0.2" />
     <PackageReference Include="StackExchange.Redis" Version="2.10.1" />
   </ItemGroup>
 

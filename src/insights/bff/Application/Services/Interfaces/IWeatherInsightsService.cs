@@ -1,9 +1,9 @@
-using WeatherInsights.Bff.Domain.AggregateModel.Insights;
+using WeatherInsights.Bff.Domain.AggregateModel.Forecast;
 
 namespace WeatherInsights.Bff.Application.Services.Interfaces;
 
 /// <summary>
-/// Management layer for <see cref="WeatherInsight"/> entity
+/// Management layer for <see cref="WeatherForecast"/> entity
 /// </summary>
 public interface IWeatherInsightsService
 {
@@ -15,7 +15,7 @@ public interface IWeatherInsightsService
     /// <param name="to">to date in a date time format</param>
     /// <param name="cancellationToken">propagate frontend cancellations to all called APIs.</param>
     /// <returns></returns>
-    Task<IReadOnlyCollection<WeatherInsight>> Get(
+    Task<IReadOnlyCollection<WeatherForecast>> Get(
         int cityId, 
         DateTime from, 
         DateTime to, 

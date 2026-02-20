@@ -1,4 +1,5 @@
 using WeatherInsights.Bff.Domain.AggregateModel.City;
+using WeatherInsights.Bff.Domain.AggregateModel.Forecast;
 
 namespace WeatherInsights.Bff.Domain.Ports.Adapters;
 
@@ -13,4 +14,14 @@ public interface IMasterDataAdapter
     /// <param name="cancellationToken">propagates task cancellations.</param>
     /// <returns></returns>
     Task<List<City>> GetAllManagedCities(CancellationToken cancellationToken);
+    
+    /// <summary>
+    /// Returns the stored weather actuals (real historical data)
+    /// For the given time range
+    /// </summary>
+    /// <param name="from">return actuals which timestamp is superior to this date</param>
+    /// <param name="to">return actuals which timestamp is inferior to this date</param>
+    /// <param name="cancellationToken">used for cancellation propagation</param>
+    /// <returns></returns>
+    Task<List<WeatherForecast>> GetActuals(DateTime from, DateTime to, CancellationToken cancellationToken);
 }

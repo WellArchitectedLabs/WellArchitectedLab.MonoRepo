@@ -1,11 +1,11 @@
-namespace WeatherInsights.Bff.Domain.AggregateModel.Insights;
+namespace WeatherInsights.Bff.Domain.AggregateModel.Forecast;
 
 /// <summary>
 /// Domain model for a weather insight
 /// Mostly identical to the insights collector model
 /// This is basically the insights collector model, adapter for the Bff business rules.
 /// </summary>
-public class WeatherInsight
+public class WeatherForecast
 {   
     /// <summary>
     /// Timestamp associated to the actual value

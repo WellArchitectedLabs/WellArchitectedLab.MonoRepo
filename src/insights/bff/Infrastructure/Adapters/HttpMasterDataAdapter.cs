@@ -1,5 +1,6 @@
 using MasterData.Client;
 using WeatherInsights.Bff.Domain.AggregateModel.City;
+using WeatherInsights.Bff.Domain.AggregateModel.Forecast;
 using WeatherInsights.Bff.Domain.Ports.Adapters;
 
 namespace WeatherInsights.Bff.Infrastructure.Adapters;
@@ -18,5 +19,11 @@ public class HttpMasterDataAdapter(IMasterDataClient masterDataHttpClient) : IMa
             Id = cDto.Id,
             Name = cDto.Name
         }).ToList();
+    }
+    
+    /// <inheritdoc/>
+    public Task<List<WeatherForecast>> GetActuals(DateTime from, DateTime to, CancellationToken cancellationToken)
+    {
+        throw new NotImplementedException();
     }
 }

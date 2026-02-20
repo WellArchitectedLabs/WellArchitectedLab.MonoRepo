@@ -35,7 +35,7 @@ public record GetWeatherInsightDto
 public static class GetWeatherInsightDtoFactory
 {
     public static IEnumerable<GetWeatherInsightDto> CreateFromDomain(
-        IEnumerable<Domain.AggregateModel.Insights.WeatherInsight> weatherInsights)
+        IEnumerable<Domain.AggregateModel.Forecast.WeatherForecast> weatherInsights)
     {
         return weatherInsights.Select(domainInsights => new GetWeatherInsightDto
         {

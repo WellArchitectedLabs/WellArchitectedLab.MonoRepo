@@ -6,3 +6,9 @@ flyway migrate command: flyway -url='jdbc:postgresql://localhost:5432/master_dat
 
 adding details on make file usage and how to differentiate docker compose level orchestration (startup dependencies) and cross service level orchestration which is done by make.
 Also talk about more modern tools.
+
+Install task as a replacement to make.
+Talk about Makefile vs Taskfile (more modern with yaml defnition)
+installation: brew install go-task
+Main commands: task --list, task target, features like runOnce and clean syntax with deps. Compare it also with modern CI yaml like github workflows or azure devops.
+usage of no build flag: task import-cities NO_BUILD=true

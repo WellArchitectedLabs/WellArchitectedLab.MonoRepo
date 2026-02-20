@@ -7,5 +7,12 @@ services:
     ports: 
       - 82:80
     environment:
-      ConnectionStrings__Postgres: "Host=masterdata-postgres;Port=5432;Database=master_data;Username=postgres;Password=postgres;Ssl Mode=Disable;"
+      ConnectionStrings__Postgres: "Host=masterdata-postgres;Port=5432;Database=master_data;Username=app_user;Password=app_password;Ssl Mode=Disable;"
       ASPNETCORE_ENVIRONMENT: Development
+    networks:
+      - weatherly-network
+  
+networks:
+  weatherly-network:
+    external: true
+    name: weatherly-network

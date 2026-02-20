@@ -12,7 +12,14 @@ services:
       ASPNETCORE_ENVIRONMENT: "Development"
       InsightsCollector__Url: "http://insights-collector:80"
       MasterData__Url: "http://master-data-service:80"
+    networks:
+      - weatherly-network
 
 secrets:
   dev_secrets:
     file: ~/.wellarchitectedlabs/secrets.json
+
+networks:
+  weatherly-network:
+    external: true
+    name: weatherly-network

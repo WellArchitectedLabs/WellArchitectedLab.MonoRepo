@@ -10,6 +10,8 @@ services:
     volumes:
       # mount the local file in the image and mark it as read only
       - ./data/imports:/data:ro
+    networks:
+      - weatherly-network
     command: ["--input", "/data/capitals.csv"]
     # the init script needs to be ran once
     restart: "no"
@@ -23,6 +25,8 @@ services:
       - POSTGRES_DSN=postgresql://app_user:app_password@masterdata-postgres:5432/master_data?sslmode=disable
     volumes:
       - ./data/imports:/data:ro
+    networks:
+      - weatherly-network
     command: ["--input", "/data/weather_hourly-full.csv"]
     restart: "no"
   wf-actuals-range-db-import:
@@ -35,6 +39,8 @@ services:
       dockerfile: Dockerfile.wf-actuals-range
     environment:
       - POSTGRES_DSN=postgresql://app_user:app_password@masterdata-postgres:5432/master_data?sslmode=disable
+    networks:
+      - weatherly-network
     command:
       - "--from-date"
       - "${FROM_DATE:-2026-01-01}"
@@ -45,3 +51,8 @@ services:
 # necessary for postgres persistence
 volumes:
   postgres-data:
+
+networks:
+  weatherly-network:
+    external: true
+    name: weatherly-network

@@ -10,7 +10,7 @@ namespace WeatherInsights.Collector.Client.Extensions;
 public static class ServiceCollectionExtensions
 {
     /// <summary>
-    /// This utility method helps you register <see cref="WeatherInsights.Collector.Client.IWeatherInsightsClient"/>
+    /// This utility method helps you register <see cref="IWeatherInsightsCollectorClient"/>
     /// Into startup by a single extension method call.
     /// Using this method, you would be able to register the client without extra configuration effort.
     /// Only the API address is needed since it depends on calling code environment.
@@ -22,7 +22,7 @@ public static class ServiceCollectionExtensions
     {
         // nothing special for the moment
         var settings = new RefitSettings();
-        services.AddRefitClient<IWeatherInsightsClient>(settings)
+        services.AddRefitClient<IWeatherInsightsCollectorClient>(settings)
             .ConfigureHttpClient(c => c.BaseAddress = new Uri(apiAddress));
         
         return services;

@@ -48,7 +48,7 @@ public interface IMasterDataClient
     /// then just provide a hour based time part with 00 minutes and 00 seconds</remarks>
     /// <returns></returns>
     [Get("/api/v1/actual")] 
-    Task<IReadOnlyCollection<GetByRangeDto>> GetByDateRange(
+    Task<IReadOnlyCollection<GetByRangeDto>> Search(
         [Query] int cityId,
         [Query] DateTime from,
         [Query] DateTime  to,

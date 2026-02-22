@@ -11,8 +11,9 @@ namespace MasterData.Api.Controllers;
 /// <summary>
 /// API Controller for <see cref="WfActual"/> entities
 /// </summary>
-/// <param name="actualService"></param>
+/// <param name="actualService">actuals service</param>
 [ApiController]
+[Route("api/v1/actual")]
 public class WfActualController(IWfActualService actualService)
 {
     /// <summary>
@@ -24,7 +25,7 @@ public class WfActualController(IWfActualService actualService)
     /// <param name="rollingWindowDays">odd number representing the number of days to pick in every historical year.</param>
     /// <param name="leapDayResolutionStrategy">resolving strategy for leap years (29th of February)</param>
     /// <param name="cancellationToken">provide cancellation token for stopping canceled processes down to downstream calls</param>
-    [Route("api/v1/actual/{referenceDate}")]
+    [Route("{referenceDate}")]
     [HttpGet]
     public async Task<IReadOnlyCollection<GetHistoricalSlicesDto>> GetHistoricalSlices(
         [FromRoute] DateOnly referenceDate,
@@ -50,15 +51,14 @@ public class WfActualController(IWfActualService actualService)
     /// <param name="from">date subject of forecasting</param>
     /// <param name="to">number of past years of history returned for prediction analysis</param>
     /// <param name="ct">provide cancellation token for stopping canceled processes down to downstream calls</param>
-    [Route("api/v1/actual")]
     [HttpGet]
-    public async Task<IReadOnlyCollection<GetByRangeDto>> GetByDateRange(
+    public async Task<IReadOnlyCollection<GetByRangeDto>> Search(
         [FromQuery] int cityId,
-        [FromQuery] DateTime from, 
-        [FromQuery] DateTime to, 
+        [FromQuery] DateTime from,
+        [FromQuery] DateTime to,
         CancellationToken ct)
     {
-        var getByRangeFromService = await actualService.GetByDateRange(cityId, from, to, ct);
+        var getByRangeFromService = await actualService.Search(cityId, from, to, ct);
         return GetByRangeDtoFactory.CreateFromDomain(getByRangeFromService).ToList();
     }
 }

@@ -9,7 +9,7 @@ namespace WeatherInsights.Collector.Client;
 /// As part of a bring your own client approach, this client will be published
 /// as a nuget package for consumption by consuming teams
 /// </summary>
-public interface IWeatherInsightsClient
+public interface IWeatherInsightsCollectorClient
 {
     /// <summary>
     /// Returns all cities stored in master data database.

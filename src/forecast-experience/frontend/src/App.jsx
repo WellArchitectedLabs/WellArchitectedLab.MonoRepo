@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import ForecastCard from "./components/ForecastCard";
 import WeatherDashboard from "./components/WeatherDashboard";
 import { loadConfig } from './configLoader';
 

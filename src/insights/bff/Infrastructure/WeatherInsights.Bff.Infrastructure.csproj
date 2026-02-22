@@ -13,8 +13,8 @@
 
   
   <ItemGroup>
-    <PackageReference Include="insightscollector.client" Version="1.0.0" />
-    <PackageReference Include="MasterData.Client" Version="2.2.1" />
+    <PackageReference Include="insightscollector.client" Version="1.0.1" />
+    <PackageReference Include="MasterData.Client" Version="2.2.2" />
     <PackageReference Include="Microsoft.Extensions.Options" Version="10.0.0" />
   </ItemGroup>
 

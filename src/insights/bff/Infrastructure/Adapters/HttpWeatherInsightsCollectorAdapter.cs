@@ -9,7 +9,7 @@ namespace WeatherInsights.Bff.Infrastructure.Adapters;
 /// Wrapper around <see cref="IWeatherInsightsClient"/>
 /// </summary>
 public class HttpWeatherInsightsCollectorAdapter
-    (IWeatherInsightsClient weatherInsightsHttpClient): IWeatherInsightsCollectorAdapter
+    (IWeatherInsightsCollectorClient weatherInsightsHttpClient): IWeatherInsightsCollectorAdapter
 {
     /// <inheritdoc/>
     public async Task<IReadOnlyCollection<WeatherForecast>> Get(

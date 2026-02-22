@@ -25,7 +25,7 @@ public class HttpMasterDataAdapter(IMasterDataClient masterDataHttpClient) : IMa
     public async Task<List<WeatherForecast>> GetActuals(
         int cityId, DateTime from, DateTime to, CancellationToken cancellationToken)
     {
-        var wfActuals = await masterDataHttpClient.GetByDateRange(cityId, from, to, cancellationToken);
+        var wfActuals = await masterDataHttpClient.Search(cityId, from, to, cancellationToken);
         return wfActuals.Select(wfActual => new WeatherForecast
         {
             CityId = cityId,

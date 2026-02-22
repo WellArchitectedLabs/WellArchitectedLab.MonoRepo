@@ -3,7 +3,7 @@ coverage:
     project:
       insights-bff:
         paths:
-          - src/insights/bff/**
+          - src/forecast-experience/bff/**
         flag_coverage_not_uploaded_behavior: exclude # don't send status checks that don't have flag 
         # do not tolerate any drift compared to the set coverage target below
         threshold: "0%"
@@ -19,7 +19,7 @@ coverage:
       insights-frontend:
         flag_coverage_not_uploaded_behavior: exclude
         paths:
-          - src/insights/frontend/**
+          - src/forecast-experience/frontend/**
         # do not tolerate any drift compared to the set coverage target below
         threshold: "0%"
         # coverage target

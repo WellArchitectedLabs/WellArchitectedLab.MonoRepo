@@ -3,18 +3,18 @@ using WeatherInsights.Collector.Domain.AggregateModel.Technical;
 using WeatherInsights.Collector.Domain.AggregateModel.Technical.Enums;
 using WeatherInsights.Collector.Domain.Ports.Config;
 
-namespace WeatherInsights.Collector.Domain.Extensions;
+namespace WeatherInsights.Collector.Domain.AggregateModel.Insight.Extensions;
 
 /// <summary>
-/// Utility methods around <see cref="WfActualDto"/>
+/// Utility methods around <see cref="GetHistoricalSlicesDto"/>
 /// </summary>
-public static class WfActualExtensions
+public static class GetHistoricalSlicesDtoExtensions
 {
     /// <summary>
     /// Gets actual timestamp in <see cref="DateOnly"/> format
     /// </summary>
     /// <param name="wfActualDto"></param>
-    public static DateOnly GetDateOnlyTimeStamp(this WfActualDto wfActualDto) =>
+    public static DateOnly GetDateOnlyTimeStamp(this GetHistoricalSlicesDto wfActualDto) =>
         DateOnly.FromDateTime(wfActualDto.TimestampUtc);
     
     /// <summary>
@@ -26,7 +26,7 @@ public static class WfActualExtensions
     /// <param name="thresholds">Application settings threshold</param>
     /// <returns></returns>
     public static List<ValidationResult> Validate(
-        this IEnumerable<WfActualDto> wfActuals,
+        this IEnumerable<GetHistoricalSlicesDto> wfActuals,
         DateOnly referenceDate,
         MasterDataApiParameters masterDataApiParameters,
         TimeStampsThresholdsConfig thresholds)

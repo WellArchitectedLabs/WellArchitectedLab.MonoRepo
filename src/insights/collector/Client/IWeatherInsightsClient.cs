@@ -29,7 +29,7 @@ public interface IWeatherInsightsClient
     /// <param name="cancellationToken">Please provide for proper cancellation management.</param>
     /// <returns></returns>
     [Get("/api/wfInsight/{cityId}")]
-    public Task<IReadOnlyCollection<GetWfInsightDto>> Get(
+    Task<IReadOnlyCollection<GetWfInsightDto>> Get(
         int cityId,
         [Query] GetWeatherInsightParameters weatherInsightParameters,
         CancellationToken cancellationToken);

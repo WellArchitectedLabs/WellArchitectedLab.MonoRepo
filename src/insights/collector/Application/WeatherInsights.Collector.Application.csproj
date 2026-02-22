@@ -12,7 +12,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="MasterData.Client" Version="2.1.0" />
+      <PackageReference Include="MasterData.Client" Version="2.2.1" />
       <PackageReference Include="Spectre.Console" Version="0.54.0" />
     </ItemGroup>
 

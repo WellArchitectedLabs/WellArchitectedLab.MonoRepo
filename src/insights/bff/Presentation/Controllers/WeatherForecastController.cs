@@ -6,15 +6,15 @@ using WeatherInsights.Bff.Application.Services.Interfaces;
 namespace WeatherInsights.Bff.Api.Controllers;
 
 [ApiController]
-[Route("insight")]
-public class WeatherInsightsController(IWeatherInsightsService weatherInsightsService) : ControllerBase
+[Route("api/v1/forecast")]
+public class WeatherForecastController(IWeatherForecastService weatherForecastService) : ControllerBase
 {
     [HttpGet("{cityId}/{fromDate}/{toDate}")]
     public async Task<ActionResult> Get(
         [FromRoute] GetWeatherInsightParameter  parameter,
         CancellationToken cancellationToken)
     {
-        var filteredInsights = await weatherInsightsService.Get(
+        var filteredInsights = await weatherForecastService.Get(
             parameter.CityId, 
             parameter.FromDate, 
             parameter.ToDate, 

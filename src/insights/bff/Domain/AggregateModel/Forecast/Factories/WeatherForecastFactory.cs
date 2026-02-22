@@ -14,7 +14,7 @@ public static class WeatherForecastFactory
     /// <param name="weatherActuals">actuals from master data service</param>
     /// <returns></returns>
     public static IReadOnlyCollection<WeatherForecast> CreateFromWeatherActuals(
-        IEnumerable<WfActualDto> weatherActuals)
+        IEnumerable<WeatherForecast> weatherActuals)
     {
         return weatherActuals.Select(wa => new WeatherForecast
         {

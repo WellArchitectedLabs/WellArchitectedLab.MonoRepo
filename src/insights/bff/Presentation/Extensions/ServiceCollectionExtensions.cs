@@ -48,7 +48,7 @@ public static class ServiceCollectionExtensions
     private static IServiceCollection RegisterApplicationLayer(this IServiceCollection services)
     {
         return services
-            .AddScoped<IWeatherInsightsService, WeatherInsightService>()
+            .AddScoped<IWeatherForecastService, WeatherForecastService>()
             .AddScoped<ICityService, CityService>();
     }
     

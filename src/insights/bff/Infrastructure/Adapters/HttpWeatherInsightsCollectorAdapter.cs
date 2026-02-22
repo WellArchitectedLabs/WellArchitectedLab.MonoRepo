@@ -12,7 +12,8 @@ public class HttpWeatherInsightsCollectorAdapter
     (IWeatherInsightsClient weatherInsightsHttpClient): IWeatherInsightsCollectorAdapter
 {
     /// <inheritdoc/>
-    public async Task<List<WeatherForecast>> Get(int cityId, DateTime from, DateTime to, CancellationToken ct)
+    public async Task<IReadOnlyCollection<WeatherForecast>> Get(
+        int cityId, DateTime from, DateTime to, CancellationToken ct)
     {
         var getWfInsightDto = await weatherInsightsHttpClient.Get(cityId,
             new GetWeatherInsightParameters

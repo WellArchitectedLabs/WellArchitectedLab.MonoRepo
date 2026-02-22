@@ -13,7 +13,7 @@ public class HttpMasterDataAdapter(IMasterDataClient masterDataHttpClient) : IMa
     /// <inheritdoc/>
     public async Task<List<City>> GetAllManagedCities(CancellationToken cancellationToken)
     {
-        var cityDtos = await masterDataHttpClient.GetAllCities();
+        var cityDtos = await masterDataHttpClient.GetAllCities(cancellationToken);
         return cityDtos.Select(cDto => new City
         {
             Id = cDto.Id,
@@ -22,8 +22,18 @@ public class HttpMasterDataAdapter(IMasterDataClient masterDataHttpClient) : IMa
     }
     
     /// <inheritdoc/>
-    public Task<List<WeatherForecast>> GetActuals(DateTime from, DateTime to, CancellationToken cancellationToken)
+    public async Task<List<WeatherForecast>> GetActuals(
+        int cityId, DateTime from, DateTime to, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        var wfActuals = await masterDataHttpClient.GetByDateRange(cityId, from, to, cancellationToken);
+        return wfActuals.Select(wfActual => new WeatherForecast
+        {
+            CityId = cityId,
+            Precipitation = wfActual.Precipitation,
+            Temperature = wfActual.Temperature,
+            TimestampUtc = wfActual.TimestampUtc,
+            WindSpeed = wfActual.WindSpeed
+        }).ToList();
+
     }
 }

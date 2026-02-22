@@ -5,7 +5,7 @@ namespace WeatherInsights.Bff.Application.Services.Interfaces;
 /// <summary>
 /// Management layer for <see cref="WeatherForecast"/> entity
 /// </summary>
-public interface IWeatherInsightsService
+public interface IWeatherForecastService
 {
     /// <summary>
     /// Fetches weather insights based on the given filters

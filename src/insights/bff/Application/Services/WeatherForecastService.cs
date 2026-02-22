@@ -1,15 +1,16 @@
-﻿using WeatherInsights.Bff.Application.Services.Interfaces;
+﻿using System.Collections.ObjectModel;
+using WeatherInsights.Bff.Application.Services.Interfaces;
 using WeatherInsights.Bff.Domain.AggregateModel.Forecast;
 using WeatherInsights.Bff.Domain.Ports.Adapters;
 
 namespace WeatherInsights.Bff.Application.Services;
 
 /// <summary>
-/// Implementation of <see cref="IWeatherInsightsService"/>
+/// Implementation of <see cref="IWeatherForecastService"/>
 /// </summary>
-public class WeatherInsightService(
+public class WeatherForecastService(
     IWeatherInsightsCollectorAdapter wInsightAdapter,
-    IMasterDataAdapter masterDataAdapter) : IWeatherInsightsService
+    IMasterDataAdapter masterDataAdapter) : IWeatherForecastService
 {
     /// <inheritdoc/>
     public async Task<IReadOnlyCollection<WeatherForecast>> Get(
@@ -19,14 +20,16 @@ public class WeatherInsightService(
         CancellationToken cancellationToken)
     {
         var yesterdaysLastSecond =
-            new DateTime(DateOnly.FromDateTime(DateTime.Now.AddDays(-1)), new TimeOnly(23, 59, 59));
+            new DateTime(DateOnly.FromDateTime(
+                DateTime.Now.AddDays(-1)), new TimeOnly(23, 59, 59));
         var limitHistoryDate = new List<DateTime>() {to, yesterdaysLastSecond}.Min();
         
         // get actuals
-        var weatherActuals = await masterDataAdapter.GetActuals(from, limitHistoryDate, cancellationToken);
+        var weatherActuals = await masterDataAdapter.GetActuals(
+            cityId, from, limitHistoryDate, cancellationToken);
         
         // get insights
-        var weatherInsights = new List<WeatherForecast>();
+        IReadOnlyCollection<WeatherForecast> weatherInsights = new List<WeatherForecast>();
         if (yesterdaysLastSecond < limitHistoryDate)
         {
             // get insights from the upper slice of the user request

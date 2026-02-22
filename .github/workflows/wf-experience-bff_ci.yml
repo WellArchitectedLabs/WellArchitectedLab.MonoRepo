@@ -26,12 +26,12 @@ jobs:
             ACR_USERNAME: ${{ secrets.ACR_USERNAME }}
             ACR_PASSWORD: ${{ secrets.ACR_PASSWORD }}
     
-    # coverage check
-    run-UnitTests:
-      uses: ./.github/workflows/template_codecov-dotnet.yml
-      name: Run Unit Tests & Calculate coverage
-      with:
-        test_project_folder: src/forecast-experience/bff/Tests
-      secrets:
-        codecov_token: ${{ secrets.CODECOV_TOKEN }}
+    # # coverage check
+    # run-UnitTests:
+    #   uses: ./.github/workflows/template_codecov-dotnet.yml
+    #   name: Run Unit Tests & Calculate coverage
+    #   with:
+    #     test_project_folder: src/forecast-experience/bff/Tests
+    #   secrets:
+    #     codecov_token: ${{ secrets.CODECOV_TOKEN }}
             

@@ -1,0 +1,16 @@
+<Solution>
+  <Folder Name="/Core/">
+    <Project Path="Application/WfExperience.Bff.Application.csproj" />
+    <Project Path="Domain/WfExperience.Bff.Domain.csproj" />
+  </Folder>
+  <Folder Name="/Infrastructure/">
+    <Project Path="Infrastructure/WfExperience.Bff.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/Presentation/">
+    <Project Path="Presentation/WfExperience.Bff.Api.csproj" />
+  </Folder>
+  <Folder Name="/Solution files/">
+    <File Path="Dockerfile.insights-bff" />
+    <File Path="GitVersion.yml" />
+  </Folder>
+</Solution>

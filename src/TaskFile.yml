@@ -10,6 +10,7 @@ vars:
   SRC: .
   MASTER: ./master-data
   INSIGHTS: ./insights
+  FORECAST_EXPERIENCE: ./forecast-experience
   STAMP_DIR: .task-stamps
   BUILD_FLAG:
     sh: '[ "${NO_BUILD}" = "true" ] && echo "" || echo "--build"'
@@ -116,13 +117,13 @@ tasks:
     desc: Start the insights BFF (full stack)
     deps: [insights-collector]
     cmds:
-      - cd {{.INSIGHTS}}/bff && docker compose -p {{.APP_NAME}} up {{.BUILD_FLAG}} -d insights-bff
+      - cd {{.FORECAST_EXPERIENCE}}/bff && docker compose -p {{.APP_NAME}} up {{.BUILD_FLAG}} -d insights-bff
 
   forecast-frontend:
     desc: Start the forecast frontend (frontend)
     deps: [insights-bff, master-data-service]
     cmds:
-      - cd {{.INSIGHTS}}/frontend && docker compose -p {{.APP_NAME}} up {{.BUILD_FLAG}} -d forecast-frontend
+      - cd {{.FORECAST_EXPERIENCE}}/frontend && docker compose -p {{.APP_NAME}} up {{.BUILD_FLAG}} -d forecast-frontend
 
   # ----------------------------------------
   # Utilities

@@ -7,10 +7,10 @@ on:
             - develop
             - 'release/**'
        paths:
-        - src/insights/frontend/**
+        - src/forecast-experience/frontend/**
     pull_request:
         paths:
-          - src/insights/frontend/**
+          - src/forecast-experience/frontend/**
     workflow_dispatch:
 
 jobs:
@@ -18,8 +18,8 @@ jobs:
         uses: ./.github/workflows/template_ci.yml
         with:
             service_name: insights-frontend
-            service_path: src/insights/frontend
-            gitversion_config_path: src/insights/frontend/GitVersion.yml
+            service_path: src/forecast-experience/frontend
+            gitversion_config_path: src/forecast-experience/frontend/GitVersion.yml
         secrets:
             ACR_LOGIN_SERVER: ${{ secrets.ACR_LOGIN_SERVER }}
             ACR_USERNAME: ${{ secrets.ACR_USERNAME }}

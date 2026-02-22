@@ -7,17 +7,17 @@ on:
       - main
       - develop
     paths:
-      - 'src/insights/bff/**'
+      - 'src/forecast-experience/bff/**'
   pull_request:
     branches:
       - main
       - develop
     paths:
-      - 'src/insights/bff/**'
+      - 'src/forecast-experience/bff/**'
   workflow_dispatch:
 
 jobs:
   call-codeql-template:
     uses: ./.github/workflows/template_csharp-codeql.yml
     with:
-      solution: 'src/insights/bff/WeatherForecast.sln'
+      solution: 'src/forecast-experience/bff/WfExperience.Bff.slnx'

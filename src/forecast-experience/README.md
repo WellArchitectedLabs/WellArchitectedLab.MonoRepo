@@ -1,0 +1,1 @@
+Dedicated for presenting edible forecast data for client consumers.

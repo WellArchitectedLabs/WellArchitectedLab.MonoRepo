@@ -17,7 +17,7 @@ public interface IWeatherInsightsClient
     /// <param name="referenceDate">Calculation date</param>
     /// <param name="cancellationToken">Please provide for proper cancellation management</param>
     /// <returns></returns>
-    [Get("/api/wfInsight/{referenceDate}")]
+    [Post("/api/v1/wfInsight/{referenceDate}")]
     Task<Task> LaunchPrediction(DateOnly referenceDate, CancellationToken cancellationToken);
     
     /// <summary>
@@ -28,7 +28,7 @@ public interface IWeatherInsightsClient
     /// <param name="weatherInsightParameters">Encapsulates weather insights parameters.</param>
     /// <param name="cancellationToken">Please provide for proper cancellation management.</param>
     /// <returns></returns>
-    [Get("/api/wfInsight/{cityId}")]
+    [Get("/api/v1/wfInsight/{cityId}")]
     Task<IReadOnlyCollection<GetWfInsightDto>> Get(
         int cityId,
         [Query] GetWeatherInsightParameters weatherInsightParameters,

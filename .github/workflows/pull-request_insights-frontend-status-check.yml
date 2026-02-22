@@ -7,7 +7,7 @@ on:
           - develop
           - 'release/**'
       paths:
-        - src/insights/frontend/**
+        - src/forecast-experience/frontend/**
     workflow_dispatch:  # allows manual testing
 
 jobs:
@@ -16,8 +16,8 @@ jobs:
     uses: ./.github/workflows/template_ci.yml
     with:
       service_name: insights-frontend
-      service_path: src/insights/frontend/
-      gitversion_config_path: src/insights/frontend//GitVersion.yml
+      service_path: src/forecast-experience/frontend/
+      gitversion_config_path: src/forecast-experience/frontend//GitVersion.yml
       #status check doesn't push into ACR
       push_to_registry: false
     secrets:

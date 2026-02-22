@@ -113,17 +113,17 @@ tasks:
     cmds:
       - cd {{.INSIGHTS}}/collector && docker compose -p {{.APP_NAME}} up {{.BUILD_FLAG}} -d insights-collector
 
-  insights-bff:
-    desc: Start the insights BFF (full stack)
+  wf-exp-bff:
+    desc: Start the forecast BFF
     deps: [insights-collector]
     cmds:
-      - cd {{.FORECAST_EXPERIENCE}}/bff && docker compose -p {{.APP_NAME}} up {{.BUILD_FLAG}} -d insights-bff
+      - cd {{.FORECAST_EXPERIENCE}}/bff && docker compose -p {{.APP_NAME}} up {{.BUILD_FLAG}} -d wf-exp-bff
 
-  forecast-frontend:
-    desc: Start the forecast frontend (frontend)
-    deps: [insights-bff, master-data-service]
+  wf-exp-frontend:
+    desc: Start the forecast frontend
+    deps: [wf-exp-bff, master-data-service]
     cmds:
-      - cd {{.FORECAST_EXPERIENCE}}/frontend && docker compose -p {{.APP_NAME}} up {{.BUILD_FLAG}} -d forecast-frontend
+      - cd {{.FORECAST_EXPERIENCE}}/frontend && docker compose -p {{.APP_NAME}} up {{.BUILD_FLAG}} -d wf-exp-frontend
 
   # ----------------------------------------
   # Utilities

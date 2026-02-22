@@ -1,11 +1,10 @@
 services:
-  insights-bff:
+  wf-exp-bff:
     build:
       context: ./
-      dockerfile: Dockerfile.insights-bff
+      dockerfile: Dockerfile.wf-exp-bff
       secrets:
         - dev_secrets
-    container_name: insights-bff
     ports: 
       - 83:80
     environment:

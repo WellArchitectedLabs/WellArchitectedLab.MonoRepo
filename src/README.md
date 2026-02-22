@@ -12,3 +12,7 @@ Talk about Makefile vs Taskfile (more modern with yaml defnition)
 installation: brew install go-task
 Main commands: task --list, task target, features like runOnce and clean syntax with deps. Compare it also with modern CI yaml like github workflows or azure devops.
 usage of no build flag: task import-cities NO_BUILD=true
+
+Investigation tools:
+
+docker ps --format "table {{.Names}}\t{{.Image}}\t{{.Status}}\t{{.Networks}}" (display every container with its associated network)

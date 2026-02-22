@@ -1,12 +1,17 @@
 services:
-  forecast-frontend:
+  wf-exp-frontend:
     build:
       context: ./
-      dockerfile: Dockerfile.insights-frontend
+      dockerfile: Dockerfile.wf-exp-frontend
     environment:
-      # Point frontend to backend container
-      BACKEND_URL: "http://insights-bff:80"
-    container_name: insights-frontend
+      BACKEND_URL: "http://localhost:83"
+    networks:
+      - weatherly-network
     ports:
       - "8080:80"
     restart: always
+
+networks:
+  weatherly-network:
+    external: true
+    name: weatherly-network

@@ -6,16 +6,21 @@ namespace MasterData.Api.Factories;
 /// <summary>
 /// Factory of <see cref="WfActual"/> type
 /// </summary>
-public static class WfActualDtoFactory
+public static class GetHistoricalSlicesDtoFactory
 {
-    public static IEnumerable<WfActualDto> CreateFromDomain(
+    /// <summary>
+    /// Creates a list of <see cref="GetHistoricalSlicesDto"/> from an ienum of domain objects
+    /// </summary>
+    /// <param name="domainActuals"></param>
+    /// <returns></returns>
+    public static IReadOnlyCollection<GetHistoricalSlicesDto> CreateFromDomain(
         IEnumerable<WfActual> domainActuals)
-        => domainActuals.Select(domainActual => new WfActualDto
+        => domainActuals.Select(domainActual => new GetHistoricalSlicesDto
         {
             TimestampUtc = domainActual.TimestampUtc,
             Temperature = domainActual.Temperature,
             WindSpeed = domainActual.WindSpeed,
             Precipitation = domainActual.Precipitation,
             CityId = domainActual.CityId
-        });
+        }).ToList();
 }

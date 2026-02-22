@@ -17,12 +17,12 @@ public class CitiesController(ICityService cityService)
     /// Returns all cities' list
     /// The list does not need to be paginated since they will not exceed the maximum allowed in parameter
     /// </summary>
-    /// <returns>ReadOnlyCollection for <see cref="CityDto"/> object</returns>
+    /// <returns>ReadOnlyCollection for <see cref="GetAllCitiesDto"/> object</returns>
     [Route("api/v1/city")]
     [HttpGet]
-    public async Task<IReadOnlyCollection<CityDto>> GetAllCities(CancellationToken cancellationToken)
+    public async Task<IReadOnlyCollection<GetAllCitiesDto>> GetAllCities(CancellationToken cancellationToken)
     {
         var allCities = await cityService.GetAll(cancellationToken);
-        return CityDtoFactory.CreateFromDomain(allCities);
+        return GetAllCitiesDtoFactory.CreateFromDomain(allCities);
     }
 }

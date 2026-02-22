@@ -1,6 +1,9 @@
-namespace MasterData.Client.Dtos.Responses.WfActual.Get.History;
+namespace MasterData.Client.Dtos.Responses.WfActual.Get.Range;
 
-public record WfActualDto
+/// <summary>
+/// Specific Dto for the <see cref="IMasterDataClient.Get"/>
+/// </summary>
+public record GetByRangeDto
 {
     /// <summary>
     /// Timestamp associated to the actual value

@@ -1,6 +1,7 @@
 using MasterData.Application.Services.Interfaces;
 using MasterData.Domain.AggregateModel.Actuals;
 using MasterData.Domain.AggregateModel.Actuals.Enums;
+using MasterData.Domain.AggregateModel.Actuals.Extensions;
 using MasterData.Domain.AggregateModel.Actuals.ValuesObjects;
 using MasterData.Domain.Ports;
 using Microsoft.Extensions.Logging;
@@ -12,6 +13,7 @@ namespace MasterData.Application.Services;
 /// </summary>
 public class WfActualService(IWfActualRepository wfActualRepository, ILogger<WfActualService> logger) : IWfActualService
 {
+    /// <inheritdoc/>
     public async Task<IReadOnlyCollection<WfActual>> GetHistoricalSlice(
         DateOnly referenceDate,
         int historicalDepthYears,
@@ -19,8 +21,8 @@ public class WfActualService(IWfActualRepository wfActualRepository, ILogger<WfA
         LeapDayResolutionStrategy leapDayResolutionStrategy,
         CancellationToken cancellationToken)
     {
-        var referenceDateDomainObject = new ReferenceDate(referenceDate);
-        var toBeFetchedDateTimes = referenceDateDomainObject.ResolveHistoricalDateTimes(
+        var referenceDateValue = new ReferenceDate(referenceDate);
+        var toBeFetchedDateTimes = referenceDateValue.ResolveHistoricalDateTimes(
             historicalDepthYears,
             rollingWindowDays,
             leapDayResolutionStrategy
@@ -34,7 +36,26 @@ public class WfActualService(IWfActualRepository wfActualRepository, ILogger<WfA
         return actuals;
     }
     
-    
+    /// <inheritdoc/>
+    public async Task<IReadOnlyCollection<WfActual>> GetByRange(
+        int cityId,
+        DateTime fromDate, 
+        DateTime toDate,
+        CancellationToken cancellationToken)
+    {
+        var toBeFetchedDateTimes = fromDate.GetHoursUpTo(toDate);
+        
+        var actuals = await wfActualRepository.GetByDateTimes(
+            cityId,
+            toBeFetchedDateTimes, 
+            cancellationToken);
+
+        LogMissingTimestamps(toBeFetchedDateTimes, actuals.Select(a => a.TimestampUtc).ToList());
+
+        return actuals; 
+    }
+
+
     /// <summary>
     /// Logs missing timestamps
     /// </summary>

@@ -6,5 +6,5 @@ namespace MasterData.Client.Dtos.Responses.City.GetAll;
 /// <param name="Id">City Id</param>
 /// <param name="Name">City Name</param>
 /// <param name="CoordinatesDto">City Coordinates Object</param>
-public record CityDto(int Id, string Name, GpsCoordinatesDto CoordinatesDto);
+public record GetAllCitiesDto(int Id, string Name, GetAllCitiesGpsCoordinatesDto CoordinatesDto);
 

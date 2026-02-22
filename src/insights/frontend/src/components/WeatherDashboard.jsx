@@ -8,7 +8,7 @@ import {
   Tooltip,
 } from "recharts";
 
-// Cities are fetched dynamically from GET /city
+// Cities are fetched dynamically from GET /api/v1/city
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 function toLocalDatetimeValue(date) {
@@ -116,7 +116,7 @@ export default function WeatherDashboard({ backendUrl }) {
   useEffect(() => {
     (async () => {
       try {
-        const res = await fetch(`${backendUrl}/city`);
+        const res = await fetch(`${backendUrl}/api/v1/city`);
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const json = await res.json();
         setCities(json);
@@ -138,7 +138,7 @@ export default function WeatherDashboard({ backendUrl }) {
     try {
       const from = new Date(fromDt).toISOString();
       const to = new Date(toDt).toISOString();
-      const res = await fetch(`${backendUrl}/insight/${cityId}/${from}/${to}`);
+      const res = await fetch(`${backendUrl}/api/v1/forecast/${cityId}/${from}/${to}`);
       if (res.status === 204) {
         // No content — backend found nothing for this range
         setData([]);

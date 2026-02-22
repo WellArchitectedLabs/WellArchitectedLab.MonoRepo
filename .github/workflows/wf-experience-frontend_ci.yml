@@ -1,4 +1,4 @@
-name: CI - Build & Push Insights Frontend
+name: CI - Build & Push Weather Forecast Frontend
 
 on:
     push:
@@ -17,7 +17,7 @@ jobs:
     Frontend-BuildAndPush:
         uses: ./.github/workflows/template_ci.yml
         with:
-            service_name: insights-frontend
+            service_name: wf-exp-frontend
             service_path: src/forecast-experience/frontend
             gitversion_config_path: src/forecast-experience/frontend/GitVersion.yml
         secrets:

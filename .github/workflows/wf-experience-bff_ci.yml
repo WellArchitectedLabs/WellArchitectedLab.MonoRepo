@@ -1,4 +1,4 @@
-name: CI - Build & Push Insights Bff
+name: CI - Build & Push Weather Forecast Bff
 
 on:
     push:
@@ -12,14 +12,15 @@ on:
 
 jobs:
 
-    # Package and push Insights Bff image
+    # Package and push Weather Forecast Bff image
     Backend-buildAndPush:
         uses: ./.github/workflows/template_ci.yml
         name: Package and push image to ACR
         with:
-            service_name: forecast-experience
+            service_name: wf-exp-bff
             service_path: src/forecast-experience/bff
             gitversion_config_path: src/forecast-experience/bff/GitVersion.yml
+            dockerfile_name: Dockerfile.wf-exp-bff
         secrets:
             ACR_LOGIN_SERVER: ${{ secrets.ACR_LOGIN_SERVER }}
             ACR_USERNAME: ${{ secrets.ACR_USERNAME }}

@@ -17,9 +17,10 @@ public interface IMasterDataClient
     /// <summary>
     /// Returns all cities stored in master data database
     /// </summary>
+    /// <param name="cancellationToken">please propagate for cancellation.</param>
     /// <returns></returns>
     [Get("/api/v1/city")]
-    Task<IReadOnlyCollection<GetAllCitiesDto>> GetAllCities();
+    Task<IReadOnlyCollection<GetAllCitiesDto>> GetAllCities(CancellationToken cancellationToken);
 
     /// <summary>
     /// Returns historical weather forecast details based on the provided history search parameters

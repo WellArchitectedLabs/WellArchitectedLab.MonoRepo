@@ -2,6 +2,7 @@ using MasterData.Client.Dtos;
 using MasterData.Client.Dtos.Parameters;
 using MasterData.Client.Dtos.Responses.City.GetAll;
 using MasterData.Client.Dtos.Responses.WfActual.Get.History;
+using MasterData.Client.Dtos.Responses.WfActual.Get.Range;
 using Refit;
 
 namespace MasterData.Client;
@@ -46,7 +47,7 @@ public interface IMasterDataClient
     /// then just provide a hour based time part with 00 minutes and 00 seconds</remarks>
     /// <returns></returns>
     [Get("/api/v1/actual")] 
-    Task<IReadOnlyCollection<GetHistoricalSlicesDto>> GetByDateange(
+    Task<IReadOnlyCollection<GetByRangeDto>> GetByDateRange(
         [Query] int cityId,
         [Query] DateTime from,
         [Query] DateTime  to,

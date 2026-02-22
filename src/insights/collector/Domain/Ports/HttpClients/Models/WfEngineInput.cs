@@ -32,7 +32,7 @@ public record WfEngineInputActualItem(
     decimal Precipitation
 )
 {
-    public WfEngineInputActualItem(WfActualDto wfActualDto)  : this(wfActualDto.Temperature, wfActualDto.WindSpeed,
+    public WfEngineInputActualItem(GetHistoricalSlicesDto wfActualDto)  : this(wfActualDto.Temperature, wfActualDto.WindSpeed,
         wfActualDto.Precipitation)
     {}
 }

@@ -11,6 +11,7 @@ public class WfInsight
     /// Auto-incremented Id
     /// </summary>
     public int Id { get; init; }
+    
     /// <summary>
     /// Timestamp associated to the actual value
     /// Insights are calculated on hourly basis for every day and every city

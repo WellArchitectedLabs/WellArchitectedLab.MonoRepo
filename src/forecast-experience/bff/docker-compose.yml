@@ -1,0 +1,24 @@
+services:
+  wf-exp-bff:
+    build:
+      context: ./
+      dockerfile: Dockerfile.wf-exp-bff
+      secrets:
+        - dev_secrets
+    ports: 
+      - 83:80
+    environment:
+      ASPNETCORE_ENVIRONMENT: "Development"
+      InsightsCollector__Url: "http://insights-collector:80"
+      MasterData__Url: "http://master-data-service:80"
+    networks:
+      - weatherly-network
+
+secrets:
+  dev_secrets:
+    file: ~/.wellarchitectedlabs/secrets.json
+
+networks:
+  weatherly-network:
+    external: true
+    name: weatherly-network

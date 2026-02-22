@@ -25,7 +25,7 @@ public interface IWfInsightMonitor
     Task<List<ValidationResult>> ApplyValidationAndLogs(
         DateOnly referenceDate,
         MasterDataApiParameters masterDataApiParameters,
-        List<WfActualDto>? wfActuals,
+        List<GetHistoricalSlicesDto>? wfActuals,
         CancellationToken cancellationToken);
     
     /// <summary>

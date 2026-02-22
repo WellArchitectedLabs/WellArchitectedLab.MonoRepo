@@ -1,0 +1,156 @@
+version: '3'
+
+############################################
+# Variables
+############################################
+
+vars:
+  APP_NAME: weatherly
+  NETWORK_NAME: weatherly-network
+  SRC: .
+  MASTER: ./master-data
+  INSIGHTS: ./insights
+  FORECAST_EXPERIENCE: ./forecast-experience
+  STAMP_DIR: .task-stamps
+  BUILD_FLAG:
+    sh: '[ "${NO_BUILD}" = "true" ] && echo "" || echo "--build"'
+
+############################################
+# Global settings
+############################################
+
+run: once  # ensures each task runs at most once per invocation, handling transitive deduplication
+
+############################################
+# Tasks
+############################################
+
+tasks:
+
+  # ----------------------------------------
+  # Network
+  # ----------------------------------------
+
+  create-network:
+    desc: Create the shared Docker network (idempotent)
+    # necessary for idempotency
+    status:
+      - test -f {{.STAMP_DIR}}/network_created
+    cmds:
+      - mkdir -p {{.STAMP_DIR}}
+      - docker network inspect {{.NETWORK_NAME}} > /dev/null 2>&1 || docker network create {{.NETWORK_NAME}}
+      - touch {{.STAMP_DIR}}/network_created
+
+  # ----------------------------------------
+  # Migrations
+  # ----------------------------------------
+
+  master-data-postgres-migrate:
+    desc: Run master data DB migration
+    deps: [create-network]
+    status:
+      - test -f {{.STAMP_DIR}}/master_data_migrated
+    cmds:
+      - cd {{.MASTER}}/data && docker compose -p {{.APP_NAME}} up {{.BUILD_FLAG}} masterdata-postgres-migrate
+      - cd {{.MASTER}}/data && docker compose stop masterdata-postgres-migrate
+      - touch {{.STAMP_DIR}}/master_data_migrated
+
+  insights-data-postgres-migrate:
+    desc: Run insights data DB migration
+    deps: [create-network]
+    status:
+      - test -f {{.STAMP_DIR}}/insights_data_migrated
+    cmds:
+      - cd {{.INSIGHTS}}/data && docker compose -p {{.APP_NAME}} up {{.BUILD_FLAG}} insights-postgres-migrate
+      - cd {{.INSIGHTS}}/data && docker compose stop insights-postgres-migrate
+      - touch {{.STAMP_DIR}}/insights_data_migrated
+
+  # ----------------------------------------
+  # Imports
+  # ----------------------------------------
+
+  import-cities:
+    desc: Import cities data (idempotent)
+    deps: [master-data-postgres-migrate]
+    status:
+      - test -f {{.STAMP_DIR}}/cities_imported
+    cmds:
+      - cd {{.MASTER}}/staging && docker compose -p {{.APP_NAME}} run {{.BUILD_FLAG}} --rm cities-import
+      - cd {{.MASTER}}/staging && docker compose stop cities-import
+      - touch {{.STAMP_DIR}}/cities_imported
+
+  wf-actuals-import:
+    desc: Import weather actuals (idempotent)
+    deps: [import-cities]
+    # necessary for idempotency
+    status:
+      - test -f {{.STAMP_DIR}}/weather_imported
+    cmds:
+      - cd {{.MASTER}}/staging && docker compose -p {{.APP_NAME}} run {{.BUILD_FLAG}} --rm wf-actuals-import
+      - cd {{.MASTER}}/staging && docker composae stop wf-actuals-import
+      - touch {{.STAMP_DIR}}/weather_imported
+
+  # ----------------------------------------
+  # Services
+  # ----------------------------------------
+
+  master-data-service:
+    # description is listed when running task --list command
+    desc: Start the master data service
+    deps: [wf-actuals-import, master-data-postgres-migrate]
+    cmds:
+      - cd {{.MASTER}}/service && docker compose -p {{.APP_NAME}} up {{.BUILD_FLAG}} -d master-data-service
+
+  insights-engine-simulator:
+    desc: Start the insights engine simulator
+    deps: [create-network]
+    cmds:
+      - cd {{.INSIGHTS}}/engine-simulator && docker compose -p {{.APP_NAME}} up {{.BUILD_FLAG}} -d engine-proxy
+
+  insights-collector:
+    desc: Start the insights collector
+    deps: [master-data-service, insights-data-postgres-migrate, insights-engine-simulator]
+    cmds:
+      - cd {{.INSIGHTS}}/collector && docker compose -p {{.APP_NAME}} up {{.BUILD_FLAG}} -d insights-collector
+
+  wf-exp-bff:
+    desc: Start the forecast BFF
+    deps: [insights-collector]
+    cmds:
+      - cd {{.FORECAST_EXPERIENCE}}/bff && docker compose -p {{.APP_NAME}} up {{.BUILD_FLAG}} -d wf-exp-bff
+
+  wf-exp-frontend:
+    desc: Start the forecast frontend
+    deps: [wf-exp-bff, master-data-service]
+    cmds:
+      - cd {{.FORECAST_EXPERIENCE}}/frontend && docker compose -p {{.APP_NAME}} up {{.BUILD_FLAG}} -d wf-exp-frontend
+
+  # ----------------------------------------
+  # Utilities
+  # ----------------------------------------
+
+  reset-imports:
+    desc: Reset all import stamps to force re-run
+    cmds:
+      - rm -rf {{.STAMP_DIR}}
+
+  down:
+    desc: Stop all running services
+    cmds:
+      - cd {{.MASTER}}/service && docker compose -p {{.APP_NAME}} down || true
+      - cd {{.INSIGHTS}}/collector && docker compose -p {{.APP_NAME}} down || true
+      - cd {{.INSIGHTS}}/engine-simulator && docker compose -p {{.APP_NAME}} down || true
+      - cd {{.INSIGHTS}}/bff && docker compose -p {{.APP_NAME}} down || true
+
+  clean:
+    desc: Stop all services, remove volumes and stamps
+    deps: [down]
+    cmds:
+      - cd {{.MASTER}}/data && docker compose -p {{.APP_NAME}} down -v || true
+      - cd {{.MASTER}}/staging && docker compose -p {{.APP_NAME}} down -v || true
+      - cd {{.MASTER}}/service && docker compose -p {{.APP_NAME}} down -v || true
+      - cd {{.INSIGHTS}}/collector && docker compose -p {{.APP_NAME}} down -v || true
+      - cd {{.INSIGHTS}}/engine-simulator && docker compose -p {{.APP_NAME}} down -v || true
+      - cd {{.INSIGHTS}}/bff && docker compose -p {{.APP_NAME}} down -v || true
+      - docker network rm {{.NETWORK_NAME}} 2>/dev/null || true
+      - rm -rf {{.STAMP_DIR}}

@@ -3,6 +3,9 @@ using Refit;
 
 namespace MasterData.Client.Formatters;
 
+/// <summary>
+/// This formatter is used by Refit for DateOnly type compatibility
+/// </summary>
 public class DateOnlyUrlParameterFormatter : DefaultUrlParameterFormatter
 {
     public override string? Format(object? value, ICustomAttributeProvider attributeProvider, Type type)

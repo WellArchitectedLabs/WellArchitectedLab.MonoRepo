@@ -1,4 +1,4 @@
-name: Status Check - Insights Frontend Pull Request Build Check
+name: Status Check - Forecast Experience Frontend Pull Request Build Check
 
 on:
     pull_request:
@@ -7,17 +7,18 @@ on:
           - develop
           - 'release/**'
       paths:
-        - src/insights/frontend/**
+        - src/forecast-experience/frontend/**
     workflow_dispatch:  # allows manual testing
 
 jobs:
   frontend-buildCheck:
-    name: Insights Frontend Status Check - Try package docker image
+    name: Forecast Experience Frontend Status Check - Try package docker image
     uses: ./.github/workflows/template_ci.yml
     with:
-      service_name: insights-frontend
-      service_path: src/insights/frontend/
-      gitversion_config_path: src/insights/frontend//GitVersion.yml
+      service_name: wf-exp-frontend
+      service_path: src/forecast-experience/frontend/
+      gitversion_config_path: src/forecast-experience/frontend/GitVersion.yml
+      dockerfile_name: Dockerfile.wf-exp-frontend
       #status check doesn't push into ACR
       push_to_registry: false
     secrets:

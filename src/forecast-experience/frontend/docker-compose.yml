@@ -1,0 +1,17 @@
+services:
+  wf-exp-frontend:
+    build:
+      context: ./
+      dockerfile: Dockerfile.wf-exp-frontend
+    environment:
+      BACKEND_URL: "http://localhost:83"
+    networks:
+      - weatherly-network
+    ports:
+      - "8080:80"
+    restart: always
+
+networks:
+  weatherly-network:
+    external: true
+    name: weatherly-network

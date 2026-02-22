@@ -1,0 +1,37 @@
+name: CI - Build & Push Weather Forecast Bff
+
+on:
+    push:
+        branches:
+            - main
+            - develop
+            - 'release/**'
+        paths:
+          - src/forecast-experience/bff/**
+    workflow_dispatch:
+
+jobs:
+
+    # Package and push Weather Forecast Bff image
+    Backend-buildAndPush:
+        uses: ./.github/workflows/template_ci.yml
+        name: Package and push image to ACR
+        with:
+            service_name: wf-exp-bff
+            service_path: src/forecast-experience/bff
+            gitversion_config_path: src/forecast-experience/bff/GitVersion.yml
+            dockerfile_name: Dockerfile.wf-exp-bff
+        secrets:
+            ACR_LOGIN_SERVER: ${{ secrets.ACR_LOGIN_SERVER }}
+            ACR_USERNAME: ${{ secrets.ACR_USERNAME }}
+            ACR_PASSWORD: ${{ secrets.ACR_PASSWORD }}
+    
+    # coverage check
+    run-UnitTests:
+      uses: ./.github/workflows/template_codecov-dotnet.yml
+      name: Run Unit Tests & Calculate coverage
+      with:
+        test_project_folder: src/forecast-experience/bff/Tests
+      secrets:
+        codecov_token: ${{ secrets.CODECOV_TOKEN }}
+            

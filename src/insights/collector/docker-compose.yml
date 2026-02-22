@@ -13,7 +13,14 @@ services:
       WfEngine__Url: "http://engine-proxy:80"
       MasterDataService__Url: "http://master-data-service:80"
       ASPNETCORE_ENVIRONMENT: Development
+    networks:
+      - weatherly-network
 
 secrets:
   dev_secrets:
     file: ~/.wellarchitectedlabs/secrets.json
+
+networks:
+  weatherly-network:
+    external: true
+    name: weatherly-network

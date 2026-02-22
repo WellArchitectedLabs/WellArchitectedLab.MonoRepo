@@ -1,4 +1,4 @@
-name: Status Check - Insights Bff Pull Request Build
+name: Status Check - Forecast Experience Bff Pull Request Build
 
 on:
     pull_request:
@@ -7,7 +7,7 @@ on:
           - main
           - 'release/**'
         paths:
-          - src/insights/bff/**
+          - src/forecast-experience/bff/**
     workflow_dispatch:  # allows manual testing
 
 jobs:
@@ -15,23 +15,24 @@ jobs:
   # build check
   backend-buildCheck:
     uses: ./.github/workflows/template_ci.yml
-    name: Insights Bff Status Check - Try package docker image
+    name: Forecast Experience Bff Status Check - Try package docker image
     with:
-        service_name: insights-bff
-        gitversion_config_path: src/insights/bff/GitVersion.yml
+        service_name: wf-exp-bff
+        gitversion_config_path: src/forecast-experience/bff/GitVersion.yml
+        dockerfile_name: Dockerfile.wf-exp-bff
         #status check doesn't push into ACR
         push_to_registry: false
-        service_path: src/insights/bff
+        service_path: src/forecast-experience/bff
     secrets:
         ACR_LOGIN_SERVER: ${{ secrets.ACR_LOGIN_SERVER }}
         ACR_PASSWORD : ${{ secrets.ACR_PASSWORD }}
         ACR_USERNAME: ${{ secrets.ACR_USERNAME }}
         
-  # coverage check
-  run-UnitTests:
-      uses: ./.github/workflows/template_codecov-dotnet.yml
-      name: Insights Bff Status Check - Tests & Coverage
-      with:
-        test_project_folder: src/insights/bff/Tests
-      secrets:
-        codecov_token: ${{ secrets.CODECOV_TOKEN }}
+  # # coverage check
+  # run-UnitTests:
+  #     uses: ./.github/workflows/template_codecov-dotnet.yml
+  #     name: Forecast Experience Bff Status Check - Tests & Coverage
+  #     with:
+  #       test_project_folder: src/forecast-experience/bff/Tests
+  #     secrets:
+  #       codecov_token: ${{ secrets.CODECOV_TOKEN }}

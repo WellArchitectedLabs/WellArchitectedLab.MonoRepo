@@ -10,7 +10,7 @@
     <Project Path="Infrastructure/MasterData.Infrastructure.csproj" />
   </Folder>
   <Folder Name="/Presentation/">
-    <Project Path="Api/MasterData.Api.csproj" />
+    <Project Path="Presentation/MasterData.Api.csproj" />
   </Folder>
   <Folder Name="/Solution Files/">
     <File Path=".gitignore" />

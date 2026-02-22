@@ -1,0 +1,22 @@
+using Microsoft.AspNetCore.Mvc;
+using WfExperience.Bff.Api.Dtos.City.Get;
+using WfExperience.Bff.Application.Services.Interfaces;
+
+namespace WfExperience.Bff.Api.Controllers;
+
+[ApiController]
+[Route("api/v1/city")]
+public class CityController(ICityService cityService) : ControllerBase
+{
+    [HttpGet]
+    public async Task<ActionResult> Get(
+        CancellationToken cancellationToken)
+    {
+        var allCities = await cityService.GetAll(cancellationToken);
+        
+        if(!allCities.Any())
+            return NoContent();
+        
+        return Ok(GetCityDtoFactory.CreateFromDomain(allCities));
+    }
+}

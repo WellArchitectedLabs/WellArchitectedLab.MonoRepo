@@ -11,6 +11,8 @@ services:
       # database instance is exposed on 5430 port to avoid port conflicts with any local postgres instance
       # and also with master data db which is exposed on 5431 port
       - 5430:5432
+    networks:
+      - weatherly-network
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 5s
@@ -39,6 +41,13 @@ services:
       DB_APP_USER: app_user
       DB_APP_PASSWORD: app_password
       POSTGRES_DATABASE: insights_database
+    networks:
+      - weatherly-network
 
 volumes:
   insights-postgres-data:
+
+networks:
+  weatherly-network:
+    external: true
+    name: weatherly-network

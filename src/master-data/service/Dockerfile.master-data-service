@@ -6,7 +6,7 @@ WORKDIR /src
 COPY . .
 
 # Go to API project folder
-WORKDIR /src/Api
+WORKDIR /src/Presentation
 
 # Restore, build, and publish API project
 RUN dotnet restore

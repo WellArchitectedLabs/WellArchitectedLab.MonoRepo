@@ -6,6 +6,7 @@ using WfInsights.Collector.Api.Factories;
 namespace WfInsights.Collector.Api.Controllers;
 
 [ApiController]
+[Route("api/v1/wsInsight")]
 public class WfInsightController(IWfInsightPipeline wfInsightPipeline) : Controller
 {
     /// <summary>
@@ -17,7 +18,7 @@ public class WfInsightController(IWfInsightPipeline wfInsightPipeline) : Control
     /// <param name="referenceDate">forecasting calculation date</param>
     /// <param name="cancellationToken"><see cref="CancellationToken"/></param>
     /// <returns></returns>
-    [Route("/api/wfInsight/{referenceDate}")]
+    [Route("{referenceDate}")]
     [HttpPost]
     public async Task<ActionResult> Post(
         [FromRoute] DateOnly referenceDate,
@@ -34,7 +35,7 @@ public class WfInsightController(IWfInsightPipeline wfInsightPipeline) : Control
     /// <param name="weatherInsightParameters">Get insights params object.</param>
     /// <param name="cancellationToken"><see cref="CancellationToken"/></param>
     /// <returns></returns>
-    [Route("/api/wfInsight/{cityId}")]
+    [Route("{cityId}")]
     [HttpGet]
     public async Task<ActionResult> Get(
         [FromRoute] int cityId,

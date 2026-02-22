@@ -2,9 +2,9 @@ using MasterData.Client.Dtos.Responses.WfActual.Get.History;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using WeatherInsights.Collector.Application.Interfaces;
+using WeatherInsights.Collector.Domain.AggregateModel.Insight.Extensions;
 using WeatherInsights.Collector.Domain.AggregateModel.Technical;
 using WeatherInsights.Collector.Domain.AggregateModel.Technical.Extensions;
-using WeatherInsights.Collector.Domain.Extensions;
 using WeatherInsights.Collector.Domain.Ports.Config;
 using WeatherInsights.Collector.Domain.Ports.HttpClients.Models;
 using WeatherInsights.Collector.Domain.Ports.HttpClients.Models.Validators;
@@ -24,7 +24,7 @@ public class WfInsightMonitor(ILogger<WfInsightMonitor> logger, IOptionsSnapshot
     public Task<List<ValidationResult>> ApplyValidationAndLogs(
         DateOnly referenceDate,
         MasterDataApiParameters masterDataApiParameters,
-        List<WfActualDto>? wfActuals,
+        List<GetHistoricalSlicesDto>? wfActuals,
         CancellationToken cancellationToken)
     {
         if (wfActuals is null || !wfActuals.Any())

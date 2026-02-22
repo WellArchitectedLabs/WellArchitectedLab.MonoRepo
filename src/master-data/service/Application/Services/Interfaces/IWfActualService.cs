@@ -23,4 +23,18 @@ public interface IWfActualService
         int rollingWindowDays,
         LeapDayResolutionStrategy leapDayResolutionStrategy,
         CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Gets actuals which timestamps belong to the given date range
+    /// </summary>
+    /// <param name="fromDate">get actuals superior to this date</param>
+    /// <param name="toDate">get actuals inferior to this date</param>
+    /// <param name="cancellationToken">cancellation propagation</param>
+    /// <param name="cityId"></param>
+    /// <returns></returns>
+    Task<IReadOnlyCollection<WfActual>> Search(
+        int cityId,
+        DateTime fromDate,
+        DateTime toDate,
+        CancellationToken cancellationToken);
 }

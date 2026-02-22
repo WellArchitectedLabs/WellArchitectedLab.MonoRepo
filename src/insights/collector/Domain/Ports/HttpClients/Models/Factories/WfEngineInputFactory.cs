@@ -1,5 +1,5 @@
 using MasterData.Client.Dtos.Responses.WfActual.Get.History;
-using WeatherInsights.Collector.Domain.Extensions;
+using WeatherInsights.Collector.Domain.AggregateModel.Insight.Extensions;
 using WeatherInsights.Collector.Domain.Ports.Config;
 
 namespace WeatherInsights.Collector.Domain.Ports.HttpClients.Models.Factories;
@@ -21,7 +21,7 @@ public static class WfEngineInputFactory
         DateOnly referenceDate,
         IEnumerable<int> cityIds,
         MasterDataApiParameters masterDataApiParameters,
-        IEnumerable<WfActualDto> wfActuals)
+        IEnumerable<GetHistoricalSlicesDto> wfActuals)
     {
         var wfActualDtos = wfActuals?.ToList() ?? [];
         var citiesList = cityIds?.ToList() ?? [];

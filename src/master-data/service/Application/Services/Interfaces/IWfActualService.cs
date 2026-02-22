@@ -32,7 +32,7 @@ public interface IWfActualService
     /// <param name="cancellationToken">cancellation propagation</param>
     /// <param name="cityId"></param>
     /// <returns></returns>
-    Task<IReadOnlyCollection<WfActual>> GetByRange(
+    Task<IReadOnlyCollection<WfActual>> GetByDateRange(
         int cityId,
         DateTime fromDate,
         DateTime toDate,

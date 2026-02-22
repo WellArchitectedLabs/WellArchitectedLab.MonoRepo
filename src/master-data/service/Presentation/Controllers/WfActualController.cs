@@ -52,13 +52,13 @@ public class WfActualController(IWfActualService actualService)
     /// <param name="ct">provide cancellation token for stopping canceled processes down to downstream calls</param>
     [Route("api/v1/actual")]
     [HttpGet]
-    public async Task<IReadOnlyCollection<GetByRangeDto>> GetByRange(
+    public async Task<IReadOnlyCollection<GetByRangeDto>> GetByDateRange(
         [FromQuery] int cityId,
         [FromQuery] DateTime from, 
         [FromQuery] DateTime to, 
         CancellationToken ct)
     {
-        var getByRangeFromService = await actualService.GetByRange(cityId, from, to, ct);
+        var getByRangeFromService = await actualService.GetByDateRange(cityId, from, to, ct);
         return GetByRangeDtoFactory.CreateFromDomain(getByRangeFromService).ToList();
     }
 }

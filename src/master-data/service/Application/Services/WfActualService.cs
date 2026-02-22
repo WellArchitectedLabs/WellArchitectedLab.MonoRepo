@@ -37,7 +37,7 @@ public class WfActualService(IWfActualRepository wfActualRepository, ILogger<WfA
     }
     
     /// <inheritdoc/>
-    public async Task<IReadOnlyCollection<WfActual>> GetByRange(
+    public async Task<IReadOnlyCollection<WfActual>> GetByDateRange(
         int cityId,
         DateTime fromDate, 
         DateTime toDate,

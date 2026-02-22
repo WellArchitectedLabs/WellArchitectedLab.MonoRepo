@@ -8,9 +8,9 @@ namespace MasterData.Domain.Ports;
 public interface IWfActualRepository
 {
     /// <summary>
-    /// Gets all actuals situated on the given datetime range
+    /// Gets all actuals situated on the given datetime range.
     /// </summary>
-    /// <param name="timestampsUtc"></param>
+    /// <param name="timestampsUtc">list of timestamps to query</param>
     /// <param name="ct"></param>
     /// <returns></returns>
     Task<IReadOnlyCollection<WfActual>> GetByDateTimes(
@@ -19,9 +19,10 @@ public interface IWfActualRepository
     
     /// <summary>
     /// Gets all actuals situated on the given datetime range
+    /// For the given city id.
     /// </summary>
     /// <param name="cityId">City Id</param>
-    /// <param name="timestampsUtc"></param>
+    /// <param name="timestampsUtc">list of timestamps to query</param>
     /// <param name="ct"></param>
     /// <returns></returns>
     Task<IReadOnlyCollection<WfActual>> GetByDateTimes(

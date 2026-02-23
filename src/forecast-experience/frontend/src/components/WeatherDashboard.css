@@ -1,0 +1,718 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   WeatherDashboard.css
+
+   Organisation:
+     0. Fonts
+     1. Reset
+     2. CSS custom properties  ← all colours live here
+        .wd-layout            dark theme (default)
+        .wd-layout.light      light theme overrides
+     3. Animations / keyframes
+     4. Theme toggle button
+     5. Layout shell
+     6. Header
+     7. Control panel
+     8. Form elements
+     9. Results divider
+    10. Stat cards
+    11. Chart cards
+    12. Tooltip
+    13. Empty / loading states
+═══════════════════════════════════════════════════════════════════════════ */
+
+
+/* ── 0. Fonts ──────────────────────────────────────────────────────────── */
+
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap');
+
+
+/* ── 1. Reset ──────────────────────────────────────────────────────────── */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  min-height: 100vh;
+}
+
+
+/* ══════════════════════════════════════════════════════════════════════════
+   2. CSS CUSTOM PROPERTIES
+   Every colour in the component reads from one of these variables.
+   Switching theme = toggling the .light class on .wd-layout.
+══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Dark theme (default) ── */
+.wd-layout {
+  /* Backgrounds */
+  --bg-page:          radial-gradient(ellipse at 20% 0%, #0d2140 0%, #060d1a 60%);
+  --bg-body:          #060d1a;
+  --bg-panel:         rgba(255, 255, 255, 0.025);
+  --bg-input:         rgba(255, 255, 255, 0.04);
+  --bg-card:          rgba(255, 255, 255, 0.025);
+  --bg-stat-card:     rgba(255, 255, 255, 0.03);
+  --bg-tooltip:       rgba(10, 18, 35, 0.95);
+  --bg-select-option: #0d1b2e;
+
+  /* Borders */
+  --border-panel:     rgba(99, 179, 237, 0.12);
+  --border-input:     rgba(99, 179, 237, 0.2);
+  --border-input-hover: rgba(99, 179, 237, 0.5);
+  --border-input-focus: #63b3ed;
+  --border-card:      rgba(255, 255, 255, 0.06);
+  --border-tooltip:   rgba(99, 179, 237, 0.25);
+  --border-empty:     rgba(255, 255, 255, 0.08);
+
+  /* Text */
+  --text-primary:     #f7fafc;
+  --text-secondary:   #cbd5e0;
+  --text-muted:       #718096;
+  --text-faint:       #4a5568;
+  --text-ghost:       #2d3748;
+  --text-accent:      #4a9fd4;
+  --text-input:       #e2e8f0;
+  --text-select-opt:  #e2e8f0;
+
+  /* Accent / brand */
+  --accent:           #63b3ed;
+  --accent-glow:      0 0 12px #63b3ed;
+  --accent-ring:      rgba(99, 179, 237, 0.12);
+
+  /* Divider lines */
+  --divider-left:     linear-gradient(90deg, transparent, rgba(99, 179, 237, 0.3));
+  --divider-right:    linear-gradient(90deg, rgba(99, 179, 237, 0.3), transparent);
+
+  /* Decorative rings */
+  --ring-sm:          rgba(99, 179, 237, 0.05);
+  --ring-lg:          rgba(99, 179, 237, 0.03);
+
+  /* Chart grid */
+  --chart-grid:       rgba(255, 255, 255, 0.04);
+  --chart-tick:       #4a5568;
+  --chart-tickline:   rgba(255, 255, 255, 0.06);
+
+  /* Calendar picker tint (CSS filter) */
+  --picker-filter:    invert(0.7) sepia(1) hue-rotate(185deg);
+
+  /* Tooltip shadow */
+  --tooltip-shadow:   0 8px 32px rgba(0, 0, 0, 0.4);
+
+  /* Transitions */
+  --transition-theme: background 0.35s ease, color 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease;
+}
+
+/* ── Light theme override ── */
+.wd-layout.light {
+  /* Backgrounds */
+  --bg-page:          radial-gradient(ellipse at 20% 0%, #dbeafe 0%, #f8fafc 60%);
+  --bg-body:          #f8fafc;
+  --bg-panel:         rgba(255, 255, 255, 0.8);
+  --bg-input:         #ffffff;
+  --bg-card:          rgba(255, 255, 255, 0.9);
+  --bg-stat-card:     #ffffff;
+  --bg-tooltip:       rgba(255, 255, 255, 0.98);
+  --bg-select-option: #ffffff;
+
+  /* Borders */
+  --border-panel:     rgba(49, 130, 206, 0.18);
+  --border-input:     #bfdbfe;
+  --border-input-hover: #93c5fd;
+  --border-input-focus: #3b82f6;
+  --border-card:      #e2e8f0;
+  --border-tooltip:   rgba(49, 130, 206, 0.2);
+  --border-empty:     #e2e8f0;
+
+  /* Text */
+  --text-primary:     #0f172a;
+  --text-secondary:   #1e293b;
+  --text-muted:       #64748b;
+  --text-faint:       #94a3b8;
+  --text-ghost:       #cbd5e1;
+  --text-accent:      #2563eb;
+  --text-input:       #0f172a;
+  --text-select-opt:  #0f172a;
+
+  /* Accent / brand */
+  --accent:           #3b82f6;
+  --accent-glow:      0 0 12px rgba(59, 130, 246, 0.5);
+  --accent-ring:      rgba(59, 130, 246, 0.12);
+
+  /* Divider */
+  --divider-left:     linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.25));
+  --divider-right:    linear-gradient(90deg, rgba(59, 130, 246, 0.25), transparent);
+
+  /* Decorative rings */
+  --ring-sm:          rgba(59, 130, 246, 0.08);
+  --ring-lg:          rgba(59, 130, 246, 0.04);
+
+  /* Chart */
+  --chart-grid:       rgba(0, 0, 0, 0.04);
+  --chart-tick:       #94a3b8;
+  --chart-tickline:   rgba(0, 0, 0, 0.06);
+
+  /* Calendar picker — dark icon on light background */
+  --picker-filter:    none;
+
+  /* Tooltip */
+  --tooltip-shadow:   0 8px 32px rgba(0, 0, 0, 0.12);
+}
+
+
+/* ── 3. Animations ─────────────────────────────────────────────────────── */
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.3; }
+}
+
+@keyframes toggleSlide {
+  from { transform: translateX(0); }
+  to   { transform: translateX(22px); }
+}
+
+.fade-up {
+  animation: fadeUp 0.5s ease forwards;
+}
+
+.loading-dot {
+  animation: pulse 1.2s ease infinite;
+}
+
+
+/* ── 4. Theme toggle button ─────────────────────────────────────────────── */
+
+.wd-theme-toggle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 0;
+  margin-left: auto; /* pushes to the right in the header eyebrow row */
+}
+
+/* The pill track */
+.wd-theme-toggle__track {
+  width: 48px;
+  height: 26px;
+  border-radius: 999px;
+  background: var(--bg-input);
+  border: 1px solid var(--border-input);
+  position: relative;
+  transition: var(--transition-theme);
+  flex-shrink: 0;
+}
+
+/* The sliding knob */
+.wd-theme-toggle__knob {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: var(--accent-glow);
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.25s;
+}
+
+/* Shift knob right when light mode is active */
+.wd-layout.light .wd-theme-toggle__knob {
+  transform: translateX(22px);
+}
+
+/* The icon (🌙 / ☀️) */
+.wd-theme-toggle__icon {
+  font-size: 15px;
+  line-height: 1;
+  user-select: none;
+  transition: opacity 0.2s;
+}
+
+/* Label */
+.wd-theme-toggle__label {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  transition: color 0.3s;
+}
+
+
+/* ── 5. Layout shell ───────────────────────────────────────────────────── */
+
+.wd-layout {
+  min-height: 100vh;
+  background: var(--bg-page);
+  padding: 40px 24px 60px;
+  font-family: 'Syne', sans-serif;
+  position: relative;
+  transition: var(--transition-theme);
+}
+
+.wd-bg-ring {
+  position: fixed;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.wd-bg-ring--sm {
+  top: -200px;
+  right: -200px;
+  width: 600px;
+  height: 600px;
+  border: 1px solid var(--ring-sm);
+  transition: border-color 0.35s ease;
+}
+
+.wd-bg-ring--lg {
+  top: -300px;
+  right: -300px;
+  width: 800px;
+  height: 800px;
+  border: 1px solid var(--ring-lg);
+  transition: border-color 0.35s ease;
+}
+
+
+/* ── 6. Header ─────────────────────────────────────────────────────────── */
+
+.wd-header {
+  max-width: 1100px;
+  margin: 0 auto 48px;
+}
+
+.wd-header__eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 6px;
+}
+
+.wd-header__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: var(--accent-glow);
+  flex-shrink: 0;
+  transition: background 0.35s, box-shadow 0.35s;
+}
+
+.wd-header__platform {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 3px;
+  color: var(--text-accent);
+  text-transform: uppercase;
+  transition: color 0.35s;
+}
+
+.wd-header__title {
+  font-size: clamp(28px, 5vw, 52px);
+  font-weight: 800;
+  color: var(--text-primary);
+  line-height: 1.1;
+  letter-spacing: -1px;
+  transition: color 0.35s;
+}
+
+.wd-header__title-accent {
+  background: linear-gradient(135deg, #63b3ed, #4299e1);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.wd-layout.light .wd-header__title-accent {
+  background: linear-gradient(135deg, #2563eb, #3b82f6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.wd-header__subtitle {
+  font-family: 'DM Mono', monospace;
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-top: 10px;
+  transition: color 0.35s;
+}
+
+
+/* ── 7. Control panel ──────────────────────────────────────────────────── */
+
+.wd-controls-wrapper {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.wd-controls-panel {
+  background: var(--bg-panel);
+  border: 1px solid var(--border-panel);
+  border-radius: 20px;
+  padding: 28px 32px;
+  backdrop-filter: blur(20px);
+  animation-delay: 0.1s;
+  transition: var(--transition-theme);
+}
+
+.wd-controls-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  align-items: flex-end;
+}
+
+.wd-field        { flex: 1.5 1 180px; min-width: 160px; }
+.wd-field--wide  { flex: 2 1 200px;   min-width: 180px; }
+.wd-field--btn   { flex: 0 0 auto; }
+
+
+/* ── 8. Form elements ──────────────────────────────────────────────────── */
+
+.wd-label {
+  display: block;
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 7px;
+  transition: color 0.35s;
+}
+
+.wd-select,
+.wd-input {
+  width: 100%;
+  background: var(--bg-input);
+  border: 1px solid var(--border-input);
+  border-radius: 10px;
+  color: var(--text-input);
+  font-family: 'DM Mono', monospace;
+  font-size: 13px;
+  padding: 10px 14px;
+  outline: none;
+  transition: var(--transition-theme);
+  appearance: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+}
+
+.wd-select:hover,
+.wd-input:hover {
+  border-color: var(--border-input-hover);
+}
+
+.wd-select:focus,
+.wd-input:focus {
+  border-color: var(--border-input-focus);
+  box-shadow: 0 0 0 3px var(--accent-ring);
+}
+
+.wd-select option {
+  background: var(--bg-select-option);
+  color: var(--text-select-opt);
+}
+
+.wd-select-wrapper {
+  position: relative;
+}
+
+.wd-select-wrapper::after {
+  content: '▾';
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--accent);
+  pointer-events: none;
+  font-size: 12px;
+  transition: color 0.35s;
+}
+
+input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+  filter: var(--picker-filter);
+  cursor: pointer;
+}
+
+.wd-btn {
+  background: linear-gradient(135deg, #2b6cb0, #3182ce);
+  border: none;
+  border-radius: 10px;
+  color: #fff;
+  cursor: pointer;
+  font-family: 'Syne', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  padding: 11px 28px;
+  text-transform: uppercase;
+  white-space: nowrap;
+  box-shadow: 0 4px 20px rgba(49, 130, 206, 0.3);
+  transition: transform 0.15s, box-shadow 0.15s, opacity 0.15s;
+}
+
+.wd-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 28px rgba(49, 130, 206, 0.45);
+}
+
+.wd-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.wd-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.wd-error-notice {
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  color: #f6ad55;
+  margin-top: 12px;
+  padding-left: 4px;
+}
+
+
+/* ── 9. Results divider ────────────────────────────────────────────────── */
+
+.wd-divider {
+  max-width: 1100px;
+  margin: 40px auto;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.wd-divider__line      { flex: 1; height: 1px; }
+.wd-divider__line--left  { background: var(--divider-left); }
+.wd-divider__line--right { background: var(--divider-right); }
+
+.wd-divider__label {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 3px;
+  color: var(--text-accent);
+  text-transform: uppercase;
+  white-space: nowrap;
+  transition: color 0.35s;
+}
+
+
+/* ── 10. Stat cards ────────────────────────────────────────────────────── */
+
+.wd-results {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.wd-stat-grid {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 28px;
+}
+
+.wd-stat-card {
+  background: var(--bg-stat-card);
+  border: 1px solid transparent; /* accent border-color injected inline */
+  border-radius: 16px;
+  padding: 20px 24px;
+  flex: 1;
+  min-width: 140px;
+  position: relative;
+  overflow: hidden;
+  transition: var(--transition-theme);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+}
+
+.wd-stat-card__bar {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  /* background injected inline */
+}
+
+.wd-stat-card__label {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+  transition: color 0.35s;
+}
+
+.wd-stat-card__value {
+  font-family: 'Syne', sans-serif;
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--text-primary);
+  line-height: 1;
+  transition: color 0.35s;
+}
+
+.wd-stat-card__unit {
+  font-size: 14px;
+  font-weight: 400;
+  margin-left: 4px;
+  /* color injected inline */
+}
+
+
+/* ── 11. Chart cards ───────────────────────────────────────────────────── */
+
+.wd-chart-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-card);
+  border-radius: 20px;
+  padding: 28px 24px 20px;
+  backdrop-filter: blur(10px);
+  position: relative;
+  transition: var(--transition-theme);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+
+.wd-chart-card__bar {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  border-radius: 20px 20px 0 0;
+  /* background injected inline */
+}
+
+.wd-chart-card__header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.wd-chart-card__dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  /* background + box-shadow injected inline */
+}
+
+.wd-chart-card__title {
+  font-family: 'Syne', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  letter-spacing: 0.5px;
+  transition: color 0.35s;
+}
+
+.wd-chart-card__unit-label {
+  font-family: 'Syne', sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--text-faint);
+  margin-left: 8px;
+  transition: color 0.35s;
+}
+
+.wd-chart-card__scroll {
+  overflow-x: auto;
+  overflow-y: hidden;
+  cursor: grab;
+  width: 100%;
+}
+
+.wd-chart-card__scroll:active {
+  cursor: grabbing;
+}
+
+.wd-chart-card__empty {
+  height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 10px;
+  border: 1px dashed var(--border-empty);
+  border-radius: 12px;
+  transition: border-color 0.35s;
+}
+
+.wd-chart-card__empty-icon {
+  font-size: 28px;
+  opacity: 0.3;
+}
+
+.wd-chart-card__empty-text {
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  color: var(--text-faint);
+  letter-spacing: 1px;
+  transition: color 0.35s;
+}
+
+
+/* ── 12. Tooltip ───────────────────────────────────────────────────────── */
+
+.wd-tooltip {
+  background: var(--bg-tooltip);
+  border: 1px solid var(--border-tooltip);
+  border-radius: 12px;
+  padding: 12px 18px;
+  backdrop-filter: blur(12px);
+  box-shadow: var(--tooltip-shadow);
+  transition: var(--transition-theme);
+}
+
+.wd-tooltip__time {
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  color: var(--accent);
+  margin-bottom: 8px;
+  letter-spacing: 1px;
+  transition: color 0.35s;
+}
+
+.wd-tooltip__row {
+  font-family: 'DM Mono', monospace;
+  font-size: 13px;
+  margin: 3px 0;
+  /* color injected inline from Recharts entry.color */
+}
+
+.wd-tooltip__name  { opacity: 0.7; }
+.wd-tooltip__unit  { opacity: 0.5; margin-left: 4px; }
+
+
+/* ── 13. Empty / loading states ─────────────────────────────────────────── */
+
+.wd-empty-state {
+  text-align: center;
+  margin-top: 80px;
+  color: var(--text-ghost);
+  transition: color 0.35s;
+}
+
+.wd-empty-state__icon {
+  font-size: 48px;
+  display: block;
+  margin-bottom: 12px;
+}
+
+.wd-empty-state__text {
+  font-family: 'DM Mono', monospace;
+  font-size: 13px;
+}

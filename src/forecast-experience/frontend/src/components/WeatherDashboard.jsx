@@ -72,7 +72,7 @@ export default function WeatherDashboard({ backendUrl }) {
       <header className="wd-header fade-up">
         <div className="wd-header__eyebrow">
           <div className="wd-header__dot" />
-          <span className="wd-header__platform">Weather Insights Platform</span>
+          <span className="wd-header__platform">Weather Forecast Platform</span>
 
           {/* Theme toggle */}
           <button

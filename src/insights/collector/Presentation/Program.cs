@@ -23,9 +23,15 @@ builder.Services.AddCors(options =>
 
 builder.Services.AddOpenApi();
 
+builder.Services.AddHealthChecks();
+builder.RegisterReadinessChecks();
+
 builder.Services.RegisterLayers(builder.Configuration);
 
 var app = builder.Build();
+
+app.MapLiveness();
+app.MapReadiness();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

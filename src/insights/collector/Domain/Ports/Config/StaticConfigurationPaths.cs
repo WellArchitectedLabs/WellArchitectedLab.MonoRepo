@@ -9,4 +9,5 @@ public static class StaticConfigurationPaths
 {
     public const string WfEngineUrlPath = "WfEngine:Url";
     public const string MasterDataServiceUrlPath = "MasterDataService:Url";
+    public const string NpgSqlConnectionString = "Postgres";
 }

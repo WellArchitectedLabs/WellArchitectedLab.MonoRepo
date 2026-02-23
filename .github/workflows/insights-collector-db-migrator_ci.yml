@@ -1,4 +1,4 @@
-name: CI - Build & Push Master Data Db Migrator - Database
+name: CI - Build & Push Insights Db Migrator - Database
 
 on:
     push:

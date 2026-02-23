@@ -89,15 +89,15 @@ export function ChartBlock({
 
       <CartesianGrid
         strokeDasharray="3 3"
-        stroke="rgba(255,255,255,0.04)"
+        stroke="var(--chart-grid)"
         vertical={false}
       />
 
       <XAxis
         dataKey="time"
-        tick={{ fill: "#4a5568", fontSize: 10, fontFamily: "DM Mono, monospace" }}
+        tick={{ fill: "var(--chart-tick)", fontSize: 10, fontFamily: "DM Mono, monospace" }}
         axisLine={false}
-        tickLine={{ stroke: "rgba(255,255,255,0.06)" }}
+        tickLine={{ stroke: "var(--chart-tickline)" }}
         interval={X_TICK_INTERVAL}
         tickFormatter={(ts) => formatAxisTick(ts, multiDay)}
         angle={multiDay ? -35 : 0}
@@ -107,7 +107,7 @@ export function ChartBlock({
 
       <YAxis
         domain={yDomain}
-        tick={{ fill: "#4a5568", fontSize: 11, fontFamily: "DM Mono, monospace" }}
+        tick={{ fill: "var(--chart-tick)", fontSize: 11, fontFamily: "DM Mono, monospace" }}
         axisLine={false}
         tickLine={false}
         width={42}

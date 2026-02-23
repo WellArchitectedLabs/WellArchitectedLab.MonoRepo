@@ -42,6 +42,10 @@ export default function WeatherDashboard({ backendUrl }) {
   const [fromDt, setFromDt] = useState(toLocalDatetimeValue(dayStart));
   const [toDt,   setToDt  ] = useState(toLocalDatetimeValue(dayEnd));
 
+  // ── Theme ────────────────────────────────────────────────────────────────
+  const [isLight, setIsLight] = useState(false);
+  const toggleTheme = () => setIsLight((prev) => !prev);
+
   // ── Remote data ──────────────────────────────────────────────────────────
   const { cities, citiesLoading, cityId, setCityId } = useCities(backendUrl);
 
@@ -58,7 +62,7 @@ export default function WeatherDashboard({ backendUrl }) {
 
   // ── Render ───────────────────────────────────────────────────────────────
   return (
-    <div className="wd-layout">
+    <div className={`wd-layout${isLight ? " light" : ""}`}>
 
       {/* Decorative background rings (purely cosmetic) */}
       <div className="wd-bg-ring wd-bg-ring--sm" />
@@ -69,6 +73,19 @@ export default function WeatherDashboard({ backendUrl }) {
         <div className="wd-header__eyebrow">
           <div className="wd-header__dot" />
           <span className="wd-header__platform">Weather Insights Platform</span>
+
+          {/* Theme toggle */}
+          <button
+            className="wd-theme-toggle"
+            onClick={toggleTheme}
+            aria-label={isLight ? "Switch to dark theme" : "Switch to light theme"}
+          >
+            <span className="wd-theme-toggle__icon">{isLight ? "☀️" : "🌙"}</span>
+            <div className="wd-theme-toggle__track">
+              <div className="wd-theme-toggle__knob" />
+            </div>
+            <span className="wd-theme-toggle__label">{isLight ? "Light" : "Dark"}</span>
+          </button>
         </div>
         <h1 className="wd-header__title">
           Climate{" "}

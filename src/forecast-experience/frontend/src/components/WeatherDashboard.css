@@ -1,0 +1,547 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   WeatherDashboard.css
+   Stylesheet for the Weather Insights dashboard.
+
+   Organisation:
+     1. Fonts
+     2. Reset
+     3. Animations / keyframes
+     4. Layout shell (.wd-layout, decorative rings)
+     5. Header (.wd-header)
+     6. Control panel (.wd-controls-*)
+     7. Form elements (.wd-label, .wd-select, .wd-input, .wd-btn)
+     8. Results divider (.wd-divider)
+     9. Stat cards (.wd-stat-*)
+    10. Chart cards (.wd-chart-card, .wd-chart-card__*)
+    11. Tooltip (.wd-tooltip*)
+    12. Empty / loading states
+═══════════════════════════════════════════════════════════════════════════ */
+
+
+/* ── 1. Fonts ──────────────────────────────────────────────────────────── */
+
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap');
+
+
+/* ── 2. Reset ──────────────────────────────────────────────────────────── */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: #060d1a;
+  min-height: 100vh;
+}
+
+
+/* ── 3. Animations ─────────────────────────────────────────────────────── */
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.3; }
+}
+
+.fade-up {
+  animation: fadeUp 0.5s ease forwards;
+}
+
+.loading-dot {
+  animation: pulse 1.2s ease infinite;
+}
+
+
+/* ── 4. Layout shell ───────────────────────────────────────────────────── */
+
+.wd-layout {
+  min-height: 100vh;
+  background: radial-gradient(ellipse at 20% 0%, #0d2140 0%, #060d1a 60%);
+  padding: 40px 24px 60px;
+  font-family: 'Syne', sans-serif;
+  position: relative;
+}
+
+/* Purely decorative background circles */
+.wd-bg-ring {
+  position: fixed;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.wd-bg-ring--sm {
+  top: -200px;
+  right: -200px;
+  width: 600px;
+  height: 600px;
+  border: 1px solid rgba(99, 179, 237, 0.05);
+}
+
+.wd-bg-ring--lg {
+  top: -300px;
+  right: -300px;
+  width: 800px;
+  height: 800px;
+  border: 1px solid rgba(99, 179, 237, 0.03);
+}
+
+
+/* ── 5. Header ─────────────────────────────────────────────────────────── */
+
+.wd-header {
+  max-width: 1100px;
+  margin: 0 auto 48px;
+}
+
+.wd-header__eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 6px;
+}
+
+.wd-header__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #63b3ed;
+  box-shadow: 0 0 12px #63b3ed;
+  flex-shrink: 0;
+}
+
+.wd-header__platform {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 3px;
+  color: #4a9fd4;
+  text-transform: uppercase;
+}
+
+.wd-header__title {
+  font-size: clamp(28px, 5vw, 52px);
+  font-weight: 800;
+  color: #f7fafc;
+  line-height: 1.1;
+  letter-spacing: -1px;
+}
+
+.wd-header__title-accent {
+  background: linear-gradient(135deg, #63b3ed, #4299e1);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.wd-header__subtitle {
+  font-family: 'DM Mono', monospace;
+  font-size: 13px;
+  color: #4a5568;
+  margin-top: 10px;
+}
+
+
+/* ── 6. Control panel ──────────────────────────────────────────────────── */
+
+.wd-controls-wrapper {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.wd-controls-panel {
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid rgba(99, 179, 237, 0.12);
+  border-radius: 20px;
+  padding: 28px 32px;
+  backdrop-filter: blur(20px);
+  animation-delay: 0.1s;
+}
+
+.wd-controls-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  align-items: flex-end;
+}
+
+.wd-field {
+  flex: 1.5 1 180px;
+  min-width: 160px;
+}
+
+.wd-field--wide {
+  flex: 2 1 200px;
+  min-width: 180px;
+}
+
+.wd-field--btn {
+  flex: 0 0 auto;
+}
+
+
+/* ── 7. Form elements ──────────────────────────────────────────────────── */
+
+.wd-label {
+  display: block;
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #718096;
+  margin-bottom: 7px;
+}
+
+/* Shared base for select and datetime-local inputs */
+.wd-select,
+.wd-input {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(99, 179, 237, 0.2);
+  border-radius: 10px;
+  color: #e2e8f0;
+  font-family: 'DM Mono', monospace;
+  font-size: 13px;
+  padding: 10px 14px;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  appearance: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+}
+
+.wd-select:hover,
+.wd-input:hover {
+  border-color: rgba(99, 179, 237, 0.5);
+}
+
+.wd-select:focus,
+.wd-input:focus {
+  border-color: #63b3ed;
+  box-shadow: 0 0 0 3px rgba(99, 179, 237, 0.12);
+}
+
+.wd-select option {
+  background: #0d1b2e;
+  color: #e2e8f0;
+}
+
+/* Custom chevron for the <select> */
+.wd-select-wrapper {
+  position: relative;
+}
+
+.wd-select-wrapper::after {
+  content: '▾';
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #63b3ed;
+  pointer-events: none;
+  font-size: 12px;
+}
+
+/* Tint the native datetime picker icon to match the blue theme */
+input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+  filter: invert(0.7) sepia(1) hue-rotate(185deg);
+  cursor: pointer;
+}
+
+/* Submit button */
+.wd-btn {
+  background: linear-gradient(135deg, #2b6cb0, #3182ce);
+  border: none;
+  border-radius: 10px;
+  color: #fff;
+  cursor: pointer;
+  font-family: 'Syne', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  padding: 11px 28px;
+  text-transform: uppercase;
+  white-space: nowrap;
+  box-shadow: 0 4px 20px rgba(49, 130, 206, 0.3);
+  transition: transform 0.15s, box-shadow 0.15s, opacity 0.15s;
+}
+
+.wd-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 28px rgba(49, 130, 206, 0.45);
+}
+
+.wd-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.wd-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Error message below the control panel */
+.wd-error-notice {
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  color: #f6ad55;
+  margin-top: 12px;
+  padding-left: 4px;
+}
+
+
+/* ── 8. Results divider ────────────────────────────────────────────────── */
+
+.wd-divider {
+  max-width: 1100px;
+  margin: 40px auto;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.wd-divider__line {
+  flex: 1;
+  height: 1px;
+}
+
+.wd-divider__line--left {
+  background: linear-gradient(90deg, transparent, rgba(99, 179, 237, 0.3));
+}
+
+.wd-divider__line--right {
+  background: linear-gradient(90deg, rgba(99, 179, 237, 0.3), transparent);
+}
+
+.wd-divider__label {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 3px;
+  color: #4a9fd4;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+
+/* ── 9. Stat cards ─────────────────────────────────────────────────────── */
+
+.wd-results {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.wd-stat-grid {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 28px;
+}
+
+.wd-stat-card {
+  background: rgba(255, 255, 255, 0.03);
+  /* borderColor supplied via inline style (dynamic accent) */
+  border: 1px solid transparent;
+  border-radius: 16px;
+  padding: 20px 24px;
+  flex: 1;
+  min-width: 140px;
+  position: relative;
+  overflow: hidden;
+}
+
+.wd-stat-card__bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  /* background supplied via inline style */
+}
+
+.wd-stat-card__label {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #718096;
+  margin-bottom: 8px;
+}
+
+.wd-stat-card__value {
+  font-family: 'Syne', sans-serif;
+  font-size: 28px;
+  font-weight: 800;
+  color: #f7fafc;
+  line-height: 1;
+}
+
+.wd-stat-card__unit {
+  font-size: 14px;
+  font-weight: 400;
+  margin-left: 4px;
+  /* color supplied via inline style */
+}
+
+
+/* ── 10. Chart cards ───────────────────────────────────────────────────── */
+
+.wd-chart-card {
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 20px;
+  padding: 28px 24px 20px;
+  backdrop-filter: blur(10px);
+  position: relative;
+  /* No overflow:hidden — that was clipping the Recharts SVG canvas. */
+}
+
+/* Top colour stripe — background set via inline style (dynamic accent) */
+.wd-chart-card__bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  border-radius: 20px 20px 0 0; /* matches the card's own border-radius */
+}
+
+.wd-chart-card__header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+/* Glowing coloured dot — background + box-shadow set via inline style */
+.wd-chart-card__dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.wd-chart-card__title {
+  font-family: 'Syne', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  color: #cbd5e0;
+  letter-spacing: 0.5px;
+}
+
+.wd-chart-card__unit-label {
+  font-family: 'Syne', sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  color: #4a5568;
+  margin-left: 8px;
+}
+
+/*
+  Horizontal scroll container.
+  overflow-x: auto  → scrollable for large (multi-week) datasets
+  overflow-y: hidden → prevents vertical scroll from the chart SVG
+  The inner div's width is set dynamically in ChartBlock.jsx.
+*/
+.wd-chart-card__scroll {
+  overflow-x: auto;
+  overflow-y: hidden;
+  cursor: grab;
+  width: 100%;
+}
+
+.wd-chart-card__scroll:active {
+  cursor: grabbing;
+}
+
+/* Empty state shown when backend returned no data */
+.wd-chart-card__empty {
+  height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 10px;
+  border: 1px dashed rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+}
+
+.wd-chart-card__empty-icon {
+  font-size: 28px;
+  opacity: 0.3;
+}
+
+.wd-chart-card__empty-text {
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  color: #4a5568;
+  letter-spacing: 1px;
+}
+
+
+/* ── 11. Tooltip ───────────────────────────────────────────────────────── */
+
+.wd-tooltip {
+  background: rgba(10, 18, 35, 0.95);
+  border: 1px solid rgba(99, 179, 237, 0.25);
+  border-radius: 12px;
+  padding: 12px 18px;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+.wd-tooltip__time {
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  color: #63b3ed;
+  margin-bottom: 8px;
+  letter-spacing: 1px;
+}
+
+.wd-tooltip__row {
+  font-family: 'DM Mono', monospace;
+  font-size: 13px;
+  margin: 3px 0;
+  /* color injected via inline style from Recharts entry.color */
+}
+
+.wd-tooltip__name {
+  opacity: 0.7;
+}
+
+.wd-tooltip__unit {
+  opacity: 0.5;
+  margin-left: 4px;
+}
+
+
+/* ── 12. Empty / loading states ────────────────────────────────────────── */
+
+/* Shown before the user clicks Analyse for the first time */
+.wd-empty-state {
+  text-align: center;
+  margin-top: 80px;
+  color: #2d3748;
+}
+
+.wd-empty-state__icon {
+  font-size: 48px;
+  display: block;
+  margin-bottom: 12px;
+}
+
+.wd-empty-state__text {
+  font-family: 'DM Mono', monospace;
+  font-size: 13px;
+}

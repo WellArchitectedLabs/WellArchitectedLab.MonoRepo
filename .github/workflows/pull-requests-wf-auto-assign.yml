@@ -31,10 +31,10 @@ jobs:
 
             // I - Wf-team auto-assignment
             const wfTouched = files.some(file =>
-              file.filename.startsWith("src/insights/bff/") ||
-              file.filename.startsWith("src/insights/frontend/")
+              file.filename.startsWith("src/forecast-experience/bff/") ||
+              file.filename.startsWith("src/forecast-experience/frontend/")
             );
-            if (wfTouched) teams.push("wf-dev-team");
+            if (wfTouched) teams.push("wf-forecast-experience-team");
 
             // II - Wf-devops team auto-assignment
             const devOpsTouched = files.some(file =>

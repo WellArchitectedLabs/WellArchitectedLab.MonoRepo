@@ -61,7 +61,7 @@ spec:
               memory: 512Mi
 
   destination:
-    namespace: backend
+    namespace: master-data-staging
     server: https://kubernetes.default.svc
   syncPolicy:
     automated:

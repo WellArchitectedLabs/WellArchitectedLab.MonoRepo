@@ -112,7 +112,7 @@ Trace ID: abc123
 ├─ Span: POST /weather
    ├─ Attributes:
    │  ├─ service.name: wf-exp-bff
-   │  ├─ service.namespace: backend
+   │  ├─ service.namespace: forecast-experience
    │  ├─ http.method: POST
    │  ├─ http.status_code: 500
    │  └─ http.route: /weather

@@ -1,7 +1,7 @@
 apiVersion: networking.istio.io/v1beta1
 kind: VirtualService
 metadata:
-  name: insights-frontend-virtualservice
+  name: wf-exp-frontend-virtualservice
   namespace: istio-gateway
   labels:
     app: frontend
@@ -17,6 +17,6 @@ spec:
             prefix: /
       route:
         - destination:
-            host: dev-insights-frontend-service.frontend.svc.cluster.local
+            host: dev-wf-exp-frontend-service.frontend.svc.cluster.local
             port:
               number: 80

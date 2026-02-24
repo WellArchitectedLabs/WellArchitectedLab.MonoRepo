@@ -2,7 +2,7 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 metadata:
   namespace: backend
-  name: insights-bff-kustomization
+  name: wf-exp-bff-kustomization
 resources:
   - namespace/backend_namespace.yaml
   - deployment.yaml

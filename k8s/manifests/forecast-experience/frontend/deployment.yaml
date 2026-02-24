@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 #descriptions arounf the deployment
 metadata:
-  name: insights-frontend
+  name: wf-exp-frontend
   namespace: frontend
   annotations:
     sidecar.istio.io/inject: "true"
@@ -10,7 +10,7 @@ spec:
   selector:
     matchLabels:
       #should be used to identify the pod the deployment manages
-      app: insights-frontend
+      app: wf-exp-frontend
   # deployment order replicaset controller to keep 3 instances of these pods always running
   replicas: 2
    # Add the rolling update strategy here
@@ -37,7 +37,7 @@ spec:
     # metadata around the pod
     metadata:
       labels:
-        app: insights-frontend
+        app: wf-exp-frontend
         # optional (nice to have)
         editor: vscode
         # necessary for kiali integration
@@ -65,11 +65,11 @@ spec:
             podAffinityTerm:
               labelSelector:
                 matchLabels:
-                  app: insights-frontend
+                  app: wf-exp-frontend
               topologyKey: kubernetes.io/hostname
       containers:
       # can be multiple containers since one pod scan contain multiple containers
-      - name: insights-frontend
+      - name: wf-exp-frontend
         # test image from docker registry, provided by nginx project
         image: acrdevtshpwn.azurecr.io/insights-frontend:0.1.0-PullRequest0083.417-9c6ad1e
         ports:
@@ -103,10 +103,10 @@ spec:
           initialDelaySeconds: 30
           periodSeconds: 10
         volumeMounts:
-          - name: insights-frontend-config-volume
+          - name: wf-exp-frontend-config-volume
             mountPath: '/usr/share/nginx/html/config'
             readOnly: true
       volumes:
-        - name:  insights-frontend-config-volume
+        - name:  wf-exp-frontend-config-volume
           configMap:
-            name: insights-frontend-configmap
+            name: wf-exp-frontend-configmap

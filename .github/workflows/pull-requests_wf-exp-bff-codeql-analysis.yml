@@ -1,4 +1,4 @@
-# .github/workflows/codeql-insights-bff.yml
+# .github/workflows/codeql-wf-exp-bff.yml
 name: CodeQL Analysis - Forecast Experience Bff
 
 on:

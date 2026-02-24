@@ -1,18 +1,18 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: insights-bff-redis
+  name: wf-exp-bff-redis
   namespace: backend
 spec:
   selector:
     matchLabels:
-      app: insights-bff-redis
-  serviceName: insights-bff-redis
+      app: wf-exp-bff-redis
+  serviceName: wf-exp-bff-redis
   replicas: 3
   template:
     metadata:
       labels:
-        app: insights-bff-redis
+        app: wf-exp-bff-redis
         # necessary for kiali integration
         version: v1
     spec:

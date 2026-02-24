@@ -1,10 +1,10 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: insights-frontend-configmap
+  name: wf-exp-frontend-configmap
   namespace: frontend
   labels:
-    app: insights-frontend-configmap
+    app: wf-exp-frontend-configmap
 data:
   appSettings.yaml: |
     # yaml file

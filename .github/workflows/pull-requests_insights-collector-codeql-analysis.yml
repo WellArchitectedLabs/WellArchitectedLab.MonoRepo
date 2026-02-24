@@ -1,4 +1,4 @@
-# .github/workflows/codeql-insights-bff.yml
+# .github/workflows/codeql-insights-collector.yml
 name: CodeQL Analysis -Insights Collector
 
 on:

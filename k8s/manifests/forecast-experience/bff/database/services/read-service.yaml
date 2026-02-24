@@ -2,15 +2,15 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: insights-bff-redis-secondary
+  name: wf-exp-bff-redis-secondary
   namespace: backend
   labels:
-    app: insights-bff-redis
+    app: wf-exp-bff-redis
     version: v1
 spec:
   type: ClusterIP
   selector:
-    app: insights-bff-redis
+    app: wf-exp-bff-redis
   ports:
   - name: redis
     port: 6379

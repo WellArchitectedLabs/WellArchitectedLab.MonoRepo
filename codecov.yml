@@ -1,7 +1,7 @@
 coverage:
   status:
     project:
-      insights-bff:
+      wf-exp-bff:
         paths:
           - src/forecast-experience/bff/**
         flag_coverage_not_uploaded_behavior: exclude # don't send status checks that don't have flag 
@@ -16,7 +16,7 @@ coverage:
         informational: false
         only_pulls: false
 
-      insights-frontend:
+      wf-exp-frontend:
         flag_coverage_not_uploaded_behavior: exclude
         paths:
           - src/forecast-experience/frontend/**

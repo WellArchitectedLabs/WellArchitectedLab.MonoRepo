@@ -8,3 +8,4 @@ resources:
   - grafana/secrets.yaml
   - grafana/grafana-dashboards-backup.yaml
   - github/secrets.yaml
+  - namespace.yaml

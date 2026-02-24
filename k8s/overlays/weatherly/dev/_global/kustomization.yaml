@@ -4,8 +4,6 @@ kind: Kustomization
 resources:
   - ../../../../manifests/shared
 
-namespace: shared
-
 # adds a metadata.label for every resource created by this kustomize hop
 # this allows easy resource managemnt using -l filters
 commonLabels:

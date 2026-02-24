@@ -3,11 +3,11 @@ kind: Kustomization
 metadata:
   namespace: backend
   name: wf-exp-bff-kustomization
-  
+
 resources:
-  # - namespace/backend_namespace.yaml
   - deployment.yaml
   - high-availability/hpa.yaml
   - high-availability/pdb.yaml
   - services/service.yaml
   - services/virtual-service.yaml
+  - database

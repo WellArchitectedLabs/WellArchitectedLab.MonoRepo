@@ -5,7 +5,6 @@ metadata:
   name: frontend-kustomization
 
 resources:
-  - namespace/frontend_namespace.yaml
   - deployment.yaml
   - high-availability/hpa.yaml
   - high-availability/pod-disruption-budget.yaml

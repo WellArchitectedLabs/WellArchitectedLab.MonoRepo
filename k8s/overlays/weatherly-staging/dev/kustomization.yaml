@@ -5,9 +5,6 @@ kind: Kustomization
 resources:
   - ../../../manifests/master-data/staging
   - ../../../gitops/app-dependencies/master-data
-  - namespace.yaml
-
-namespace: master-data-staging
 
 # adds a metadata.label for every resource created by this kustomize hop
 # this allows easy resource managemnt using -l filters

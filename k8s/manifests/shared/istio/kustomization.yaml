@@ -5,4 +5,5 @@ metadata:
   name: shared-kustomization 
 
 resources:
-  - istio
+  - namespace.yaml
+  - gateway.yaml

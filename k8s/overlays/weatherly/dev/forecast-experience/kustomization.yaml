@@ -3,28 +3,22 @@ kind: Kustomization
 
 # reference all manifests from base folder
 resources:
-  - ../../../../manifests/forecast-experience/bff
-  - ../../../../manifests/forecast-experience/frontend
-  - ../../../../manifests/forecast-experience/bff/database
+  - ../../../../manifests/forecast-experience
   - config-maps/wf-exp-bff.yaml
-  - namespace.yaml
   - ../_global
   # - ../../../manifests/tools/htg
-
-namespace: wf-experience
 
 # adds a metadata.label for every resource created by this kustomize hop
 # this allows easy resource managemnt using -l filters
 commonLabels:
   environment: dev
-  domain: weather
+  domain: forecast-experience
 
 # we need to track the environment in order to use it on pod level
 # config map generators are used here in order to update the pods as the config changes
 # this will created a config which is suffixed by the hash of the config content. Something like 
 configMapGenerator:
   - name: rediswfconfigenvvars
-    namespace: backend
     literals:
       # used by redis in order to configure the replication mecanism
       - REDIS_HEADLESS_SERVICE=dev-wf-exp-bff-redis

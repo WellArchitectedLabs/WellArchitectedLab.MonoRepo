@@ -4,3 +4,4 @@ metadata:
   name: wf-experience
   labels:
     istio-injection: enabled
+    domain: forecast-experience

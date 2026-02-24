@@ -4,6 +4,7 @@ metadata:
   namespace: backend
   name: master-data-staging-kustomization
 resources:
+  - namespace.yaml
   - jobs/cities-import.yaml
   - jobs/wf-actuals-import.yaml
   - jobs/wf-actuals-range-import.yaml

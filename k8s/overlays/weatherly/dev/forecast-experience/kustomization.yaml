@@ -3,9 +3,9 @@ kind: Kustomization
 
 # reference all manifests from base folder
 resources:
-  - ../../../manifests/forecast-experience/bff
-  - ../../../manifests/forecast-experience/frontend
-  - ../../../manifests/forecast-experience/bff/database
+  - ../../../../manifests/forecast-experience/bff
+  - ../../../../manifests/forecast-experience/frontend
+  - ../../../../manifests/forecast-experience/bff/database
   - config-maps/wf-exp-bff_config-map.yaml
   - namespace.yaml
   - ../_global

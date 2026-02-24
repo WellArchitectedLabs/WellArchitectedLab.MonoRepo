@@ -1,0 +1,27 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: dev-operations-app
+  namespace: argocd
+  labels:
+    workload: root-applications
+    environment: dev
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/WellArchitectedLabs/WellArchitectedLab.MonoRepo.git
+    targetRevision: feature/42-k8s
+    path: k8s/overlays/weatherly/dev/operations
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: default
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+    retry:
+      limit: 2
+      backoff:
+        duration: 5s

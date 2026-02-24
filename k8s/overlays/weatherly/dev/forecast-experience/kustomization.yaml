@@ -3,24 +3,21 @@ kind: Kustomization
 
 # reference all manifests from base folder
 resources:
-  - ../../../manifests/operations
   - ../../../manifests/forecast-experience/bff
   - ../../../manifests/forecast-experience/frontend
   - ../../../manifests/forecast-experience/bff/database
-  - wf-exp-bff_config-map.yaml
-  - ../../../manifests/shared
+  - config-maps/wf-exp-bff_config-map.yaml
+  - namespace.yaml
+  - ../_global
   # - ../../../manifests/tools/htg
 
-
-# define a dev prefix for all created environment in relation to this overlay
-namePrefix: dev-
-# no suffix is defined
-nameSuffix: ""
+namespace: wf-experience
 
 # adds a metadata.label for every resource created by this kustomize hop
 # this allows easy resource managemnt using -l filters
 commonLabels:
   environment: dev
+  domain: weather
 
 # we need to track the environment in order to use it on pod level
 # config map generators are used here in order to update the pods as the config changes

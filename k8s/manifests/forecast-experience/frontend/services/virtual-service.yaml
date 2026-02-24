@@ -10,13 +10,13 @@ spec:
   hosts:
     - front.weatherly.local
   gateways:
-    - istio-gateway/dev-weatherly-gateway
+    - istio-gateway/weatherly-gateway
   http:
     - match:
         - uri:
             prefix: /
       route:
         - destination:
-            host: dev-wf-exp-frontend-service.frontend.svc.cluster.local
+            host: wf-exp-frontend-service.frontend.svc.cluster.local
             port:
               number: 80

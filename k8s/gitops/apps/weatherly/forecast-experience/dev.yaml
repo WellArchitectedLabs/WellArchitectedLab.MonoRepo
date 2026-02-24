@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: dev-weatherly-app
+  name: dev-forecast-experience-app
   namespace: argocd
   labels:
     workload: root-applications
@@ -11,7 +11,7 @@ spec:
   source:
     repoURL: https://github.com/WellArchitectedLabs/WellArchitectedLab.MonoRepo.git
     targetRevision: feature/42-k8s
-    path: k8s/overlays/weatherly/dev
+    path: k8s/overlays/weatherly/dev/forecast-experience
   destination:
     server: https://kubernetes.default.svc
     namespace: default

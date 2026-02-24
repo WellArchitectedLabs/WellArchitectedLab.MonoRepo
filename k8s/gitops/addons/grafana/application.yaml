@@ -140,7 +140,7 @@ spec:
         # Reference the environment variables for database configuration
         env:
           GF_DATABASE_TYPE: postgres
-          GF_DATABASE_HOST: dev-grafana-database-postgresql.monitoring.svc.cluster.local:5432
+          GF_DATABASE_HOST: grafana-database-postgresql.monitoring.svc.cluster.local:5432
           GF_DATABASE_NAME: $__env{GF_POSTGRES_DB}
           GF_DATABASE_USER: $__env{GF_POSTGRES_USER}
           GF_DATABASE_PASSWORD: $__env{GF_POSTGRES_PASSWORD}

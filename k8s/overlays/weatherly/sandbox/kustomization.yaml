@@ -11,11 +11,6 @@ resources:
   - wf-exp-bff_config-map.yaml
   - ../../manifests/tools/htg
 
-# define a sandbox prefix for all created environment in relation to this overlay
-namePrefix: sandbox-
-# no suffix is defined
-nameSuffix: ""
-
 # adds a metadata.label for every resource created by this kustomize hop
 # this allows easy resource managemnt using -l filters
 commonLabels:

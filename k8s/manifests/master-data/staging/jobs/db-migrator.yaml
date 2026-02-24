@@ -36,7 +36,7 @@ spec:
             env:
               # Database connection settings
               - name: FLYWAY_URL
-                value: "jdbc:postgresql://dev-master-data-database-postgresql:5432/master_data"
+                value: "jdbc:postgresql://master-data-database-postgresql:5432/master_data"
               
               - name: FLYWAY_USER
                 value: "postgres"
@@ -44,20 +44,20 @@ spec:
               - name: FLYWAY_PASSWORD
                 valueFrom:
                   secretKeyRef:
-                    name: dev-master-data-db-sealed-secrets
+                    name: master-data-db-sealed-secrets
                     key: POSTGRES_SUPERUSER_PASSWORD
               
               # Application user credentials (for envsubst)
               - name: DB_APP_USER
                 valueFrom:
                   secretKeyRef:
-                    name: dev-master-data-db-sealed-secrets
+                    name: master-data-db-sealed-secrets
                     key: DB_APP_USER
               
               - name: DB_APP_PASSWORD
                 valueFrom:
                   secretKeyRef:
-                    name: dev-master-data-db-sealed-secrets
+                    name: master-data-db-sealed-secrets
                     key: DB_APP_PASSWORD
               
               - name: POSTGRES_DATABASE

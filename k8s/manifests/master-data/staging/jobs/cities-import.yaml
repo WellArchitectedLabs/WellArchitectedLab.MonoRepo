@@ -37,7 +37,7 @@ spec:
             image: acrdevtshpwn.azurecr.io/postgres-sanity-guard:0.1.0-staging-scripts.1-276fa6a
             env:
               - name: DB_HOST
-                value: dev-master-data-database-postgresql.backend.svc.cluster.local
+                value: master-data-database-postgresql.master-data-staging.svc.cluster.local
               - name: DB_PORT
                 value: "5432"
               - name: DB_NAME
@@ -45,17 +45,17 @@ spec:
               - name: DB_APP_USER
                 valueFrom:
                   secretKeyRef:
-                    name: dev-master-data-db-sealed-secrets
+                    name: master-data-db-sealed-secrets
                     key: DB_APP_USER
               - name: DB_APP_PASSWORD
                 valueFrom:
                   secretKeyRef:
-                    name: dev-master-data-db-sealed-secrets
+                    name: master-data-db-sealed-secrets
                     key: DB_APP_PASSWORD
               - name: POSTGRES_SUPERUSER_PASSWORD
                 valueFrom:
                   secretKeyRef:
-                    name: dev-master-data-db-sealed-secrets
+                    name: master-data-db-sealed-secrets
                     key: POSTGRES_SUPERUSER_PASSWORD
               - name: MAX_RETRIES
                 value: "30"
@@ -69,7 +69,7 @@ spec:
               - name: POSTGRES_DSN
                 valueFrom:
                   secretKeyRef:
-                    name: dev-master-data-db-sealed-secrets
+                    name: master-data-db-sealed-secrets
                     key: DB_APP_DSN
             volumeMounts:
             - name: imports-blob
@@ -78,6 +78,6 @@ spec:
           volumes:
           - name: imports-blob
             persistentVolumeClaim:
-              claimName: dev-pvc-az-blob-imports
+              claimName: pvc-az-blob-imports
           
           restartPolicy: Never

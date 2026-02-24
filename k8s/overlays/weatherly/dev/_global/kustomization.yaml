@@ -1,16 +1,13 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
-# reference all manifests from base folder
 resources:
-  - ../../../manifests/master-data/staging
-  - ../../../gitops/app-dependencies/master-data
-  - namespace.yaml
+  - ../../../manifests/shared
 
-namespace: master-data-staging
+namespace: shared
 
 # adds a metadata.label for every resource created by this kustomize hop
 # this allows easy resource managemnt using -l filters
 commonLabels:
   environment: dev
-  domain: master-data
+  domain: shared

@@ -1,0 +1,5 @@
+# we do not track operations workloads with istio injection labels
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: operations

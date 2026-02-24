@@ -59,7 +59,7 @@ spec:
         command:
           - /app/wait-for.sh
         args:
-          - wf-exp-bff-redis-secondary.wf-experience.svc.cluster.local
+          - wf-exp-bff-redis-secondary.forecast-experience.svc.cluster.local
           - "6379"
           - dotnet
           - WeatherForecast.Api.dll

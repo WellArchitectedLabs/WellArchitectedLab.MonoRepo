@@ -17,6 +17,6 @@ spec:
             prefix: /
       route:
         - destination:
-            host: wf-exp-bff-service.wf-experience.svc.cluster.local
+            host: wf-exp-bff-service.forecast-experience.svc.cluster.local
             port:
               number: 8080

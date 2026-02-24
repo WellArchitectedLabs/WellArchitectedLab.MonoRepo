@@ -15,8 +15,8 @@ data:
     "AllowedHosts": "*",
     "WeatherForecast": {
         "Redis": {
-          "WriteDbConnection": "dev-wf-exp-bff-redis-primary.wf-experience.svc.cluster.local:6379",
-          "ReadDbConnection": "dev-wf-exp-bff-redis-secondary.wf-experience.svc.cluster.local:6379"
+          "WriteDbConnection": "wf-exp-bff-redis-secondary.forecast-experience.svc.cluster.local:6379",
+          "ReadDbConnection": "wf-exp-bff-redis-secondary.forecast-experience.svc.cluster.local:6379"
         }
       }
     }

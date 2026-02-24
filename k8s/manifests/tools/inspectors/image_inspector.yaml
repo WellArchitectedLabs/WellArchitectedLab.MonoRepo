@@ -2,7 +2,7 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: cities-import-as-root
-  namespace: backend
+  namespace: tools
 spec:
   template:
     metadata:

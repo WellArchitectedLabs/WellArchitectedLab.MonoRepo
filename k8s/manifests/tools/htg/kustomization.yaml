@@ -4,3 +4,4 @@ kind: Kustomization
 resources:
   - deployment_heavy-traffic-generator.yaml
   - service_heavy-traffic-generator.yaml
+  - namespace.yaml

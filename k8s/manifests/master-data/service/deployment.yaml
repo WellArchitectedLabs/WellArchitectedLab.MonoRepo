@@ -49,18 +49,18 @@ spec:
       containers:
       # can be multiple containers since one pod scan contain multiple containers
       - name: master-data-service
-        image: acrdevtshpwn.azurecr.io/master-data-service:0.1.0-PullRequest0109.451-80b795f
         env:
           - name: ConnectionStrings__Postgres
             valueFrom:
               secretKeyRef:
                 name: master-data-db-sealed-secrets
                 key: DB_APP_DSN
-        # mounting config file
-        volumeMounts:
-          - name: config
-            mountPath: /app/appsettings.json
-            subPath: appsettings.json
+        image: acrdevtshpwn.azurecr.io/master-data-service:0.1.0-PullRequest0109.451-80b795f
+        # # mounting config file
+        # volumeMounts:
+        #   - name: config
+        #     mountPath: /app/appsettings.json
+        #     subPath: appsettings.json
         ports: 
         - containerPort: 80
         imagePullPolicy: Always  # Always pull latest
@@ -92,7 +92,7 @@ spec:
           initialDelaySeconds: 30
           timeoutSeconds: 10
           periodSeconds: 60
-      volumes:
-      - name: config
-        configMap:
-          name: master-data-service-configmap
+      # volumes:
+      # - name: config
+      #   configMap:
+      #     name: master-data-service-configmap

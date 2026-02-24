@@ -12,3 +12,4 @@ resources:
   - open-telemetry
   - prometheus
   - tempo
+  - namespace.yaml

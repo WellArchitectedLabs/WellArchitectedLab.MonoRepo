@@ -4,7 +4,6 @@ kind: Kustomization
 # reference all manifests from base folder
 resources:
   - ../../../gitops/addons
-  - ../namespace.yaml
 
 # adds a metadata.label for every resource created by this kustomize hop
 # this allows easy resource managemnt using -l filters

@@ -87,8 +87,7 @@ spec:
             namespaces:
             - istio-system
             - istio-gateway
-            - backend
-            - frontend
+            - forecast-experience
 
   destination:
     server: https://kubernetes.default.svc

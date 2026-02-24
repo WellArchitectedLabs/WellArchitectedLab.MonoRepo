@@ -3,5 +3,4 @@ kind: Namespace
 metadata:
   name: master-data-staging
   labels:
-    environment: dev
     domain: master-data

@@ -2,7 +2,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: wf-exp-frontend-configmap
-  namespace: frontend
+  namespace: forecast-experience
   labels:
     app: wf-exp-frontend-configmap
 data:

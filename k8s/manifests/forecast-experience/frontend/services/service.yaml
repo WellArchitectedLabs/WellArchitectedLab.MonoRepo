@@ -2,7 +2,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: wf-exp-frontend-service
-  namespace: frontend
+  namespace: forecast-experience
 spec:
   selector:
     app: wf-exp-frontend

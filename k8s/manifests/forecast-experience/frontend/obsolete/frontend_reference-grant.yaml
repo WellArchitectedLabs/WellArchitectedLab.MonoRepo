@@ -10,7 +10,7 @@ apiVersion: gateway.networking.k8s.io/v1beta1
 kind: ReferenceGrant
 metadata:
   name: nginx-class-to-frontend-grant
-  namespace: frontend #needs to be the service namespace
+  namespace: forecast-experience #needs to be the service namespace
 spec:
   from: 
   - group: gateway.networking.k8s.io

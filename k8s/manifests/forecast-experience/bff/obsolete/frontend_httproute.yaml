@@ -21,4 +21,4 @@ spec:
       backendRefs:
         - name: frontend-service
           port: 80
-          namespace: frontend
+          namespace: forecast-experience

@@ -22,7 +22,7 @@ configMapGenerator:
     namespace: forecast-experience
     literals:
       # used by redis in order to configure the replication mecanism
-      - REDIS_HEADLESS_SERVICE=dev-wf-exp-bff-redis
+      - REDIS_HEADLESS_SERVICE=wf-exp-bff-redis
     # this is necessary in order to avoid non conventional resource name with naming RFCs
     options:
       disableNameSuffixHash: true

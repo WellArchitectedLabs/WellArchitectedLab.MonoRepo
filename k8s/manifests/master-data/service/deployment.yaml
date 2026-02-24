@@ -46,17 +46,21 @@ spec:
                 matchLabels:
                   app: master-data-service
               topologyKey: kubernetes.io/hostname
-      env:
-        - name: ConnectionStrings__Postgres
-          valueFrom:
-            secretKeyRef:
-              name: master-data-db-sealed-secrets
-              key: DB_APP_DSN
       containers:
       # can be multiple containers since one pod scan contain multiple containers
       - name: master-data-service
-        # test image from docker registry, provided by nginx project
         image: acrdevtshpwn.azurecr.io/master-data-service:0.1.0-PullRequest0109.451-80b795f
+        env:
+          - name: ConnectionStrings__Postgres
+            valueFrom:
+              secretKeyRef:
+                name: master-data-db-sealed-secrets
+                key: DB_APP_DSN
+        # mounting config file
+        volumeMounts:
+          - name: config
+            mountPath: /app/appsettings.json
+            subPath: appsettings.json
         ports: 
         - containerPort: 80
         imagePullPolicy: Always  # Always pull latest
@@ -87,3 +91,7 @@ spec:
             port: 80
           initialDelaySeconds: 30
           timeoutSeconds: 10
+      volumes:
+      - name: config
+        configMap:
+          name: master-data-service-configmap

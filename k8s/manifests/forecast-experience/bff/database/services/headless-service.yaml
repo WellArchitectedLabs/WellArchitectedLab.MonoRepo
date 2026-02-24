@@ -12,7 +12,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: wf-exp-bff-redis
-  namespace: backend
+  namespace: forecast-experience
   labels:
     app: wf-exp-bff-redis
     version: v1

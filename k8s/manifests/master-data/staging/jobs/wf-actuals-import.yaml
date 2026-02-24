@@ -2,7 +2,7 @@ apiVersion: batch/v1
 kind: CronJob
 metadata:
   name: wf-actuals-import
-  namespace: backend
+  namespace: master-data-staging
   labels:
     app: wf-actuals-import
 spec:

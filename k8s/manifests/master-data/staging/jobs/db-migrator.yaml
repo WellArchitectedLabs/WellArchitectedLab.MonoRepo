@@ -2,7 +2,7 @@ apiVersion: batch/v1
 kind: CronJob
 metadata:
   name: master-data-flyway-migration
-  namespace: backend
+  namespace: master-data-staging
 spec:
   schedule: "0 0 31 2 *"  # Feb 31st (never runs automatically)
   suspend: true            # Suspended by default - only manual triggers

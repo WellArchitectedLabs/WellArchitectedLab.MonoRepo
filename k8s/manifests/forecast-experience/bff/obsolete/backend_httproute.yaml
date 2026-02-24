@@ -22,4 +22,4 @@ spec:
       backendRefs:
         - name: backend-service
           port: 8080
-          namespace: backend
+          namespace: forecast-experience

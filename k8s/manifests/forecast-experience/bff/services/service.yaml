@@ -2,7 +2,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: wf-exp-bff-service
-  namespace: backend
+  namespace: forecast-experience
 spec:
   selector:
     app: wf-exp-bff

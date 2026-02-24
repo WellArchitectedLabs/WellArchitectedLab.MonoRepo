@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: wf-experience
+  name: forecast-experience
   labels:
     istio-injection: enabled
     domain: forecast-experience

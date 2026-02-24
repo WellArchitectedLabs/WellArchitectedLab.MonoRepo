@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: wf-exp-bff-redis
-  namespace: backend
+  namespace: forecast-experience
 spec:
   selector:
     matchLabels:

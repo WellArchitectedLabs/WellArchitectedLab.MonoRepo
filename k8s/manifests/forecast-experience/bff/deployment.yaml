@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name:  wf-exp-bff
-  namespace: backend
+  namespace: forecast-experience
 spec:
   selector:
     matchLabels:

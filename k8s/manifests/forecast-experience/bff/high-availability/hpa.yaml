@@ -2,7 +2,7 @@ apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
   name: wf-exp-bff-hpa
-  namespace: backend
+  namespace: forecast-experience
 spec:
   scaleTargetRef:
     apiVersion: apps/v1

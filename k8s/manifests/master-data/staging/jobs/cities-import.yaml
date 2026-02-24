@@ -2,7 +2,7 @@ apiVersion: batch/v1
 kind: CronJob
 metadata:
   name: cities-import
-  namespace: backend
+  namespace: master-data-staging
   labels:
     app: cities-import
 spec:

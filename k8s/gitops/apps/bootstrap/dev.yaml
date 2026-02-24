@@ -14,7 +14,7 @@ spec:
   project: default
   source:
     repoURL: https://github.com/WellArchitectedLabs/WellArchitectedLab.MonoRepo.git
-    targetRevision: feature/42-k8S
+    targetRevision: feature/42-k8s
     path: k8s/overlays/bootstrap/dev
   destination:
     server: https://kubernetes.default.svc

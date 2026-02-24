@@ -9,7 +9,7 @@ resources:
   - ../../../manifests/forecast-experience/bff/database
   - wf-exp-bff_config-map.yaml
   - ../../../manifests/shared
-  - ../../../manifests/tools/htg
+  # - ../../../manifests/tools/htg
 
 
 # define a dev prefix for all created environment in relation to this overlay

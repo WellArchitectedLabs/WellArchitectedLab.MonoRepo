@@ -6,7 +6,7 @@ resources:
   - ../../../../manifests/forecast-experience/bff
   - ../../../../manifests/forecast-experience/frontend
   - ../../../../manifests/forecast-experience/bff/database
-  - config-maps/wf-exp-bff_config-map.yaml
+  - config-maps/wf-exp-bff.yaml
   - namespace.yaml
   - ../_global
   # - ../../../manifests/tools/htg

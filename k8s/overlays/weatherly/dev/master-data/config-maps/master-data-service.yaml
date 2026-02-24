@@ -13,8 +13,5 @@ data:
         }
       },
       "AllowedHosts": "*",
-      "MaximumCitiesBeforeWarning": 300,
-      "ConnectionStrings": {
-        "Postgres": ""
-      }
+      "MaximumCitiesBeforeWarning": 300
     }

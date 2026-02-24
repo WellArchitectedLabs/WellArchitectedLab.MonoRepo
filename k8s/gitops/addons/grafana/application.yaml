@@ -52,7 +52,7 @@ spec:
                 url: http://prometheus-server-kube-pro-prometheus.monitoring.svc.cluster.local:9090
                 isDefault: true
                 editable: false
-                uid: prometheus-uid
+                uid: prometheus-uidas
 
               - name: Tempo
                 type: tempo

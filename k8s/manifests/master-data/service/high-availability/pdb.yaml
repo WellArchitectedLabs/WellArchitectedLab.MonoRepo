@@ -1,0 +1,10 @@
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: master-data-service-pdb
+  namespace: master-data
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: master-data-service

@@ -4,7 +4,7 @@ kind: Kustomization
 # reference needed master data service manifests from base folder
 resources:
   - ../../../../manifests/master-data/service
-  - secrets/sealed-secrets.yaml
+  - secrets/db-access.yaml
   - config-maps/master-data-service.yaml
 
 # adds a metadata.label for every resource created by this kustomize hop

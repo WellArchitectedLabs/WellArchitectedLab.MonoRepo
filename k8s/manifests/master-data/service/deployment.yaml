@@ -57,11 +57,6 @@ spec:
       - name: master-data-service
         # test image from docker registry, provided by nginx project
         image: acrdevtshpwn.azurecr.io/master-data-service:0.1.0-PullRequest0109.451-80b795f
-        # mounting config file
-        volumeMounts:
-          - name: config
-            mountPath: /app/appsettings.json
-            subPath: appsettings.json
         ports: 
         - containerPort: 80
         imagePullPolicy: Always  # Always pull latest
@@ -92,7 +87,3 @@ spec:
             port: 80
           initialDelaySeconds: 30
           timeoutSeconds: 10
-      volumes:
-      - name: config
-        configMap:
-          name: master-data-service-configmap

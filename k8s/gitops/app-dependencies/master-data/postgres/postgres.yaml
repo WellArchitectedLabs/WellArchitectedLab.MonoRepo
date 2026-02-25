@@ -42,7 +42,7 @@ spec:
           persistence:
             enabled: true
             storageClass: managed-csi
-            size: 10Gi
+            size: 1Gi
 
           tolerations:
             - key: "workload"

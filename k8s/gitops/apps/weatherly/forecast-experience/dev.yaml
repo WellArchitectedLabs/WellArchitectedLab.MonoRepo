@@ -4,8 +4,9 @@ metadata:
   name: dev-forecast-experience-app
   namespace: argocd
   labels:
-    workload: root-applications
+    workload: business
     environment: dev
+    domain: forecast-experience
 spec:
   project: default
   source:

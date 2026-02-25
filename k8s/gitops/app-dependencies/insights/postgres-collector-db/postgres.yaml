@@ -1,12 +1,12 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: master-data-database
+  name: insights-collector-database
   namespace: argocd
   labels:
     workload: business
     workload-type: database
-    domain: master-data
+    domain: insights
   annotations:
     argocd.argoproj.io/sync-wave: "20"
 spec:
@@ -30,11 +30,11 @@ spec:
 
         auth:
           username: postgres
-          existingSecret: master-data-db-sealed-secrets
+          existingSecret: insights-collector-db-sealed-secrets
           secretKeys:
             adminPasswordKey: POSTGRES_SUPERUSER_PASSWORD
           # Database to create on initialization
-          database: master_data
+          database: insights
 
         primary:
           podAnnotations:
@@ -62,7 +62,7 @@ spec:
               memory: 512Mi
 
   destination:
-    namespace: master-data-staging
+    namespace: insights-collector
     server: https://kubernetes.default.svc
   syncPolicy:
     automated:

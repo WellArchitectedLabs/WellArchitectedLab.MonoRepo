@@ -1,18 +1,18 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: dev-master-data-app
+  name: dev-insights-app
   namespace: argocd
   labels:
     workload: business
     environment: dev
-    domain: master-data
+    domain: insights
 spec:
   project: default
   source:
     repoURL: https://github.com/WellArchitectedLabs/WellArchitectedLab.MonoRepo.git
     targetRevision: feature/42-k8s
-    path: k8s/overlays/weatherly/master-data/dev
+    path: k8s/overlays/weatherly/insights/dev
   destination:
     server: https://kubernetes.default.svc
     namespace: default

@@ -4,7 +4,7 @@ metadata:
   name: dev-operations-app
   namespace: argocd
   labels:
-    workload: root-applications
+    workload: operations
     environment: dev
 spec:
   project: default

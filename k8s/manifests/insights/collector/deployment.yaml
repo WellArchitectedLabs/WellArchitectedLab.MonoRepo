@@ -56,9 +56,9 @@ spec:
                 name: insights-collector-db-sealed-secrets
                 key: DB_APP_DSN
           - name: WfEngine__Url
-            value: http://master-data-service-service:8080
+            value: http://wf-engine.insights-engine.svc.cluster.local:8080
           - name: MasterDataService__Url
-            value: http://master-data-service-service:8080
+            value: http://master-data-service-service.master-data.svc.cluster.local:8080
         image: acrdevtshpwn.azurecr.io/insights-collector:0.1.0-PullRequest0109.451-80b795f
         # mounting config file
         volumeMounts:

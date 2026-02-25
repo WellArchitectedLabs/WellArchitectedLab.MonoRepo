@@ -3,7 +3,6 @@ kind: Kustomization
 
 resources:
   - ../../../../manifests/operations
-  - ../_global
 
 # adds a metadata.label for every resource created by this kustomize hop
 # this allows easy resource managemnt using -l filters

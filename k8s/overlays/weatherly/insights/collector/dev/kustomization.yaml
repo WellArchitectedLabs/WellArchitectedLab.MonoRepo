@@ -6,7 +6,6 @@ resources:
   - ../../../../../manifests/insights/collector
   - config-maps/insights-collector.yaml
   - ../../../../../gitops/app-dependencies/insights/collector
-  - ../_global
   # - ../../../manifests/tools/htg
 
 # adds a metadata.label for every resource created by this kustomize hop

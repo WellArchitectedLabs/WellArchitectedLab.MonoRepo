@@ -3,8 +3,8 @@ kind: Kustomization
 
 # reference all manifests from base folder
 resources:
-  - ../../../manifests/master-data/staging
-  - ../../../gitops/app-dependencies/master-data
+  - ../../../../manifests/master-data/staging
+  - ../../../../gitops/app-dependencies/master-data
 
 # adds a metadata.label for every resource created by this kustomize hop
 # this allows easy resource managemnt using -l filters

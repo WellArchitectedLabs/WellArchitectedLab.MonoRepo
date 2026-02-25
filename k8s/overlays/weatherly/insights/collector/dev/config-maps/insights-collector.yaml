@@ -1,8 +1,8 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: wf-exp-bff-configmap
-  namespace: forecast-experience
+  name: insights-collector-configmap
+  namespace: insights-collector
 data:
   appsettings.json: |
     {

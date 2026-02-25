@@ -5,7 +5,7 @@ kind: Kustomization
 resources:
   - ../../../../manifests/forecast-experience
   - config-maps/wf-exp-bff.yaml
-  - ../../_global
+  - ../../_global/dev
   # - ../../../manifests/tools/htg
 
 # adds a metadata.label for every resource created by this kustomize hop

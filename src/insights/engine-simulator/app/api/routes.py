@@ -12,6 +12,10 @@ engine = WeatherInsightsEngineSimulator()
 async def forecast(input: WfEngineInput):
     return engine.call(input)
 
-@router.get("/health")
-async def health_check():
+@router.get("/ping")
+async def ping_check():
+    return {"status": "healthy"}
+
+@router.get("/ready")
+async def ready_check():
     return {"status": "healthy"}

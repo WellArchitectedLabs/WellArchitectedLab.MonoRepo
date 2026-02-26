@@ -7,5 +7,3 @@ resources:
   - namespace.yaml
   - high-availability/hpa.yaml
   - high-availability/pdb.yaml
-  - db-migrator.yaml
-  - cronjob.yaml

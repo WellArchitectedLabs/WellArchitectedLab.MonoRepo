@@ -1,0 +1,22 @@
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: wf-exp-bff-virtualservice
+  namespace: istio-gateway
+  labels:
+    app: backend
+    version: v1
+spec:
+  hosts:
+    - api.weatherly.local
+  gateways:
+    - istio-gateway/weatherly-gateway
+  http:
+    - match:
+        - uri:
+            prefix: /
+      route:
+        - destination:
+            host: wf-exp-bff-service.forecast-experience.svc.cluster.local
+            port:
+              number: 8080

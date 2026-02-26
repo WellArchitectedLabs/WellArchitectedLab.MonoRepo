@@ -4,8 +4,9 @@ metadata:
   name: master-data-database
   namespace: argocd
   labels:
-    stack: business
+    workload: business
     workload-type: database
+    domain: master-data
   annotations:
     argocd.argoproj.io/sync-wave: "20"
 spec:
@@ -29,7 +30,7 @@ spec:
 
         auth:
           username: postgres
-          existingSecret: dev-master-data-db-sealed-secrets
+          existingSecret: master-data-db-sealed-secrets
           secretKeys:
             adminPasswordKey: POSTGRES_SUPERUSER_PASSWORD
           # Database to create on initialization
@@ -61,7 +62,7 @@ spec:
               memory: 512Mi
 
   destination:
-    namespace: backend
+    namespace: master-data-staging
     server: https://kubernetes.default.svc
   syncPolicy:
     automated:

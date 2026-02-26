@@ -1,0 +1,102 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name:  insights-engine-sim
+  namespace: insights-engine-sim
+spec:
+  selector:
+    matchLabels:
+      app: insights-engine-sim
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 0
+      maxUnavailable: 1
+  # pod definition section
+  template:
+    # metadata around the pod
+    metadata:
+      labels:
+        app: insights-engine-sim
+        # optional (nice to have)
+        editor: vscode
+        # necessary for kiali integration
+        version: v1
+    spec:
+      # give pod 30 seconds to shut down after kube sends SIGTERM signal
+      terminationGracePeriodSeconds: 30
+      # Where will I tolerate my pods to run
+      # These do not restrict the pod from running on nodes that do not have the provided taint
+      tolerations:
+      - key: workload
+        operator: 'Equal'
+        value: 'weather-forecast'
+        effect: 'NoSchedule'
+      # Where will my pods will run, and in what node label
+      # We should add a toleration because the user nodes are tainted and will be not schedule the pods if the taint is not provided
+      nodeSelector:
+        kubernetes.azure.com/mode: user
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchLabels:
+                  app: insights-engine-sim
+              topologyKey: kubernetes.io/hostname
+      containers:
+      # can be multiple containers since one pod scan contain multiple containers
+      - name: insights-engine-sim
+        env:
+          - name: ConnectionStrings__Postgres
+            valueFrom:
+              secretKeyRef:
+                name: insights-engine-sim-db-sealed-secrets
+                key: DB_APP_DSN
+          - name: WfEngine__Url
+            value: http://wf-engine.insights-engine.svc.cluster.local:8080
+          - name: MasterDataService__Url
+            value: http://master-data-service-service.master-data.svc.cluster.local:8080
+        image: acrdevtshpwn.azurecr.io/insights-engine-sim:0.1.0-PullRequest0109.451-80b795f
+        # mounting config file
+        volumeMounts:
+          - name: config
+            mountPath: /app/appsettings.json
+            subPath: appsettings.json
+        ports: 
+        - containerPort: 80
+        imagePullPolicy: Always  # Always pull latest
+        resources:
+          requests:
+            # node should have 128 megabytes available for pod to run into it
+            # metrics are constantly sent from kubelet into metrics api (api server)
+            # which updates etcd, 
+            # kubernetes scheduler would then read the metrics and decide in which node the pod will be ran
+            memory: "128Mi"
+            # quarter of a CPU core is supposed to be allocated to this pod
+            # this is used by kubernetes's scheduler for determining wether the pod can run into the node
+            cpu: "20m"
+          limits:
+            memory: "1Gi"
+            #1 core maximum allocated to each pod
+            cpu: "1"
+        # defning liveness and readiness probes
+        livenessProbe:
+          httpGet:
+            path: /ping
+            port: 80
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 80
+          initialDelaySeconds: 30
+          timeoutSeconds: 10
+          periodSeconds: 60
+      volumes:
+      - name: config
+        configMap:
+          name: insights-engine-sim-configmap

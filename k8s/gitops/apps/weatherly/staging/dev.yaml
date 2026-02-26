@@ -1,0 +1,31 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: dev-weatherly-master-data-staging-app
+  namespace: argocd
+  labels:
+    workload: business
+    environment: dev
+    domain: master-data
+  annotations:
+    argocd.argoproj.io/sync-wave: "999"  # Run last
+    argocd.argoproj.io/sync-options: Prune=false
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/WellArchitectedLabs/WellArchitectedLab.MonoRepo.git
+    targetRevision: feature/42-k8s
+    path: k8s/overlays/weatherly/staging/dev
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: default
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+    retry:
+      limit: 2
+      backoff:
+        duration: 5s

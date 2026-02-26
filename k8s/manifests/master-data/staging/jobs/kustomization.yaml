@@ -1,0 +1,8 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - cities-import.yaml
+  - wf-actuals-import.yaml
+  - wf-actuals-range-import.yaml
+  - db-migrator.yaml

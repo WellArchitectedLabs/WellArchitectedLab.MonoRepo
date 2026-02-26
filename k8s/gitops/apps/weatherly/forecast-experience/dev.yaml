@@ -1,0 +1,28 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: dev-forecast-experience-app
+  namespace: argocd
+  labels:
+    workload: business
+    environment: dev
+    domain: forecast-experience
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/WellArchitectedLabs/WellArchitectedLab.MonoRepo.git
+    targetRevision: feature/42-k8s
+    path: k8s/overlays/weatherly/forecast-experience/dev
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: default
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+    retry:
+      limit: 2
+      backoff:
+        duration: 5s

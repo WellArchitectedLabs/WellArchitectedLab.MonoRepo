@@ -5,13 +5,8 @@ kind: Kustomization
 resources:
   - ../../../gitops/addons
 
-
-# define a dev prefix for all created environment in relation to this overlay
-namePrefix: dev-
-# no suffix is defined
-nameSuffix: ""
-
 # adds a metadata.label for every resource created by this kustomize hop
 # this allows easy resource managemnt using -l filters
 commonLabels:
   environment: dev
+  domain: cluster-setup

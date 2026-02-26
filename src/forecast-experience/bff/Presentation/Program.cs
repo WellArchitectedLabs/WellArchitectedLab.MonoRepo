@@ -1,5 +1,6 @@
 using FluentValidation.AspNetCore;
 using Scalar.AspNetCore;
+using WfExperience.Bff.Api.Constants;
 using WfExperience.Bff.Api.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -9,16 +10,19 @@ var builder = WebApplication.CreateBuilder(args);
 builder.SetupConfiguration();
 
 builder.Services.AddControllers();
-builder.Services.AddOpenApi();
 
 builder.Services.AddFluentValidationAutoValidation();
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAllPolicy", corsPolicyBuilder => corsPolicyBuilder.AllowAnyOrigin()
+    options.AddPolicy(ApiConstants.AllowAllPolicyName, corsPolicyBuilder => corsPolicyBuilder.AllowAnyOrigin()
     .AllowAnyMethod()
     .AllowAnyHeader());
 });
+
+
+builder.Services.AddOpenApi();
+builder.Services.AddHealthChecks();
 
 builder.Services.RegisterLayers(builder.Configuration);
 
@@ -31,11 +35,13 @@ if (app.Environment.IsDevelopment())
     app.MapScalarApiReference();
 }
 
+app.MapLiveness();
+
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
 
-app.UseCors("AllowAllPolicy");
+app.UseCors(ApiConstants.AllowAllPolicyName);
 
 app.MapControllers();
 

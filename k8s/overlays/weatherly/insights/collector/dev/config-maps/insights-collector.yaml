@@ -1,0 +1,38 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: insights-collector-configmap
+  namespace: insights-collector
+data:
+  appsettings.json: |
+    {
+      "Logging": {
+        "LogLevel": {
+          "Default": "Information",
+          "Microsoft.AspNetCore": "Warning"
+        }
+      },
+      "AllowedHosts": "*",
+      "WfEngine": {
+        "Thresholds": {
+          "MaxToleratedMissingHoursPercentage": 70,
+          "EnforceErrorOnUnrelatedTimeStamps": false
+        }
+      },
+      "MasterDataService": {
+        "Parameters": {
+          "YearsHistoryDepth": "1",
+          "RollingWindowDays": "3",
+          "LeapDayStrategy": "ClampToFeb28"
+        },
+        "Thresholds": {
+          "MaxToleratedMissingHoursPercentage": 100,
+          "EnforceErrorOnUnrelatedTimeStamps": false
+        }
+      },
+      "Endpoints": {
+        "GetInsightsV1": {
+          "MaxRequestDateRangeInDays": 30
+        }
+      }
+    }

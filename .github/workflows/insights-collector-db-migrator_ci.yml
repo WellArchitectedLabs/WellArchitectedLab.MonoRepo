@@ -17,7 +17,7 @@ jobs:
     FlyWayDbMigrator-BuildAndPush:
         uses: ./.github/workflows/template_ci.yml
         with:
-            service_name: db-migrator
+            service_name: insights-collector-db-migrator
             service_path: src/insights/data
             gitversion_config_path: src/insights/data/GitVersion.yml
             dockerfile_name: Dockerfile.db-migrator

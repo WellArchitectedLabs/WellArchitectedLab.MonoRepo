@@ -4,7 +4,7 @@
     {
       "label": "pf grafana",
       "type": "shell",
-      "command": "kubectl port-forward svc/dev-grafana 9090:80 -n monitoring",
+      "command": "kubectl port-forward svc/grafana 9090:80 -n monitoring",
       "options": {
         "cwd": "${workspaceFolder}"
       },
@@ -32,7 +32,7 @@
     {
       "label": "pf prometheus",
       "type": "shell",
-      "command": "kubectl port-forward svc/dev-prometheus-server-kube-prometheus -n monitoring 7070:9090",
+      "command": "kubectl port-forward svc/prometheus-server-kube-pro-prometheus -n monitoring 7070:9090",
       "options": {
         "cwd": "${workspaceFolder}"
       },

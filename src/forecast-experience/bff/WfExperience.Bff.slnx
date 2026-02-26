@@ -10,7 +10,7 @@
     <Project Path="Presentation/WfExperience.Bff.Api.csproj" />
   </Folder>
   <Folder Name="/Solution files/">
-    <File Path="Dockerfile.insights-bff" />
+    <File Path="Dockerfile.wf-exp-bff" />
     <File Path="GitVersion.yml" />
   </Folder>
 </Solution>

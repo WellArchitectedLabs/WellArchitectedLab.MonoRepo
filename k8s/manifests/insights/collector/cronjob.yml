@@ -1,0 +1,29 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: insights-collector-daily-trigger
+  namespace: insights-collector
+spec:
+  schedule: "0 0 * * *"  # Every day at midnight UTC
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: OnFailure
+          tolerations:
+          - key: workload
+            operator: 'Equal'
+            value: 'weather-forecast'
+            effect: 'NoSchedule'
+          nodeSelector:
+            kubernetes.azure.com/mode: user
+          containers:
+          - name: curl-trigger
+            image: curlimages/curl:latest
+            command:
+            - /bin/sh
+            - -c
+            - |
+              DATE=$(date +%Y-%m-%d)
+              curl -f -X POST \
+                "http://insights-collector-service.insights-collector.svc.cluster.local:80/api/v1/wsInsight/${DATE}"

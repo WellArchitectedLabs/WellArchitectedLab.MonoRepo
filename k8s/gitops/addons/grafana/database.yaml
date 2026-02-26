@@ -46,7 +46,7 @@ spec:
           persistence:
             enabled: true
             storageClass: managed-csi
-            size: 10Gi
+            size: 1Gi
           # tolerations:
           #   - key: "workload"
           #     operator: "Equal"
@@ -58,7 +58,7 @@ spec:
           resources:
             requests:
               cpu: 25m
-              memory: 50Mi
+              memory: 25Mi
             limits:
               cpu: 500m
               memory: 512Mi

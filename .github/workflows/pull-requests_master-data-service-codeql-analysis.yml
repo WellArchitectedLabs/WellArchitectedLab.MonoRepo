@@ -1,4 +1,4 @@
-# .github/workflows/codeql-insights-bff.yml
+# .github/workflows/codeql-master-data-service.yml
 name: CodeQL Analysis - Master Data Service
 
 on:

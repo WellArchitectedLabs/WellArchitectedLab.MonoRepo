@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Configuration;
 using Npgsql;
+using WeatherInsights.Collector.Domain.Ports.Config;
 
 namespace WeatherInsights.Collector.Infrastructure.DataAccess.Postgres.Connectors;
 
@@ -30,7 +31,7 @@ public sealed class PostgresDbConnectionFactory : IPostgresDbConnectionFactory
 
     public PostgresDbConnectionFactory(IConfiguration configuration)
     {
-        _connectionString = configuration.GetConnectionString("Postgres")
+        _connectionString = configuration.GetConnectionString(StaticConfigurationPaths.NpgSqlConnectionString)
                             ?? throw new InvalidOperationException("Postgres connection string not found.");
     }
     

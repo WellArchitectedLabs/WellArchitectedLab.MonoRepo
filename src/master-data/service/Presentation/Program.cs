@@ -1,3 +1,4 @@
+using MasterData.Api.Constants;
 using MasterData.Api.Extensions;
 using Scalar.AspNetCore;
 
@@ -10,10 +11,11 @@ builder.SetupConfiguration();
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddOpenApi();
+builder.Services.AddHealthChecks();
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAllPolicy", corsPolicyBuilder => corsPolicyBuilder.AllowAnyOrigin()
+    options.AddPolicy(ApiConstants.DefaultCorsPolicy, corsPolicyBuilder => corsPolicyBuilder.AllowAnyOrigin()
     .AllowAnyMethod()
     .AllowAnyHeader());
 });
@@ -21,6 +23,9 @@ builder.Services.AddCors(options =>
 builder.Services.RegisterLayers();
 
 var app = builder.Build();
+
+app.MapLiveness();
+app.MapReadiness();
 
 if (app.Environment.IsDevelopment())
 {
@@ -32,7 +37,7 @@ app.UseHttpsRedirection();
 
 app.UseAuthorization();
 
-app.UseCors("AllowAllPolicy");
+app.UseCors(ApiConstants.DefaultCorsPolicy);
 
 app.MapControllers();
 

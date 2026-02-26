@@ -1,8 +1,8 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: dev-cities-import-as-root
-  namespace: backend
+  name: cities-import-as-root
+  namespace: tools
 spec:
   template:
     metadata:
@@ -37,6 +37,6 @@ spec:
       volumes:
       - name: imports-blob
         persistentVolumeClaim:
-          claimName: dev-pvc-az-blob-imports
+          claimName: pvc-az-blob-imports
       
       restartPolicy: Never

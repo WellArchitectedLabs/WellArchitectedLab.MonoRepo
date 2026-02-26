@@ -160,15 +160,15 @@ Status check workflow files are prefixed by pull-request:
 - `pull-requests_wf-codeql-analysis.yml`: Runs CodeQL, github's security check tool.
 - `pull-requests_wf-auto-label.yml`: Add label to pull requests based on the changed file. The weather forecast source pull requests will be labeled accordingly to the feature teams owning the changed code. Labels are very useful for PR grouping and filtering.
 - `pull-request_insight-bff-status-check.yml`: Runs a dry-run for Insights Bff CI workflow are is later launched on develop / main pushes.
-- `pull-request_insights-frontend-status-check.yml`: Runs a dry-run for Insights frontend CI workflow are is later launched on develop / main pushes.
+- `pull-request_wf-exp-frontend-status-check.yml`: Runs a dry-run for Insights frontend CI workflow are is later launched on develop / main pushes.
 
 *All these pipeliens are triggered by pull requests that target develop and main branch.*
 
 > Note: This repository is only for demonstration purposes. When implementing a devops process, we generally chose the processes that fits more with the desired delivery caracteristics. Typically, if you search for more of a "rapid" or "flexible" devops process, or > if your runner processes are rare, implementing all these checks may be overkill.
 
 ### Contrinous Integration workflows:
-- `insights-bff_ci.yml`: Packages and pushes insights bff API image into ACR registry. Calls wf api docker file.
-- `insights-frontend_ci.yml`: Runs a CI for insights frontend on develop / main push. Calls wf frontend docker file.
+- `wf-experience-bff_ci.yml`: Packages and pushes weather forecast experience bff API image into ACR registry. Calls wf api docker file.
+- `wf-experience-frontend_ci.yml`: Runs a CI for weather forecast experience frontend on develop / main push. Calls wf frontend docker file.
   
 *Both CI pipelines use GitVersion in order to correctly version the pushed images. A GitVersion.yml file is added under every microservice folder.*
 

@@ -14,7 +14,7 @@ spec:
   project: default
   source:
     repoURL: https://github.com/WellArchitectedLabs/WellArchitectedLab.MonoRepo.git
-    targetRevision: feature/42-k8s
+    targetRevision: feature/k8sfullStack
     path: k8s/overlays/weatherly/staging/dev
   destination:
     server: https://kubernetes.default.svc

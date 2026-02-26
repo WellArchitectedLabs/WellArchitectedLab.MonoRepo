@@ -3,9 +3,7 @@ kind: Kustomization
 
 # reference all manifests from base folder
 resources:
-  - ../../../../../manifests/insights/collector
-  - config-maps/insights-collector.yaml
-  - ../../../../../gitops/app-dependencies/insights/collector
+  - ../../../../../manifests/insights/engine-simulator
 
 # adds a metadata.label for every resource created by this kustomize hop
 # this allows easy resource managemnt using -l filters

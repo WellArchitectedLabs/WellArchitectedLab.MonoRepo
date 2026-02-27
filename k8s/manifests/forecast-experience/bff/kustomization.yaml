@@ -10,4 +10,3 @@ resources:
   - high-availability/pdb.yaml
   - services/service.yaml
   - services/virtual-service.yaml
-  - database

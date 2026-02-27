@@ -89,7 +89,7 @@ spec:
           periodSeconds: 10
         readinessProbe:
           httpGet:
-            path: /ready
+            path: /ping
             port: 80
           initialDelaySeconds: 30
           timeoutSeconds: 10

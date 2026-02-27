@@ -132,13 +132,10 @@ spec:
         monitoring:
           serviceMonitor:
             enabled: true
-
-        # Self monitoring is disabled
-        monitoring:
           selfMonitoring:
             enabled: false
             grafanaAgent:
-              installOperator: false  # ← Le problème est ici
+              installOperator: false
         
         # Loki canary is Loki's health checker
         lokiCanary:

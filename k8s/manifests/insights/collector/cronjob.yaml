@@ -9,7 +9,7 @@ spec:
     spec:
       template:
         spec:
-          restartPolicy: OnFailure
+          restartPolicy: Never
           tolerations:
           - key: workload
             operator: 'Equal'

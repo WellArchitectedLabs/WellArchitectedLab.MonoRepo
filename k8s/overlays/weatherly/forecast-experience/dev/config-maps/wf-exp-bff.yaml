@@ -6,17 +6,16 @@ metadata:
 data:
   appsettings.json: |
     {
-    "Logging": {
-      "LogLevel": {
-        "Default": "Information",
-        "Microsoft.AspNetCore": "Warning"
-      }
-    },
-    "AllowedHosts": "*",
-    "WeatherForecast": {
-        "Redis": {
-          "WriteDbConnection": "wf-exp-bff-redis-primary.forecast-experience.svc.cluster.local:6379",
-          "ReadDbConnection": "wf-exp-bff-redis-secondary.forecast-experience.svc.cluster.local:6379"
+      "Logging": {
+        "LogLevel": {
+          "Default": "Information",
+          "Microsoft.AspNetCore": "Warning"
+        }
+      },
+      "AllowedHosts": "*",
+      "Endpoints": {
+        "GetInsightV1": {
+          "ToDateMaxDaysFromNow": 1
         }
       }
     }

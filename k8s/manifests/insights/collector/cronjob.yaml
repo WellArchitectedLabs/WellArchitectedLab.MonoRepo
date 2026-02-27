@@ -8,8 +8,11 @@ spec:
   jobTemplate:
     spec:
       template:
+        metadata:
+          annotations:
+            sidecar.istio.io/inject: "false"
         spec:
-          restartPolicy: OnFailure
+          restartPolicy: Never
           tolerations:
           - key: workload
             operator: 'Equal'
@@ -26,4 +29,4 @@ spec:
             - |
               DATE=$(date +%Y-%m-%d)
               curl -f -X POST \
-                "http://insights-collector-service.insights-collector.svc.cluster.local:80/api/v1/wsInsight/${DATE}"
+                "http://insights-collector-service.insights-collector.svc.cluster.local:8080/api/v1/wsInsight/2025-12-03"

@@ -3,13 +3,10 @@ kind: Kustomization
 
 # reference all manifests from base folder
 resources:
-  - ../../../../manifests/forecast-experience
-  - config-maps/wf-exp-bff.yaml
-  - ../../_global/dev
-  # - ../../../manifests/tools/htg
+  - ../../../../../manifests/insights/engine-simulator
 
 # adds a metadata.label for every resource created by this kustomize hop
 # this allows easy resource managemnt using -l filters
 commonLabels:
   environment: dev
-  domain: forecast-experience
+  domain: insights

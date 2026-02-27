@@ -5,7 +5,7 @@ metadata:
   namespace: insights-collector
 spec:
   selector:
-    app: insights-collector-service
+    app: insights-collector
     version: v1
   ports:
   - name: http

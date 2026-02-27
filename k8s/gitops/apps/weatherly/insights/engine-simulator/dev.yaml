@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: dev-insights-collector-app
+  name: dev-insights-engine-simulator-app
   namespace: argocd
   labels:
     workload: business
@@ -12,7 +12,7 @@ spec:
   source:
     repoURL: https://github.com/WellArchitectedLabs/WellArchitectedLab.MonoRepo.git
     targetRevision: feature/k8sfullStack
-    path: k8s/overlays/weatherly/insights/collector/dev
+    path: k8s/overlays/weatherly/insights/engine-simulator/dev
   destination:
     server: https://kubernetes.default.svc
     namespace: default

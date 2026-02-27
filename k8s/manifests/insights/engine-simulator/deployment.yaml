@@ -49,24 +49,9 @@ spec:
       containers:
       # can be multiple containers since one pod scan contain multiple containers
       - name: insights-engine-sim
-        env:
-          - name: ConnectionStrings__Postgres
-            valueFrom:
-              secretKeyRef:
-                name: insights-engine-sim-db-sealed-secrets
-                key: DB_APP_DSN
-          - name: WfEngine__Url
-            value: http://wf-engine.insights-engine.svc.cluster.local:8080
-          - name: MasterDataService__Url
-            value: http://master-data-service-service.master-data.svc.cluster.local:8080
-        image: acrdevtshpwn.azurecr.io/insights-engine-sim:0.1.0-PullRequest0109.451-80b795f
-        # mounting config file
-        volumeMounts:
-          - name: config
-            mountPath: /app/appsettings.json
-            subPath: appsettings.json
+        image: acrdevtshpwn.azurecr.io/insights-engine-sim:0.1.0-k8sfullStack.1-ff7c544
         ports: 
-        - containerPort: 80
+        - containerPort: 8000
         imagePullPolicy: Always  # Always pull latest
         resources:
           requests:
@@ -86,17 +71,13 @@ spec:
         livenessProbe:
           httpGet:
             path: /ping
-            port: 80
+            port: 8000
           initialDelaySeconds: 30
           periodSeconds: 10
         readinessProbe:
           httpGet:
             path: /ready
-            port: 80
+            port: 8000
           initialDelaySeconds: 30
           timeoutSeconds: 10
           periodSeconds: 60
-      volumes:
-      - name: config
-        configMap:
-          name: insights-engine-sim-configmap

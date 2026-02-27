@@ -81,25 +81,19 @@ spec:
                   #   - name: "Sanity"
                   #     query: up
                   # Trace to logs correlation
-                  # tracesToLogs:
-                  #   datasourceUid: loki-uid
-                  #   tags:
-                  #     - service
-                  #     - pod
-                  #     - namespace
-                  #     - container
-                  #   mappedTags:
-                  #     - key: service.name
-                  #       value: service
-                  #   spanStartTimeShift: -1h
-                  #   spanEndTimeShift: 1h
-                  #   filterByTraceID: true
-                  #   filterBySpanID: false
                   tracesToLogs:
                     datasourceUid: loki-uid
-                    spanStartTimeShift: -5m
-                    spanEndTimeShift: 5m
-                    filterByTraceID: false
+                    tags:
+                      - service
+                      - pod
+                      - namespace
+                      - container
+                    mappedTags:
+                      - key: service.name
+                        value: service
+                    spanStartTimeShift: -1h
+                    spanEndTimeShift: 1h
+                    filterByTraceID: true
                     filterBySpanID: false
                 editable: false
 

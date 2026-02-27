@@ -57,12 +57,11 @@ spec:
             mountPath: /app/appsettings.json
             subPath: appsettings.json
         # map env variables
-
         env:
           - name: MasterData__Url
-            value: master-data-service-service.master-data.svc.cluster.local:8080
+            value: http://master-data-service-service.master-data.svc.cluster.local:8080
           - name: InsightsCollector__Url
-            value: insights-collector-service.insights-collector.svc.cluster.local:8080
+            value: http://insights-collector-service.insights-collector.svc.cluster.local:8080
         ports:
         - containerPort: 80
         imagePullPolicy: Always  # Always pull latest

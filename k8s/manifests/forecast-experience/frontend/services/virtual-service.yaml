@@ -17,6 +17,6 @@ spec:
             prefix: /
       route:
         - destination:
-            host: wf-exp-frontend-service.frontend.svc.cluster.local
+            host: wf-exp-frontend-service.forecast-experience.svc.cluster.local
             port:
               number: 80

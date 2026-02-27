@@ -5,7 +5,7 @@ metadata:
   namespace: insights-engine-sim
 spec:
   selector:
-    app: insights-engine-sim-service
+    app: insights-engine-sim
     version: v1
   ports:
   - name: http

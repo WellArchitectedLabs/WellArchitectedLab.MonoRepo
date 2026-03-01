@@ -4,5 +4,4 @@ metadata:
   namespace: argocd
   name: cilium-bootstrap-kustomization
 resources:
-  - configmap.yaml
   - application.yaml

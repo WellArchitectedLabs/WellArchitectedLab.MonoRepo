@@ -1,0 +1,76 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cni-configuration
+  namespace: kube-system
+data:
+  cni-config: |-
+    {
+      "cniVersion": "0.3.0",
+      // The CNI spec version. 0.3.0 is the most widely supported version
+      // across AKS node images and is safe to use here.
+
+      "name": "azure",
+      // Logical name for this CNI configuration. Must match what Azure CNI
+      // expects on this node image. "azure" is the conventional name for
+      // Azure CNI chains on AKS.
+
+      "plugins": [
+        {
+          "type": "azure-vnet",
+          // The Azure CNI plugin itself. Runs first in the chain.
+          // Responsible for:
+          // - Assigning a real VNet IP to the pod from the pre-allocated pool
+          // - Creating and wiring the veth pair (one end in the pod network
+          //   namespace, one end on the host). veth = virtual ethernet (like ethernet cable routing traffic between two nodes)
+          // - Setting up pod-level routes so traffic enters/exits correctly
+
+          "mode": "transparent",
+          // Tells azure-vnet to operate in transparent mode.
+          // In transparent mode, Azure CNI does NOT set up its own iptables
+          // masquerade or SNAT rules — it leaves the packet path clean for
+          // Cilium's eBPF programs to attach and operate without conflicts.
+          // Without this, Azure CNI's iptables rules and Cilium's eBPF programs
+          // would fight over the same packets.
+
+          "ipam": {
+            "type": "azure-vnet-ipam"
+            // The IPAM plugin Azure CNI uses to allocate pod IP addresses.
+            // azure-vnet-ipam talks to the Azure node agent (which pre-allocates
+            // IPs from the VNet subnet onto the NIC) and hands one of those
+            // pre-allocated IPs to the pod being created.
+          }
+        },
+
+        {
+          "type": "portmap",
+          // Standard CNI portmap plugin. Runs second in the chain.
+          // Handles HostPort mappings — when a pod declares a hostPort,
+          // this plugin sets up the iptables DNAT rules that forward traffic
+          // arriving on that host port to the correct pod port.
+
+          "capabilities": {"portMappings": true},
+          // Declares that this plugin handles the portMappings capability,
+          // so the Kubernetes kubelet knows to invoke it when a pod requests
+          // a HostPort.
+
+          "snat": true
+          // Enables SNAT for return traffic on HostPort connections,
+          // so replies are correctly routed back through the host.
+        },
+
+        {
+          "name": "cilium",
+          "type": "cilium-cni"
+          // Cilium's CNI plugin. Runs last in the chain.
+          // By this point azure-vnet has already created the veth pair and
+          // assigned the IP. Cilium's job here is to:
+          // - Attach its eBPF programs to the veth interface created by azure-vnet
+          // - Register the endpoint with the Cilium agent
+          // - Begin enforcing CiliumNetworkPolicy for this pod
+          // Cilium does NOT touch IP assignment or routing — it only attaches
+          // its policy enforcement programs to the already-configured interface.
+        }
+
+      ]
+    }

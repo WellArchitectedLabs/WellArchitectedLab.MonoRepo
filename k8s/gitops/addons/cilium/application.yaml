@@ -11,41 +11,30 @@ spec:
   source:
     repoURL: https://helm.cilium.io/
     chart: cilium
-    targetRevision: 1.19.1
+    targetRevision: 1.15.9
     helm:
       releaseName: cilium
       values: |
-        # --- AKS CNI chaining (legacy mode) ---
-        # azure-cni is no longer a valid chainingMode value since Cilium 1.16+.
-        # The correct value is generic-veth, and the actual chain definition
-        # (azure-vnet → portmap → cilium) is declared in the cni-configuration
-        # ConfigMap deployed separately.
-        # Note: Cilium now considers this the legacy approach. The recommended
-        # paths are BYO CNI (Cilium as sole CNI) or Azure CNI Powered by Cilium
-        # (managed by AKS via --network-dataplane cilium at cluster creation).
-        # In this project, we chose to go for a custom CNI pipeline with integration with Azure CNI
-        # Which will continue to handle IP address pre allocation (ipam) and routing, which Cilium will
-        # integrate into physical veth interfaces, created by Azure CNI, and inject their network policy logic via extended Berkeley Packet Filter technology
-        # Allowing integration of network policies directly on linux kernel.
-        # All this config would be more simple with direct cilium integration via --network-dataplane cilium at cluster creation, but we want to show how to do it with a custom configuration for learning purposes.
+        # --- AKS specific ---
         cni:
-          chainingMode: generic-veth # keep the classic / generic virtual ethernet management layer, like managed by Azure CNI 
-          customConf: true       # tell Cilium to use the ConfigMap instead of writing its own CNI config
-          exclusive: false       # allow Azure CNI to coexist
-          configMap: cni-configuration
-
-        # --- Routing ---
-        # Azure CNI handles cross-node routing natively via the VNet SDN,
-        # so no overlay tunnel is needed.
-        routingMode: native
-        enableIPv4Masquerade: false
-        endpointRoutes:
-          enabled: true
-
-        # --- Node init ---
-        # Required to update the Azure CNI plugin to transparent mode on each node.
-        nodeinit:
-          enabled: true
+          # azure-cni is AKS's default CNI plugin.
+          # A CNI plugin is responsible for managing network interfaces, IP address
+          # allocation, and cross-node routing in a Kubernetes cluster.
+          #
+          # In Azure CNI chaining mode, Cilium delegates IP allocation and basic
+          # connectivity to Azure CNI, which is optimized for Azure and provides
+          # better performance and compatibility with AKS features.
+          # Cilium focuses on advanced features: network policy enforcement,
+          # optional kube-proxy replacement via eBPF, and observability.
+          #
+          # In kubenet mode, pod IPs are managed by the kubenet CNI plugin itself,
+          # which allocates addresses from the per-node pod CIDR assigned by Kubernetes.
+          # When using kubenet, the recommended approach is to replace kubenet entirely
+          # with Cilium (chainingMode: none), giving Cilium full ownership of IP
+          # allocation and routing. Chaining is technically possible via generic-veth
+          # but is not the recommended path — and Microsoft advises migrating away
+          # from kubenet on AKS in general.
+          chainingMode: azure-cni
 
         azure:
           enabled: true

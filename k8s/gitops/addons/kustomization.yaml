@@ -12,4 +12,5 @@ resources:
   - open-telemetry
   - prometheus
   - tempo
+  - cilium
   - namespace.yaml

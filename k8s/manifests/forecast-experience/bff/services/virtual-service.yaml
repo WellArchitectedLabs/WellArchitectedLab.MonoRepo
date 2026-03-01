@@ -4,7 +4,7 @@ metadata:
   name: wf-exp-bff-virtualservice
   namespace: istio-gateway
   labels:
-    app: backend
+    app: weatherly
     version: v1
 spec:
   hosts:

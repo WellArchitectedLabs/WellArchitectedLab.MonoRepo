@@ -1,0 +1,98 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: cilium
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+spec:
+  project: default
+
+  source:
+    repoURL: https://helm.cilium.io/
+    chart: cilium
+    targetRevision: 1.19.1
+    helm:
+      releaseName: cilium
+      values: |
+        # --- AKS specific ---
+        cni:
+          # azure-cni is AKS's default CNI plugin.
+          # A CNI plugin is responsible for managing network interfaces, IP address
+          # allocation, and cross-node routing in a Kubernetes cluster.
+          #
+          # In Azure CNI chaining mode, Cilium delegates IP allocation and basic
+          # connectivity to Azure CNI, which is optimized for Azure and provides
+          # better performance and compatibility with AKS features.
+          # Cilium focuses on advanced features: network policy enforcement,
+          # optional kube-proxy replacement via eBPF, and observability.
+          #
+          # In kubenet mode, pod IPs are managed by the kubenet CNI plugin itself,
+          # which allocates addresses from the per-node pod CIDR assigned by Kubernetes.
+          # When using kubenet, the recommended approach is to replace kubenet entirely
+          # with Cilium (chainingMode: none), giving Cilium full ownership of IP
+          # allocation and routing. Chaining is technically possible via generic-veth
+          # but is not the recommended path — and Microsoft advises migrating away
+          # from kubenet on AKS in general.
+          chainingMode: azure-cni
+
+        azure:
+          enabled: true
+
+        # --- DO NOT replace kube-proxy ---
+        # kube-proxy will continue to handle Service routing (ClusterIP → pod IP
+        # translation) via iptables. Cilium will handle L4/L7 policy enforcement
+        # using its rich CiliumNetworkPolicy syntax.
+        # Cilium is also able to fully replace kube-proxy via eBPF, but that is
+        # not the chosen approach here.
+        # Note: k8sServiceHost/k8sServicePort are NOT needed here — they are only
+        # required when kubeProxyReplacement is true, to break the chicken-and-egg
+        # dependency of Cilium needing to resolve the API server ClusterIP before
+        # kube-proxy has set up the iptables rules for it.
+        kubeProxyReplacement: false
+
+        # --- IPAM ---
+        ipam:
+          mode: kubernetes
+
+        # --- Disable extras (minimal footprint) ---
+        hubble:
+          # hubble is cilium's observability platform. We will use prometheus and
+          # grafana for monitoring and observability, so hubble is disabled here.
+          enabled: false
+
+        prometheus:
+          # Cilium can expose its own prometheus metrics. We disable the standalone
+          # scraping here since we integrate with our existing prometheus instance.
+          enabled: false
+
+        operator:
+          replicas: 1
+
+        # --- Enable policy enforcement ---
+        policyEnforcementMode: default
+
+        # --- Resource tuning (minimal but safe) ---
+        resources:
+          limits:
+            cpu: 500m
+            memory: 512Mi
+          requests:
+            cpu: 100m
+            memory: 128Mi
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kube-system
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+    retry:
+      limit: 5
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 3m

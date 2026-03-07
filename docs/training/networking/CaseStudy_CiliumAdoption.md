@@ -41,3 +41,9 @@ Two levels of networking:
   When chainingMode is none, Cilium acts as the sole CNI and takes full
   ownership of IP assignment, east-west routing, and policy enforcement,
   replacing Azure CNI. kube-proxy may still be replaced independently.
+
+  The most common mode for adopting cillium as for network plicies enforcements is adopting on custer creation.
+  This is the most stable, azure compatible mode.
+  Custom Cillium installations like the one coded in the application.yaml file under this same folder is very advanced, yet not needed for our setup.
+  As part of this project, and since the cluster was created using default networking component (kube-proxy), and for sake of simplicity, the decision was made in order to stay with built in network policies
+  They stay safe, production ready, a bit more hard to maintain and to write, for sure, but still production ready and very relevant for our use case.

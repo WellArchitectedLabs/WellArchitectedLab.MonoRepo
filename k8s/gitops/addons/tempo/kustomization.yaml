@@ -6,4 +6,3 @@ metadata:
 resources:
   - application.yaml
   - servicemonitors.yaml
-  - prometheus-monitors/service-monitor.yaml

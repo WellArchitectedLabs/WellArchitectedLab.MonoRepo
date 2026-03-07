@@ -8,4 +8,3 @@ resources:
   - deamon.yaml
   - ingress.yaml
   - podmonitors.yaml
-  - prometheus-monitors/pod-monitor.yaml

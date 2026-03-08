@@ -1,0 +1,18 @@
+# allow-egress-internet.yaml
+# Allows all pods in this namespace to make outbound calls to external internet destinations.
+# Scoped to HTTPS (443) and HTTP (80) only — extend ports if your use case requires more.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-egress-internet
+  namespace: monitoring
+spec:
+  podSelector: {}
+  policyTypes:
+    - Egress
+  egress:
+    - ports:
+        - port: 443
+          protocol: TCP
+        - port: 80
+          protocol: TCP

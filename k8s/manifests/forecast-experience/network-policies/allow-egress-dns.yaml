@@ -1,0 +1,26 @@
+# Necessary for the pods to correctly communicate with CoreDNS component for service resolving.
+# Pods send UDP packets to kube-proxy and this for the configured dns service IP address in their local dns config
+# For now pods only point to a virtual DNS server IP address
+# kube-proxy DNATs the packets to the DNS server real address
+# DNS server resolves the A record for the requested address (svc.namespace.cluster.local in most cases) and returns the service IP ClusterIP address
+# Pods receive the response and can then communicate with the service using its ClusterIP
+# The future communication will pass by kube-proxy again which keeps a iptable updated with real pod ips associated to the virtual cluster IP.
+# Kube-proxy is ignorant of the load on the pods, so it cannot not take into account the number of active connections or the resource usage of each pod (istio destination rules are more effective in this field and can ensure this task).
+# Kube-proxy can be configured to use sticky sessions (session affinity: ClientIP) in order to forward traffic to the same client. Otherwise, the default mode is random.
+# HPA also helps preserving a healthy resource usage with watching the metrics and scaling the pods accordingly.
+# Please refer to the kubernetes networking training for more details.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-egress-dns
+  namespace: forecast-experience
+spec:
+  podSelector: {}
+  policyTypes:
+    - Egress
+  egress:
+    - ports:
+        - port: 53
+          protocol: UDP # used 99 per cent for DNS resolution process
+        - port: 53
+          protocol: TCP # Not very used for DNS resolution, but included for completeness

@@ -1,0 +1,11 @@
+# Default deny all ingress and egress in insights-collector
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny-all
+  namespace: insights-collector
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+    - Egress

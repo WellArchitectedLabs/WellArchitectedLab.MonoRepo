@@ -1,0 +1,11 @@
+# Default deny all ingress and egress in forecast-experience
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny-all
+  namespace: forecast-experience
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+    - Egress

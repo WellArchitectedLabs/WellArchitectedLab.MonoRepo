@@ -1,0 +1,18 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-ingress-internet
+  namespace: istio-gateway
+spec:
+  podSelector:
+    matchLabels:
+      # scope to gateway pods only — not every pod in the namespace
+      app: istio-ingressgateway
+  policyTypes:
+    - Ingress
+  ingress:
+    - ports:
+        - port: 80
+          protocol: TCP
+        - port: 443
+          protocol: TCP

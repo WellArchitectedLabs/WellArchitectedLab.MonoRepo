@@ -1,0 +1,15 @@
+# allow-egress-same-namespace.yaml
+# Allows all pods in this namespace to send traffic to other pods in the same namespace.
+# Required even for intra-namespace calls — default-deny blocks same-namespace traffic too.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-egress-same-namespace
+  namespace: master-data
+spec:
+  podSelector: {}
+  policyTypes:
+    - Egress
+  egress:
+    - to:
+        - podSelector: {}

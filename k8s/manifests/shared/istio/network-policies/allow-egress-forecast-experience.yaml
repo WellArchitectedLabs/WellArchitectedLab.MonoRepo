@@ -1,0 +1,19 @@
+# Allow egress to forecast-experience
+# Istio gateway forwards inbound public traffic to forecast-experience
+# VirtualService rules route matching requests to this namespace
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-egress-forecast-experience
+  namespace: istio-gateway
+spec:
+  podSelector:
+    matchLabels:
+      app: istio-ingressgateway
+  policyTypes:
+    - Egress
+  egress:
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: forecast-experience

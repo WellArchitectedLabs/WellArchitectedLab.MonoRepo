@@ -1,0 +1,15 @@
+# allow-ingress-same-namespace.yaml
+# Allows all pods in this namespace to receive traffic from other pods in the same namespace.
+# Required even for intra-namespace calls — default-deny blocks same-namespace traffic too.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-ingress-same-namespace
+  namespace: master-data-staging
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - podSelector: {}

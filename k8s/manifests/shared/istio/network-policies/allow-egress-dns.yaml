@@ -1,0 +1,17 @@
+# Allow egress DNS — required for all service name resolution
+# including internal FQDNs like forecast-experience-svc.forecast-experience.svc.cluster.local
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-egress-dns
+  namespace: istio-gateway
+spec:
+  podSelector: {}
+  policyTypes:
+    - Egress
+  egress:
+    - ports:
+        - port: 53
+          protocol: UDP
+        - port: 53
+          protocol: TCP

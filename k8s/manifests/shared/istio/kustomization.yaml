@@ -7,3 +7,4 @@ metadata:
 resources:
   - namespace.yaml
   - gateway.yaml
+  - network-policies

@@ -1,0 +1,21 @@
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: master-data-lb
+  namespace: master-data
+spec:
+  host: master-data-svc
+  trafficPolicy:
+    loadBalancer:
+      simple: LEAST_REQUEST  # sends to pod with fewest active requests
+                             # other options:
+                             # ROUND_ROBIN
+                             # RANDOM
+                             # PASSTHROUGH (no LB, connect directly)
+    outlierDetection:
+      # automatically ejects pods that are returning errors
+      consecutive5xxErrors: 5
+      interval: 30s
+      baseEjectionTime: 30s
+      # never eject more than 50% of pods simultaneously
+      maxEjectionPercent: 50

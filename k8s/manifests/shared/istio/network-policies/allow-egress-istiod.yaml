@@ -1,0 +1,25 @@
+# Allow egress to istiod (istio control plane)
+# The gateway must reach istiod to receive xDS configuration updates
+# (VirtualService, DestinationRule, certificate rotation, etc.)
+# Without this the gateway cannot update its routing rules
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-egress-istiod
+  namespace: istio-gateway
+spec:
+  podSelector:
+    matchLabels:
+      app: istio-ingressgateway
+  policyTypes:
+    - Egress
+  egress:
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: istio-system
+      ports:
+        - port: 15012
+          protocol: TCP
+        - port: 15014
+          protocol: TCP

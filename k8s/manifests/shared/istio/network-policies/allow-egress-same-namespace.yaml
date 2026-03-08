@@ -1,0 +1,17 @@
+# Allow egress to same namespace
+# Istio gateway pods communicate with each other internally
+# (leader election, health checks, coordination between replicas)
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-egress-same-namespace
+  namespace: istio-gateway
+spec:
+  podSelector: {}
+  policyTypes:
+    - Egress
+  egress:
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: istio-gateway

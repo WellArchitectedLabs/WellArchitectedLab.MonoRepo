@@ -1,0 +1,11 @@
+# Default deny all ingress and egress in master-data
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny-all
+  namespace: master-data
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+    - Egress

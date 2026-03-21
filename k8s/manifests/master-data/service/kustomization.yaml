@@ -8,3 +8,4 @@ resources:
   - high-availability/hpa.yaml
   - high-availability/pdb.yaml
   - network-policies
+  - istio

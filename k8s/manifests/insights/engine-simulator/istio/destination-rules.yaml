@@ -1,0 +1,11 @@
+
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: default
+  namespace: insights-engine-sim        # change per namespace
+spec:
+  host: "*.insights-engine-sim.svc.cluster.local"   # scoped to this namespace's services
+  trafficPolicy:
+    tls:
+      mode: ISTIO_MUTUAL

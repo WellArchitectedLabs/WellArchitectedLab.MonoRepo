@@ -1,0 +1,25 @@
+# Allow plaintext connections TO the postgres workload
+# This is necessary because postgres is not mTLS-enabled and this for issues with the postgres health check startups
+apiVersion: security.istio.io/v1beta1
+kind: PeerAuthentication
+metadata:
+  name: postgres-permissive
+  namespace: insights-collector
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: postgresql   # Bitnami chart label
+  mtls:
+    mode: DISABLE
+---
+# Tell the collector's sidecar NOT to use mTLS toward postgres
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: postgres-disable-mtls
+  namespace: insights-collector
+spec:
+  host: "insights-collector-database-postgresql.insights-collector.svc.cluster.local"
+  trafficPolicy:
+    tls:
+      mode: DISABLE

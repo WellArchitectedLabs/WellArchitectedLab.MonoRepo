@@ -4,3 +4,4 @@ kind: Kustomization
 resources:
   - peer-authentication.yaml
   - destination-rules.yaml
+  - exception_allow-postgres.yaml

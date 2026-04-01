@@ -23,6 +23,8 @@ public class WeatherForecastService(
                 DateTime.Now.AddDays(-1)), new TimeOnly(23, 59, 59));
         var limitHistoryDate = new List<DateTime>() {to, yesterdaysLastSecond}.Min();
         
+        var storage = "DefaultEndpointsProtocol=https;AccountName=testaccount;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDvEXAMPLEKEY1234567890=;EndpointSuffix=core.windows.net";
+        
         // get actuals
         var weatherActuals = await masterDataAdapter.GetActuals(
             cityId, from, limitHistoryDate, cancellationToken);
